@@ -1,15 +1,17 @@
 package com.govorun.lite.service
 
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
 import android.inputmethodservice.InputMethodService
 import android.view.View
 import android.view.WindowInsets
 import android.view.inputmethod.EditorInfo
-import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.color.DynamicColors
 import com.govorun.lite.R
 import com.govorun.lite.model.GigaAmModel
 import com.govorun.lite.stats.StatsStore
@@ -20,101 +22,108 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 
-/**
- * Voice-first auxiliary IME. It also provides the editing controls normally
- * available on a keyboard, so users can correct or remove the last dictation
- * without switching back to their regular keyboard.
- */
+/** Voice-first auxiliary IME with dictation and lightweight editing controls. */
 class GovorunInputMethodService : InputMethodService() {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
     private var recorder: VadRecorder? = null
     private var recording = false
 
-    private lateinit var recordButton: Button
+    private lateinit var recordButton: MaterialButton
     private lateinit var hint: TextView
-    private lateinit var removeSessionButton: Button
-
-    // Exact text committed during the current recognition session. It is reset
-    // when the user presses "Начать диктовку". This lets removeSessionText()
-    // safely remove only that session, provided the cursor is still at its end.
+    private lateinit var themedContext: Context
     private val sessionText = StringBuilder()
 
     override fun onCreateInputView(): View {
-        val root = LinearLayout(this).apply {
+        // InputMethodService does not inherit the Activity theme. Wrapping the
+        // context is required for MaterialButton's theme enforcement and also
+        // lets Material resolve the device's Monet/dynamic colors.
+        themedContext = DynamicColors.wrapContextIfAvailable(this)
+        val root = LinearLayout(themedContext).apply {
             orientation = LinearLayout.VERTICAL
-            setPadding(dp(24), dp(16), dp(24), dp(16))
+            setPadding(dp(24), dp(8), dp(24), dp(16))
         }
-        hint = TextView(this).apply {
+
+        val topRow = LinearLayout(themedContext).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = android.view.Gravity.START
+        }
+        val exitButton = makeIconButton(
+            R.drawable.ic_arrow_back_24,
+            R.string.ime_exit,
+        ) { exitToPreviousInputMethod() }
+        topRow.addView(exitButton, LinearLayout.LayoutParams(dp(56), dp(48)))
+        root.addView(topRow, LinearLayout.LayoutParams(-1, -2))
+
+        hint = TextView(themedContext).apply {
             text = getString(R.string.ime_hint)
+            textSize = 18f
             setPadding(0, 0, 0, dp(8))
         }
-        recordButton = Button(this).apply {
-            text = getString(R.string.ime_start)
-            setOnClickListener { if (recording) stopRecording() else startRecording() }
-        }
         root.addView(hint, LinearLayout.LayoutParams(-1, -2))
-        root.addView(recordButton, LinearLayout.LayoutParams(-1, -2))
 
-        val editRow = LinearLayout(this).apply {
+        // Fixed order: clear, whole-word backspace, start/stop, character
+        // backspace, newline.
+        val controls = LinearLayout(themedContext).apply {
             orientation = LinearLayout.HORIZONTAL
             weightSum = 5f
         }
-        val backspace = makeControlButton(R.string.ime_backspace, "⌫") {
-            deletePreviousCodePoint()
-        }
-        val wordBackspace = makeControlButton(R.string.ime_backspace_word, "⌫ слово") {
+        controls.addView(makeIconButton(R.drawable.ic_clear_all_24, R.string.ime_remove_session) {
+            removeSessionText()
+        }, weightedButtonParams())
+        controls.addView(makeIconButton(R.drawable.ic_backspace_word_24, R.string.ime_backspace_word) {
             deletePreviousWord()
+        }, weightedButtonParams())
+        recordButton = makeIconButton(R.drawable.ic_mic_24, R.string.ime_start) {
+            if (recording) stopRecording() else startRecording()
         }
-        val newline = makeControlButton(R.string.ime_newline, "↵") {
+        controls.addView(recordButton, weightedButtonParams())
+        controls.addView(makeIconButton(R.drawable.ic_backspace_24, R.string.ime_backspace) {
+            deletePreviousCodePoint()
+        }, weightedButtonParams())
+        controls.addView(makeIconButton(R.drawable.ic_keyboard_return_24, R.string.ime_newline) {
             commitInserted("\n")
-        }
-        removeSessionButton = makeControlButton(
-            R.string.ime_remove_session,
-            "Очистить",
-        ) { removeSessionText() }
-        val exit = makeControlButton(R.string.ime_exit, "Клавиатура") {
-            exitToPreviousInputMethod()
-        }
-        listOf(backspace, wordBackspace, newline, removeSessionButton, exit).forEach {
-            editRow.addView(it, LinearLayout.LayoutParams(0, dp(52), 1f))
-        }
-        root.addView(editRow, LinearLayout.LayoutParams(-1, -2))
+        }, weightedButtonParams())
+        root.addView(controls, LinearLayout.LayoutParams(-1, dp(56)))
 
-        // The IME window shares the bottom edge with Android's gesture/navigation
-        // area. Android also places the hide-IME and keyboard-switcher controls
-        // there. Reserve a deliberately generous area so the complete pressable
-        // area of those system controls stays below our content, rather than
-        // sitting on top of the editing buttons.
+        // Keep the entire system hide/switcher touch target below our content.
+        // Android 17 can place those controls over the bottom of an IME view.
         root.setOnApplyWindowInsetsListener { view, insets ->
-            val navigationBottom = insets.getInsets(WindowInsets.Type.navigationBars()).bottom
-            val imeBottom = insets.getInsets(WindowInsets.Type.ime()).bottom
-            val bottom = maxOf(navigationBottom, imeBottom)
-            view.setPadding(
-                view.paddingLeft,
-                view.paddingTop,
-                view.paddingRight,
-                dp(72) + bottom,
-            )
+            val nav = insets.getInsets(WindowInsets.Type.navigationBars()).bottom
+            val ime = insets.getInsets(WindowInsets.Type.ime()).bottom
+            view.setPadding(view.paddingLeft, view.paddingTop, view.paddingRight, dp(88) + maxOf(nav, ime))
             insets
         }
         root.requestApplyInsets()
         return root
     }
 
-    private fun makeControlButton(labelRes: Int, fallbackText: String, action: () -> Unit): Button =
-        Button(this).apply {
-            contentDescription = getString(labelRes)
-            text = fallbackText
+    private fun makeIconButton(iconRes: Int, descriptionRes: Int, action: () -> Unit): MaterialButton =
+        MaterialButton(themedContext).apply {
+            contentDescription = getString(descriptionRes)
+            icon = ContextCompat.getDrawable(themedContext, iconRes)
+            iconGravity = MaterialButton.ICON_GRAVITY_TEXT
+            iconPadding = 0
+            text = ""
             minWidth = 0
             minHeight = 0
-            setPadding(dp(2), 0, dp(2), 0)
+            insetTop = 4
+            insetBottom = 4
+            setPadding(0, 0, 0, 0)
             setOnClickListener { action() }
         }
+
+    private fun weightedButtonParams() = LinearLayout.LayoutParams(0, dp(56), 1f)
 
     override fun onStartInputView(info: EditorInfo?, restarting: Boolean) {
         super.onStartInputView(info, restarting)
         if (::recordButton.isInitialized) {
-            recordButton.text = getString(if (recording) R.string.ime_stop else R.string.ime_start)
+            recordButton.icon = ContextCompat.getDrawable(
+                themedContext,
+                if (recording) R.drawable.ic_stop_24 else R.drawable.ic_mic_24,
+            )
+            recordButton.contentDescription = getString(
+                if (recording) R.string.ime_stop else R.string.ime_start,
+            )
         }
     }
 
@@ -128,10 +137,9 @@ class GovorunInputMethodService : InputMethodService() {
             hint.text = getString(R.string.ime_model_not_ready)
             return
         }
-        // A new tap starts a new removable session.
         sessionText.clear()
         recording = true
-        recordButton.text = getString(R.string.ime_stop)
+        updateRecordButton()
         hint.text = getString(R.string.ime_listening)
         val currentRecorder = VadRecorder(this)
         recorder = currentRecorder
@@ -147,7 +155,7 @@ class GovorunInputMethodService : InputMethodService() {
             onDone = {
                 recording = false
                 recorder = null
-                recordButton.text = getString(R.string.ime_start)
+                updateRecordButton()
                 hint.text = getString(R.string.ime_hint)
             },
             useVad = true,
@@ -160,7 +168,17 @@ class GovorunInputMethodService : InputMethodService() {
         recorder?.stop()
     }
 
-    /** Commits text and remembers exactly what was inserted for session undo. */
+    private fun updateRecordButton() {
+        if (!::recordButton.isInitialized) return
+        recordButton.icon = ContextCompat.getDrawable(
+            themedContext,
+            if (recording) R.drawable.ic_stop_24 else R.drawable.ic_mic_24,
+        )
+        recordButton.contentDescription = getString(
+            if (recording) R.string.ime_stop else R.string.ime_start,
+        )
+    }
+
     private fun commitInserted(text: String) {
         if (text.isEmpty()) return
         currentInputConnection?.commitText(text, 1)
@@ -174,11 +192,7 @@ class GovorunInputMethodService : InputMethodService() {
         }
     }
 
-    /**
-     * Deletes the preceding whitespace-delimited token. Punctuation is not
-     * stripped separately: it remains part of the token, so "слово," is
-     * removed as one unit, including the comma.
-     */
+    /** Attached punctuation stays part of the preceding word/token. */
     private fun deletePreviousWord() {
         val connection = currentInputConnection ?: return
         val before = connection.getTextBeforeCursor(512, 0)?.toString() ?: return
@@ -188,8 +202,8 @@ class GovorunInputMethodService : InputMethodService() {
         var start = end
         while (start > 0 && !before[start - 1].isWhitespace()) start--
         if (start == end) return
-        val codePoints = before.substring(start, before.length).codePointCount(0, before.length - start)
-        connection.deleteSurroundingTextInCodePoints(codePoints, 0)
+        val token = before.substring(start)
+        connection.deleteSurroundingTextInCodePoints(token.codePointCount(0, token.length), 0)
     }
 
     private fun removeSessionText() {
@@ -197,8 +211,6 @@ class GovorunInputMethodService : InputMethodService() {
         val text = sessionText.toString()
         if (text.isEmpty()) return
         val before = connection.getTextBeforeCursor(text.length + 8, 0)?.toString() ?: return
-        // Do not delete unrelated text if the user moved the cursor or edited
-        // the field after dictation. Verify the exact session suffix first.
         if (!before.endsWith(text)) return
         connection.deleteSurroundingTextInCodePoints(text.codePointCount(0, text.length), 0)
         sessionText.clear()
@@ -206,12 +218,7 @@ class GovorunInputMethodService : InputMethodService() {
 
     private fun exitToPreviousInputMethod() {
         stopRecording()
-        // Auxiliary voice subtypes are intended to return to the IME that was
-        // active before them. This is the same framework path used by the
-        // standard Android voice keyboard.
-        if (!switchToPreviousInputMethod()) {
-            requestHideSelf(0)
-        }
+        if (!switchToPreviousInputMethod()) requestHideSelf(0)
     }
 
     override fun onFinishInput() {
@@ -225,6 +232,5 @@ class GovorunInputMethodService : InputMethodService() {
         super.onDestroy()
     }
 
-    private fun dp(value: Int): Int =
-        (value * resources.displayMetrics.density).toInt()
+    private fun dp(value: Int): Int = (value * resources.displayMetrics.density).toInt()
 }

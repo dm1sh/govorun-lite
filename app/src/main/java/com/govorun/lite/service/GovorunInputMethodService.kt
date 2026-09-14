@@ -5,9 +5,13 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.graphics.Color
+import android.os.Handler
+import android.os.Looper
 import android.view.ContextThemeWrapper
 import android.inputmethodservice.InputMethodService
+import android.view.MotionEvent
 import android.view.View
+import android.view.ViewConfiguration
 import android.view.WindowInsets
 import android.view.inputmethod.EditorInfo
 import android.widget.LinearLayout
@@ -19,6 +23,7 @@ import com.govorun.lite.R
 import com.govorun.lite.model.GigaAmModel
 import com.govorun.lite.stats.StatsStore
 import com.govorun.lite.transcriber.OfflineTranscriber
+import com.govorun.lite.util.Prefs
 import com.govorun.lite.transcriber.VadRecorder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -30,6 +35,13 @@ class GovorunInputMethodService : InputMethodService() {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
     private var recorder: VadRecorder? = null
     private var recording = false
+    private val touchHandler = Handler(Looper.getMainLooper())
+    private var walkieLongPressTriggered = false
+    private var walkieLocked = false
+    private var walkieDownRawY = 0f
+    private val walkieStartRunnable = Runnable {
+        if (!recording && walkieLongPressTriggered) startRecording()
+    }
 
     private lateinit var recordButton: MaterialButton
     private lateinit var themedContext: Context
@@ -79,6 +91,7 @@ class GovorunInputMethodService : InputMethodService() {
             deletePreviousWord()
         }, weightedButtonParams())
         recordButton = makeRecordButton()
+        configureRecordTouch()
         controls.addView(recordButton, recordButtonParams())
         controls.addView(makeIconButton(R.drawable.ic_backspace_24, R.string.ime_backspace) {
             deletePreviousCodePoint()
@@ -143,6 +156,51 @@ class GovorunInputMethodService : InputMethodService() {
             insetBottom = dp(4)
         }
 
+    private fun configureRecordTouch() {
+        recordButton.setOnTouchListener { _, event ->
+            if (!Prefs.isImeWalkieTalkieEnabled(this)) return@setOnTouchListener false
+            when (event.actionMasked) {
+                MotionEvent.ACTION_DOWN -> {
+                    walkieLongPressTriggered = !recording
+                    walkieLocked = false
+                    walkieDownRawY = event.rawY
+                    if (walkieLongPressTriggered) {
+                        touchHandler.postDelayed(
+                            walkieStartRunnable,
+                            ViewConfiguration.getLongPressTimeout().toLong(),
+                        )
+                    }
+                    recordButton.isPressed = true
+                    true
+                }
+                MotionEvent.ACTION_MOVE -> {
+                    if (walkieLongPressTriggered && !walkieLocked &&
+                        walkieDownRawY - event.rawY >= dp(48)
+                    ) {
+                        // Slide upward to lock recording after release.
+                        walkieLocked = true
+                        recordButton.isPressed = false
+                    }
+                    true
+                }
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    touchHandler.removeCallbacks(walkieStartRunnable)
+                    recordButton.isPressed = false
+                    if (walkieLongPressTriggered) {
+                        if (!walkieLocked && recording) stopRecording()
+                    } else if (recording) {
+                        // A tap always stops an active recording, including an
+                        // automatically started or previously locked session.
+                        stopRecording()
+                    }
+                    walkieLongPressTriggered = false
+                    true
+                }
+                else -> true
+            }
+        }
+    }
+
     private fun weightedButtonParams() = LinearLayout.LayoutParams(0, dp(56), 1f).apply {
         marginStart = dp(4)
         marginEnd = dp(4)
@@ -176,7 +234,12 @@ class GovorunInputMethodService : InputMethodService() {
     override fun onStartInputView(info: EditorInfo?, restarting: Boolean) {
         super.onStartInputView(info, restarting)
         currentEditorInfo = info
-        if (::recordButton.isInitialized) updateRecordButton()
+        if (::recordButton.isInitialized) {
+            updateRecordButton()
+            if (Prefs.isImeAutoStartEnabled(this) && !recording) {
+                recordButton.post { if (!recording) startRecording() }
+            }
+        }
     }
 
     private fun startRecording() {

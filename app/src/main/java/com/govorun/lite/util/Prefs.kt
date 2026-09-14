@@ -25,6 +25,8 @@ object Prefs {
     private const val KEY_PAUSE_LENGTH = "pause_length"
     private const val KEY_KEEP_SCREEN_ON = "keep_screen_on"
     private const val KEY_AUTO_STOP_MINUTES = "auto_stop_minutes"
+    private const val KEY_IME_AUTO_START = "ime_auto_start"
+    private const val KEY_IME_WALKIE_TALKIE = "ime_walkie_talkie"
     // One-shot flag: marks that we've already run the 1.0.8 migration that
     // bumps existing users from Short → Medium. Without this we'd reset
     // the pref on every cold start, which would override the user's
@@ -384,6 +386,24 @@ object Prefs {
             .edit()
             .putBoolean(KEY_VOICE_SUFFIX_ENABLED, enabled)
             .apply()
+    }
+
+    fun isImeAutoStartEnabled(context: Context): Boolean =
+        context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE)
+            .getBoolean(KEY_IME_AUTO_START, true)
+
+    fun setImeAutoStartEnabled(context: Context, enabled: Boolean) {
+        context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE)
+            .edit().putBoolean(KEY_IME_AUTO_START, enabled).apply()
+    }
+
+    fun isImeWalkieTalkieEnabled(context: Context): Boolean =
+        context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE)
+            .getBoolean(KEY_IME_WALKIE_TALKIE, false)
+
+    fun setImeWalkieTalkieEnabled(context: Context, enabled: Boolean) {
+        context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE)
+            .edit().putBoolean(KEY_IME_WALKIE_TALKIE, enabled).apply()
     }
 
     // App filter — controls in which apps the bubble appears.

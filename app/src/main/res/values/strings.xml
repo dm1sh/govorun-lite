@@ -20,6 +20,10 @@
     <string name="ime_processing">Распознаю…</string>
     <string name="ime_mic_permission">Разрешите доступ к микрофону в настройках приложения</string>
     <string name="ime_model_not_ready">Модель ещё устанавливается. Попробуйте через минуту.</string>
+    <string name="settings_ime_auto_start_title">Автозапуск диктовки</string>
+    <string name="settings_ime_auto_start_body">Начинать распознавание сразу после открытия голосовой клавиатуры.</string>
+    <string name="settings_ime_walkie_title">Режим рации</string>
+    <string name="settings_ime_walkie_body">Удерживайте микрофон для диктовки. Проведите вверх, чтобы зафиксировать запись; отпустите для остановки.</string>
     <string name="voice_recognition_listening">Говорите…</string>
     <string name="voice_recognition_processing">Распознаю…</string>
     <string name="voice_recognition_stop">Остановить и вставить</string>
@@ -121,6 +125,9 @@
     <string name="main_card_service_title">Включите Говоруна</string>
     <string name="main_card_service_body">Птичка не появится в других программах, пока вы не включили «Говорун — голосовой ввод» в специальных возможностях.</string>
     <string name="main_card_service_button">Разрешить специальные возможности</string>
+    <string name="main_card_keyboard_title">Включите голосовую клавиатуру</string>
+    <string name="main_card_keyboard_body">Можно использовать Говорун без специальных возможностей — включите «Говорун — голосовой ввод» в настройках клавиатур и запускайте диктовку кнопкой микрофона.</string>
+    <string name="main_card_keyboard_button">Открыть настройки клавиатур</string>
     <string name="main_card_battery_title">Разрешите работу в фоне</string>
     <string name="main_card_battery_body">Без этого Android со временем может выгрузить Говоруна, и птичка перестанет появляться — пока вы заново не откроете приложение.</string>
     <string name="main_card_battery_button">Разрешить</string>

@@ -13,6 +13,7 @@ import android.os.Looper
 import android.os.PowerManager
 import android.provider.Settings
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -53,6 +54,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var cardMicButton: MaterialButton
     private lateinit var cardServiceMissing: MaterialCardView
     private lateinit var cardServiceButton: MaterialButton
+    private lateinit var cardKeyboardMissing: MaterialCardView
+    private lateinit var cardKeyboardButton: MaterialButton
     private lateinit var cardBatteryMissing: MaterialCardView
     private lateinit var cardBatteryButton: MaterialButton
     private lateinit var cardWhatsNew: MaterialCardView
@@ -123,6 +126,12 @@ class MainActivity : AppCompatActivity() {
         cardServiceButton = findViewById(R.id.cardServiceButton)
         cardServiceButton.setOnClickListener {
             AccessibilityHelper.openAccessibilitySettings(this)
+        }
+
+        cardKeyboardMissing = findViewById(R.id.cardKeyboardMissing)
+        cardKeyboardButton = findViewById(R.id.cardKeyboardButton)
+        cardKeyboardButton.setOnClickListener {
+            try { startActivity(Intent(Settings.ACTION_INPUT_METHOD_SETTINGS)) } catch (_: Exception) { }
         }
 
         cardBatteryMissing = findViewById(R.id.cardBatteryMissing)
@@ -266,6 +275,7 @@ class MainActivity : AppCompatActivity() {
             this, Manifest.permission.RECORD_AUDIO
         ) == PackageManager.PERMISSION_GRANTED
         val serviceOk = AccessibilityHelper.isLiteServiceEnabled(this)
+        val keyboardOk = isVoiceKeyboardEnabled()
         val batteryOk = run {
             val pm = getSystemService(Context.POWER_SERVICE) as? PowerManager
             pm?.isIgnoringBatteryOptimizations(packageName) == true
@@ -278,7 +288,9 @@ class MainActivity : AppCompatActivity() {
         // turns it off). Battery is recommended, not critical: many users on
         // stock Android with light use never hit the kill, and we shouldn't
         // hold the whole main screen hostage over an optional optimisation.
-        val criticalOk = micOk && serviceOk && !shortcutOn
+        // Either input mode is sufficient. The accessibility shortcut only
+        // matters when accessibility is the selected mode.
+        val criticalOk = micOk && (keyboardOk || (serviceOk && !shortcutOn))
 
         // Only surface the shortcut card when the service is on — otherwise
         // the user is still in "enable me first" mode and the extra advisory
@@ -301,7 +313,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         cardMicMissing.visibility = if (micOk) View.GONE else View.VISIBLE
-        cardServiceMissing.visibility = if (serviceOk) View.GONE else View.VISIBLE
+        cardServiceMissing.visibility = if (serviceOk || keyboardOk) View.GONE else View.VISIBLE
+        cardKeyboardMissing.visibility = if (keyboardOk || serviceOk) View.GONE else View.VISIBLE
         // Battery card is independent of criticalOk — it co-exists with stats
         // and promo as a soft "recommended" hint, not a setup blocker.
         cardBatteryMissing.visibility = if (batteryOk) View.GONE else View.VISIBLE
@@ -316,6 +329,12 @@ class MainActivity : AppCompatActivity() {
         // and nice-to-have surfaces. Battery being unset doesn't qualify.
         statsCard.visibility = if (criticalOk) View.VISIBLE else View.GONE
         promoCard.visibility = if (criticalOk) View.VISIBLE else View.GONE
+    }
+
+    private fun isVoiceKeyboardEnabled(): Boolean {
+        val imm = getSystemService(InputMethodManager::class.java) ?: return false
+        val id = "$packageName/${com.govorun.lite.service.GovorunInputMethodService::class.java.name}"
+        return imm.enabledInputMethodList.any { it.id == id }
     }
 
     private fun openAppDetails() {

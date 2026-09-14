@@ -158,6 +158,22 @@ class SettingsActivity : AppCompatActivity() {
         }
         voiceSuffixRow.setOnClickListener { voiceSuffixSwitch.toggle() }
 
+        val imeAutoStartSwitch = findViewById<MaterialSwitch>(R.id.imeAutoStartSwitch)
+        val imeAutoStartRow = findViewById<View>(R.id.imeAutoStartRow)
+        imeAutoStartSwitch.isChecked = Prefs.isImeAutoStartEnabled(this)
+        imeAutoStartSwitch.setOnCheckedChangeListener { _, checked ->
+            Prefs.setImeAutoStartEnabled(this, checked)
+        }
+        imeAutoStartRow.setOnClickListener { imeAutoStartSwitch.toggle() }
+
+        val imeWalkieSwitch = findViewById<MaterialSwitch>(R.id.imeWalkieSwitch)
+        val imeWalkieRow = findViewById<View>(R.id.imeWalkieRow)
+        imeWalkieSwitch.isChecked = Prefs.isImeWalkieTalkieEnabled(this)
+        imeWalkieSwitch.setOnCheckedChangeListener { _, checked ->
+            Prefs.setImeWalkieTalkieEnabled(this, checked)
+        }
+        imeWalkieRow.setOnClickListener { imeWalkieSwitch.toggle() }
+
         val keepScreenSwitch = findViewById<MaterialSwitch>(R.id.keepScreenSwitch)
         val keepScreenRow = findViewById<View>(R.id.keepScreenRow)
         val keepScreenBody = findViewById<MaterialTextView>(R.id.keepScreenBody)
@@ -278,12 +294,16 @@ class SettingsActivity : AppCompatActivity() {
             Prefs.setPauseLength(this, Prefs.PAUSE_DEFAULT)
             Prefs.setKeepScreenOnEnabled(this, false)
             Prefs.setAutoStopMinutes(this, Prefs.AUTO_STOP_DEFAULT)
+            Prefs.setImeAutoStartEnabled(this, true)
+            Prefs.setImeWalkieTalkieEnabled(this, false)
 
             sizeSlider.value = Prefs.BUBBLE_SIZE_DEFAULT
             transparencySlider.value = Prefs.BUBBLE_ALPHA_DEFAULT
             edgeMarginSlider.value = Prefs.BUBBLE_EDGE_MARGIN_DEFAULT.toFloat()
             hapticsSwitch.isChecked = false
             hideInSearchSwitch.isChecked = false
+            imeAutoStartSwitch.isChecked = true
+            imeWalkieSwitch.isChecked = false
             sideGroup.check(R.id.sideRight)
             pauseGroup.check(R.id.pauseShort)
             pauseHint.setText(hintForPause(Prefs.PAUSE_DEFAULT))

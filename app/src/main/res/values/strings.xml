@@ -15,6 +15,9 @@
     <string name="ime_processing">Распознаю…</string>
     <string name="ime_mic_permission">Разрешите доступ к микрофону в настройках приложения</string>
     <string name="ime_model_not_ready">Модель ещё устанавливается. Попробуйте через минуту.</string>
+    <string name="voice_recognition_listening">Говорите…</string>
+    <string name="voice_recognition_processing">Распознаю…</string>
+    <string name="voice_recognition_stop">Остановить и вставить</string>
 
     <!-- Notifications -->
     <string name="notif_channel_overlay">Говорун</string>

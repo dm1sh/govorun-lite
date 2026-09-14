@@ -53,6 +53,18 @@
             tools:ignore="LockedOrientationActivity" />
 
         <activity
+            android:name=".ui.VoiceRecognitionActivity"
+            android:exported="true"
+            android:excludeFromRecents="true"
+            android:theme="@style/Theme.GovorunLite">
+            <intent-filter>
+                <action android:name="android.speech.action.RECOGNIZE_SPEECH" />
+                <action android:name="android.speech.action.WEB_SEARCH" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity
             android:name=".ui.ShareTranscriptionActivity"
             android:exported="true"
             android:screenOrientation="portrait"
@@ -81,7 +93,7 @@
 
         <activity
             android:name=".ui.SettingsActivity"
-            android:exported="false"
+            android:exported="true"
             android:parentActivityName=".ui.MainActivity"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity" />
@@ -119,10 +131,14 @@
             android:name=".service.GovorunRecognitionService"
             android:exported="true"
             android:label="@string/ime_label"
-            android:permission="android.permission.BIND_SPEECH_RECOGNITION_SERVICE">
+            android:permission="android.permission.RECORD_AUDIO">
             <intent-filter>
                 <action android:name="android.speech.RecognitionService" />
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
+            <meta-data
+                android:name="android.speech"
+                android:resource="@xml/recognition_service_metadata" />
         </service>
 
         <service

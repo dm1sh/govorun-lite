@@ -6,6 +6,16 @@
     <string name="accessibility_service_label">Говорун — голосовой ввод</string>
     <string name="accessibility_description">Показывает плавающего Говоруна и вставляет распознанный текст в поле ввода. Работает без интернета. Звук не отправляется никуда.</string>
 
+    <!-- System voice-input keyboard -->
+    <string name="ime_label">Говорун — голосовой ввод</string>
+    <string name="ime_hint">Нажмите кнопку и говорите</string>
+    <string name="ime_start">Начать диктовку</string>
+    <string name="ime_stop">Остановить</string>
+    <string name="ime_listening">Слушаю…</string>
+    <string name="ime_processing">Распознаю…</string>
+    <string name="ime_mic_permission">Разрешите доступ к микрофону в настройках приложения</string>
+    <string name="ime_model_not_ready">Модель ещё устанавливается. Попробуйте через минуту.</string>
+
     <!-- Notifications -->
     <string name="notif_channel_overlay">Говорун</string>
     <string name="notif_overlay_title">Говорун</string>

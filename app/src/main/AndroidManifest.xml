@@ -111,6 +111,29 @@
             tools:ignore="LockedOrientationActivity" />
 
         <service
+            android:name=".service.GovorunRecognitionService"
+            android:exported="true"
+            android:label="@string/ime_label"
+            android:permission="android.permission.BIND_SPEECH_RECOGNITION_SERVICE">
+            <intent-filter>
+                <action android:name="android.speech.RecognitionService" />
+            </intent-filter>
+        </service>
+
+        <service
+            android:name=".service.GovorunInputMethodService"
+            android:exported="true"
+            android:label="@string/ime_label"
+            android:permission="android.permission.BIND_INPUT_METHOD">
+            <intent-filter>
+                <action android:name="android.view.InputMethod" />
+            </intent-filter>
+            <meta-data
+                android:name="android.view.im"
+                android:resource="@xml/ime_method" />
+        </service>
+
+        <service
             android:name=".service.LiteAccessibilityService"
             android:exported="true"
             android:label="@string/accessibility_service_label"

@@ -251,7 +251,7 @@ class GovorunInputMethodService : InputMethodService() {
                     // Continuous whole-word movement is deliberately slower
                     // than normal finger movement so a word is not skipped
                     // before the user can reverse direction.
-                    touchHandler.postDelayed(this, if (wholeWord) 300L else 100L)
+                    touchHandler.postDelayed(this, if (wholeWord) 450L else 220L)
                 }
             }
         }
@@ -440,9 +440,17 @@ class GovorunInputMethodService : InputMethodService() {
         currentInputConnection?.getExtractedText(ExtractedTextRequest(), 0)?.text?.length ?: 0
 
     private fun setSelection(anchor: Int, target: Int) {
+        val connection = currentInputConnection ?: return
         val start = minOf(anchor, target)
         val end = maxOf(anchor, target)
-        currentInputConnection?.setSelection(start, end)
+        connection.setSelection(start, end)
+        // Well-behaved multiline editors normally scroll the active selection
+        // into view after setSelection(). Requesting cursor updates also gives
+        // editors that support CursorAnchorInfo a chance to reposition their
+        // viewport while the endpoint is being advanced continuously.
+        connection.requestCursorUpdates(
+            android.view.inputmethod.InputConnection.CURSOR_UPDATE_IMMEDIATE,
+        )
     }
 
     private fun configureRecordTouch() {

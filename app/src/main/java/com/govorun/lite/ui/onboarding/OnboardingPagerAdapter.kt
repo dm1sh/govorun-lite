@@ -14,6 +14,7 @@ class OnboardingPagerAdapter(activity: FragmentActivity) : FragmentStateAdapter(
         OnboardingStep.WELCOME -> WelcomeFragment()
         OnboardingStep.TRY_IT -> TryItFragment()
         OnboardingStep.ACCESSIBILITY -> AccessibilityFragment()
+        OnboardingStep.KEYBOARD -> KeyboardFragment()
         OnboardingStep.BATTERY -> BatteryFragment()
     }
 

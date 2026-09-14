@@ -23,7 +23,9 @@ class AccessibilityFragment : OnboardingStepFragment() {
     private lateinit var topIcon: ImageView
     private lateinit var statusText: MaterialTextView
     private lateinit var openButton: MaterialButton
+    private lateinit var skipButton: MaterialButton
     private lateinit var checklist: View
+    private var skipped = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -36,10 +38,15 @@ class AccessibilityFragment : OnboardingStepFragment() {
         topIcon = view.findViewById(R.id.accIcon)
         statusText = view.findViewById(R.id.accStatus)
         openButton = view.findViewById(R.id.accOpen)
+        skipButton = view.findViewById(R.id.accSkip)
         checklist = view.findViewById(R.id.accChecklist)
 
         openButton.setOnClickListener {
             AccessibilityHelper.openAccessibilitySettings(requireContext())
+        }
+        skipButton.setOnClickListener {
+            skipped = true
+            setStepComplete(true)
         }
     }
 
@@ -64,12 +71,12 @@ class AccessibilityFragment : OnboardingStepFragment() {
             statusText.setText(R.string.onb_accessibility_body_enabled)
             openButton.visibility = View.GONE
             checklist.visibility = View.GONE
-            setStepComplete(true)
         } else {
             statusText.setText(R.string.onb_accessibility_body_pending)
             openButton.visibility = View.VISIBLE
             checklist.visibility = View.VISIBLE
-            setStepComplete(false)
         }
+        skipButton.visibility = if (serviceOn || skipped) View.GONE else View.VISIBLE
+        setStepComplete(serviceOn || skipped)
     }
 }

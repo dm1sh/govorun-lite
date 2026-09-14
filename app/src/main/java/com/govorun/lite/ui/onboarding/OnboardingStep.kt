@@ -9,5 +9,6 @@ enum class OnboardingStep {
     WELCOME,
     TRY_IT,
     ACCESSIBILITY,
+    KEYBOARD,
     BATTERY
 }

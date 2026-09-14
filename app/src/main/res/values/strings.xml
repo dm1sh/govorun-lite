@@ -46,6 +46,13 @@
     <string name="onb_accessibility_body_pending">Без них Говорун не сможет вставлять текст в другие программы.</string>
     <string name="onb_accessibility_body_enabled">Готово — Говорун может работать в других программах</string>
     <string name="onb_accessibility_open">Разрешить специальные возможности</string>
+    <string name="onb_skip">Пропустить</string>
+
+    <!-- Onboarding: optional voice keyboard -->
+    <string name="onb_keyboard_title">Голосовая клавиатура</string>
+    <string name="onb_keyboard_pending">Включите «Говорун — голосовой ввод» в настройках экранной клавиатуры, чтобы запускать диктовку кнопкой микрофона в других клавиатурах.</string>
+    <string name="onb_keyboard_enabled">Голосовая клавиатура включена. Её можно выбрать кнопкой смены клавиатуры или кнопкой микрофона в AOSP Keyboard и HeliBoard.</string>
+    <string name="onb_keyboard_open">Открыть настройки клавиатур</string>
     <string name="onb_accessibility_do_row">Говорун — голосовой ввод (включить)</string>
     <string name="onb_accessibility_dont_row">Быстрый запуск (не включать)</string>
 

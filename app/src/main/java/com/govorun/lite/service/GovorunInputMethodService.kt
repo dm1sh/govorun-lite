@@ -33,6 +33,7 @@ class GovorunInputMethodService : InputMethodService() {
 
     private lateinit var recordButton: MaterialButton
     private lateinit var themedContext: Context
+    private var currentEditorInfo: EditorInfo? = null
     private val sessionText = StringBuilder()
 
     override fun onCreateInputView(): View {
@@ -82,9 +83,16 @@ class GovorunInputMethodService : InputMethodService() {
         controls.addView(makeIconButton(R.drawable.ic_backspace_24, R.string.ime_backspace) {
             deletePreviousCodePoint()
         }, weightedButtonParams())
-        controls.addView(makeIconButton(R.drawable.ic_keyboard_return_24, R.string.ime_newline) {
+        val enterButton = makeIconButton(R.drawable.ic_keyboard_return_24, R.string.ime_newline) {
+            if (!performEditorActionIfSupported()) commitInserted("\n")
+        }
+        // Long-press is intentionally different from a tap: it always inserts
+        // a literal newline, even for search/go/done editor actions.
+        enterButton.setOnLongClickListener {
             commitInserted("\n")
-        }, weightedButtonParams())
+            true
+        }
+        controls.addView(enterButton, weightedButtonParams())
         root.addView(controls, LinearLayout.LayoutParams(-1, dp(64)))
 
         // Keep the entire system hide/switcher touch target below our content.
@@ -167,6 +175,7 @@ class GovorunInputMethodService : InputMethodService() {
 
     override fun onStartInputView(info: EditorInfo?, restarting: Boolean) {
         super.onStartInputView(info, restarting)
+        currentEditorInfo = info
         if (::recordButton.isInitialized) updateRecordButton()
     }
 
@@ -226,6 +235,14 @@ class GovorunInputMethodService : InputMethodService() {
         val label = if (recording) R.string.ime_stop else R.string.ime_start
         recordButton.contentDescription = getString(label)
         recordButton.tooltipText = getString(label)
+    }
+
+    private fun performEditorActionIfSupported(): Boolean {
+        val info = currentEditorInfo ?: return false
+        if ((info.imeOptions and EditorInfo.IME_FLAG_NO_ENTER_ACTION) != 0) return false
+        val action = info.imeOptions and EditorInfo.IME_MASK_ACTION
+        if (action == EditorInfo.IME_ACTION_NONE || action == EditorInfo.IME_ACTION_UNSPECIFIED) return false
+        return currentInputConnection?.performEditorAction(action) == true
     }
 
     private fun commitInserted(text: String) {

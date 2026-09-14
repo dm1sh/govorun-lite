@@ -248,7 +248,10 @@ class GovorunInputMethodService : InputMethodService() {
                 if (next != target) {
                     target = next
                     setSelection(anchor, target)
-                    touchHandler.postDelayed(this, if (wholeWord) 170L else 90L)
+                    // Continuous whole-word movement is deliberately slower
+                    // than normal finger movement so a word is not skipped
+                    // before the user can reverse direction.
+                    touchHandler.postDelayed(this, if (wholeWord) 300L else 100L)
                 }
             }
         }
@@ -281,13 +284,13 @@ class GovorunInputMethodService : InputMethodService() {
                 val end = p
                 while (p > 0 && !text[p - 1].isWhitespace()) p--
                 val chars = (end - p).coerceAtLeast(1)
-                return maxOf(dp(48).toFloat(), chars * dp(12).toFloat())
+                return maxOf(dp(42).toFloat(), chars * dp(11).toFloat())
             }
             while (p < text.length && text[p].isWhitespace()) p++
             val start = p
             while (p < text.length && !text[p].isWhitespace()) p++
             val chars = (p - start).coerceAtLeast(1)
-            return maxOf(dp(48).toFloat(), chars * dp(12).toFloat())
+            return maxOf(dp(42).toFloat(), chars * dp(11).toFloat())
         }
 
         fun moveByPixels(delta: Float) {

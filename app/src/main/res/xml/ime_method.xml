@@ -1,3 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <input-method xmlns:android="http://schemas.android.com/apk/res/android"
-    android:supportsSwitchingToNextInputMethod="true" />
+    android:supportsSwitchingToNextInputMethod="true">
+    <!-- HeliBoard, AOSP Keyboard and similar keyboards look for an enabled
+         IME subtype whose mode is "voice" when their microphone key is
+         pressed. Without this declaration they can never discover Говорун
+         as the system voice-input keyboard, even though the IME service is
+         enabled. -->
+    <subtype
+        android:imeSubtypeLocale="ru_RU"
+        android:imeSubtypeMode="voice"
+        android:isAsciiCapable="true"
+        android:label="@string/ime_label" />
+</input-method>

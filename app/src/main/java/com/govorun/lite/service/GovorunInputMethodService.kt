@@ -291,6 +291,7 @@ class GovorunInputMethodService : InputMethodService() {
         }
 
         fun moveByPixels(delta: Float) {
+            if (delta != 0f) lastDirection = if (delta < 0f) -1 else 1
             accumulatedPixels += delta
             while (kotlin.math.abs(accumulatedPixels) >= selectionStepPixels(
                     extractedText()?.text ?: return,

@@ -1,0 +1,113 @@
+name: Build release APK
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag, for example v1.0.16
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  build-release:
+    name: Build signed release APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Validate release signing secrets
+        env:
+          RELEASE_KEYSTORE_BASE64: ${{ secrets.RELEASE_KEYSTORE_BASE64 }}
+          RELEASE_STORE_PASSWORD: ${{ secrets.RELEASE_STORE_PASSWORD }}
+          RELEASE_KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
+          RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
+        run: |
+          test -n "$RELEASE_KEYSTORE_BASE64" || { echo "Missing RELEASE_KEYSTORE_BASE64"; exit 1; }
+          test -n "$RELEASE_STORE_PASSWORD" || { echo "Missing RELEASE_STORE_PASSWORD"; exit 1; }
+          test -n "$RELEASE_KEY_ALIAS" || { echo "Missing RELEASE_KEY_ALIAS"; exit 1; }
+          test -n "$RELEASE_KEY_PASSWORD" || { echo "Missing RELEASE_KEY_PASSWORD"; exit 1; }
+
+      - name: Install release signing configuration
+        env:
+          RELEASE_KEYSTORE_BASE64: ${{ secrets.RELEASE_KEYSTORE_BASE64 }}
+          RELEASE_STORE_PASSWORD: ${{ secrets.RELEASE_STORE_PASSWORD }}
+          RELEASE_KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
+          RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
+        run: |
+          printf '%s' "$RELEASE_KEYSTORE_BASE64" | base64 --decode > release.keystore
+          cat > keystore.properties <<EOF
+          storeFile=release.keystore
+          storePassword=$RELEASE_STORE_PASSWORD
+          keyAlias=$RELEASE_KEY_ALIAS
+          keyPassword=$RELEASE_KEY_PASSWORD
+          EOF
+          chmod 600 release.keystore keystore.properties
+
+      # The native runtime is intentionally gitignored because it is a large AAR.
+      - name: Download sherpa-onnx runtime
+        run: ./scripts/download-sherpa-onnx.sh
+
+      # The model is also gitignored, but is required for a usable APK.
+      - name: Download GigaAM model
+        run: ./scripts/download-model.sh
+
+      - name: Build signed release APK
+        env:
+          # Keep release builds monotonically versioned for upgrade installs.
+          VERSION_CODE: ${{ github.run_number }}
+        run: ./gradlew --no-daemon assembleRelease -PversionCode="$VERSION_CODE"
+
+      - name: Upload release APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: govorun-lite-release-apk
+          path: app/build/outputs/apk/release/app-release.apk
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Upload release mapping
+        uses: actions/upload-artifact@v4
+        with:
+          name: govorun-lite-release-mapping
+          path: app/build/outputs/mapping/release/mapping.txt
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Create GitHub release and attach APK
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MANUAL_TAG: ${{ inputs.tag }}
+        run: |
+          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
+            RELEASE_TAG="$MANUAL_TAG"
+          else
+            RELEASE_TAG="$GITHUB_REF_NAME"
+          fi
+
+          case "$RELEASE_TAG" in
+            v*) ;;
+            *) echo "Release tag must start with v: $RELEASE_TAG"; exit 1 ;;
+          esac
+
+          gh release create "$RELEASE_TAG" \
+            app/build/outputs/apk/release/app-release.apk \
+            --title "$RELEASE_TAG" \
+            --generate-notes
+

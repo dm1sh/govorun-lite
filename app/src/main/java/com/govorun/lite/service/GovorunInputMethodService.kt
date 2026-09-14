@@ -3,6 +3,7 @@ package com.govorun.lite.service
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.view.ContextThemeWrapper
 import android.inputmethodservice.InputMethodService
 import android.view.View
 import android.view.WindowInsets
@@ -37,7 +38,9 @@ class GovorunInputMethodService : InputMethodService() {
         // InputMethodService does not inherit the Activity theme. Wrapping the
         // context is required for MaterialButton's theme enforcement and also
         // lets Material resolve the device's Monet/dynamic colors.
-        themedContext = DynamicColors.wrapContextIfAvailable(this)
+        themedContext = DynamicColors.wrapContextIfAvailable(
+            ContextThemeWrapper(this, R.style.Theme_GovorunIme)
+        )
         val root = LinearLayout(themedContext).apply {
             orientation = LinearLayout.VERTICAL
             setPadding(dp(24), dp(8), dp(24), dp(16))

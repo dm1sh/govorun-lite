@@ -3,6 +3,8 @@ package com.govorun.lite.service
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.view.ContextThemeWrapper
 import android.inputmethodservice.InputMethodService
 import android.view.View
@@ -13,6 +15,7 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.color.DynamicColors
+import com.google.android.material.color.MaterialColors
 import com.govorun.lite.R
 import com.govorun.lite.model.GigaAmModel
 import com.govorun.lite.stats.StatsStore
@@ -43,6 +46,11 @@ class GovorunInputMethodService : InputMethodService() {
         )
         val root = LinearLayout(themedContext).apply {
             orientation = LinearLayout.VERTICAL
+            setBackgroundColor(MaterialColors.getColor(
+                themedContext,
+                com.google.android.material.R.attr.colorSurface,
+                Color.TRANSPARENT,
+            ))
             setPadding(dp(24), dp(8), dp(24), dp(16))
         }
 
@@ -76,24 +84,24 @@ class GovorunInputMethodService : InputMethodService() {
         controls.addView(makeIconButton(R.drawable.ic_backspace_word_24, R.string.ime_backspace_word) {
             deletePreviousWord()
         }, weightedButtonParams())
-        recordButton = makeIconButton(R.drawable.ic_mic_24, R.string.ime_start) {
-            if (recording) stopRecording() else startRecording()
-        }
-        controls.addView(recordButton, weightedButtonParams())
+        recordButton = makeRecordButton()
+        controls.addView(recordButton, recordButtonParams())
         controls.addView(makeIconButton(R.drawable.ic_backspace_24, R.string.ime_backspace) {
             deletePreviousCodePoint()
         }, weightedButtonParams())
         controls.addView(makeIconButton(R.drawable.ic_keyboard_return_24, R.string.ime_newline) {
             commitInserted("\n")
         }, weightedButtonParams())
-        root.addView(controls, LinearLayout.LayoutParams(-1, dp(56)))
+        root.addView(controls, LinearLayout.LayoutParams(-1, dp(64)))
 
         // Keep the entire system hide/switcher touch target below our content.
         // Android 17 can place those controls over the bottom of an IME view.
         root.setOnApplyWindowInsetsListener { view, insets ->
             val nav = insets.getInsets(WindowInsets.Type.navigationBars()).bottom
             val ime = insets.getInsets(WindowInsets.Type.ime()).bottom
-            view.setPadding(view.paddingLeft, view.paddingTop, view.paddingRight, dp(88) + maxOf(nav, ime))
+            // The inset is exactly the system-owned touch area. Do not add
+            // an extra fixed spacer: it makes the voice panel unnecessarily tall.
+            view.setPadding(view.paddingLeft, view.paddingTop, view.paddingRight, maxOf(nav, ime))
             insets
         }
         root.requestApplyInsets()
@@ -104,30 +112,65 @@ class GovorunInputMethodService : InputMethodService() {
         MaterialButton(themedContext).apply {
             contentDescription = getString(descriptionRes)
             icon = ContextCompat.getDrawable(themedContext, iconRes)
+            iconTint = ColorStateList.valueOf(onSurfaceVariantColor())
             iconGravity = MaterialButton.ICON_GRAVITY_TEXT_START
             iconPadding = 0
             text = ""
             minWidth = 0
             minHeight = 0
-            insetTop = 4
-            insetBottom = 4
+            insetTop = 0
+            insetBottom = 0
+            elevation = 0f
+            strokeWidth = 0
+            backgroundTintList = ColorStateList.valueOf(Color.TRANSPARENT)
             setPadding(0, 0, 0, 0)
             setOnClickListener { action() }
         }
 
-    private fun weightedButtonParams() = LinearLayout.LayoutParams(0, dp(56), 1f)
+    private fun makeRecordButton(): MaterialButton =
+        makeIconButton(R.drawable.ic_mic_24, R.string.ime_start) {
+            if (recording) stopRecording() else startRecording()
+        }.apply {
+            cornerRadius = dp(32)
+            backgroundTintList = ColorStateList.valueOf(primaryColor())
+            iconTint = ColorStateList.valueOf(onPrimaryColor())
+            insetTop = dp(4)
+            insetBottom = dp(4)
+        }
+
+    private fun weightedButtonParams() = LinearLayout.LayoutParams(0, dp(56), 1f).apply {
+        marginStart = dp(4)
+        marginEnd = dp(4)
+    }
+
+    private fun recordButtonParams() = LinearLayout.LayoutParams(dp(64), dp(64)).apply {
+        marginStart = dp(4)
+        marginEnd = dp(4)
+    }
+
+    private fun primaryColor(): Int = MaterialColors.getColor(
+        themedContext, com.google.android.material.R.attr.colorPrimary, Color.rgb(70, 90, 150)
+    )
+
+    private fun errorColor(): Int = MaterialColors.getColor(
+        themedContext, com.google.android.material.R.attr.colorError, Color.rgb(186, 26, 26)
+    )
+
+    private fun onSurfaceVariantColor(): Int = MaterialColors.getColor(
+        themedContext, com.google.android.material.R.attr.colorOnSurfaceVariant, Color.DKGRAY
+    )
+
+    private fun onPrimaryColor(): Int = MaterialColors.getColor(
+        themedContext, com.google.android.material.R.attr.colorOnPrimary, Color.WHITE
+    )
+
+    private fun onErrorColor(): Int = MaterialColors.getColor(
+        themedContext, com.google.android.material.R.attr.colorOnError, Color.WHITE
+    )
 
     override fun onStartInputView(info: EditorInfo?, restarting: Boolean) {
         super.onStartInputView(info, restarting)
-        if (::recordButton.isInitialized) {
-            recordButton.icon = ContextCompat.getDrawable(
-                themedContext,
-                if (recording) R.drawable.ic_stop_24 else R.drawable.ic_mic_24,
-            )
-            recordButton.contentDescription = getString(
-                if (recording) R.string.ime_stop else R.string.ime_start,
-            )
-        }
+        if (::recordButton.isInitialized) updateRecordButton()
     }
 
     private fun startRecording() {
@@ -176,6 +219,12 @@ class GovorunInputMethodService : InputMethodService() {
         recordButton.icon = ContextCompat.getDrawable(
             themedContext,
             if (recording) R.drawable.ic_stop_24 else R.drawable.ic_mic_24,
+        )
+        recordButton.backgroundTintList = ColorStateList.valueOf(
+            if (recording) errorColor() else primaryColor()
+        )
+        recordButton.iconTint = ColorStateList.valueOf(
+            if (recording) onErrorColor() else onPrimaryColor()
         )
         recordButton.contentDescription = getString(
             if (recording) R.string.ime_stop else R.string.ime_start,

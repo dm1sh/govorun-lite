@@ -5,11 +5,8 @@
         <item name="android:windowBackground">?attr/colorSurface</item>
     </style>
 
-    <!-- InputMethodService does not inherit the Activity theme. MaterialButton
-         requires a Theme.MaterialComponents descendant, so the IME creates its
-         controls with this dedicated wrapper theme. -->
-    <style name="Theme.GovorunIme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <item name="android:windowActionModeOverlay">true</item>
-        <item name="android:windowBackground">?attr/colorSurface</item>
-    </style>
+    <!-- InputMethodService does not inherit the Activity theme. Use the same
+         Material 3 theme as the rest of the app through a ContextThemeWrapper
+         before creating MaterialButton instances. -->
+    <style name="Theme.GovorunIme" parent="Theme.GovorunLite" />
 </resources>

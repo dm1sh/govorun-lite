@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.inputmethodservice.InputMethodService
 import android.view.View
+import android.view.WindowInsets
 import android.view.inputmethod.EditorInfo
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -46,6 +47,20 @@ class GovorunInputMethodService : InputMethodService() {
         }
         root.addView(hint, LinearLayout.LayoutParams(-1, -2))
         root.addView(button, LinearLayout.LayoutParams(-1, -2))
+
+        // The IME window shares the bottom edge with Android's gesture/navigation
+        // area. On gesture-navigation devices Android also places the hide-IME
+        // and keyboard-switcher controls there. Without reserving that inset,
+        // those controls are drawn over the voice button (and over the gesture
+        // calibration bar), as happens on Android 17.
+        root.setOnApplyWindowInsetsListener { view, insets ->
+            val navigationBottom = insets.getInsets(WindowInsets.Type.navigationBars()).bottom
+            val imeBottom = insets.getInsets(WindowInsets.Type.ime()).bottom
+            val bottom = maxOf(navigationBottom, imeBottom)
+            view.setPadding(view.paddingLeft, view.paddingTop, view.paddingRight, 16 + bottom)
+            insets
+        }
+        root.requestApplyInsets()
         return root
     }
 

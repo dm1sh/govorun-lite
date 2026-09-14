@@ -11,7 +11,6 @@ import android.view.View
 import android.view.WindowInsets
 import android.view.inputmethod.EditorInfo
 import android.widget.LinearLayout
-import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.color.DynamicColors
@@ -33,7 +32,6 @@ class GovorunInputMethodService : InputMethodService() {
     private var recording = false
 
     private lateinit var recordButton: MaterialButton
-    private lateinit var hint: TextView
     private lateinit var themedContext: Context
     private val sessionText = StringBuilder()
 
@@ -51,7 +49,7 @@ class GovorunInputMethodService : InputMethodService() {
                 com.google.android.material.R.attr.colorSurface,
                 Color.TRANSPARENT,
             ))
-            setPadding(dp(24), dp(8), dp(24), dp(16))
+            setPadding(dp(16), dp(8), dp(16), dp(16))
         }
 
         val topRow = LinearLayout(themedContext).apply {
@@ -65,18 +63,13 @@ class GovorunInputMethodService : InputMethodService() {
         topRow.addView(exitButton, LinearLayout.LayoutParams(dp(56), dp(48)))
         root.addView(topRow, LinearLayout.LayoutParams(-1, -2))
 
-        hint = TextView(themedContext).apply {
-            text = getString(R.string.ime_hint)
-            textSize = 18f
-            setPadding(0, 0, 0, dp(8))
-        }
-        root.addView(hint, LinearLayout.LayoutParams(-1, -2))
-
         // Fixed order: clear, whole-word backspace, start/stop, character
         // backspace, newline.
         val controls = LinearLayout(themedContext).apply {
             orientation = LinearLayout.HORIZONTAL
-            weightSum = 5f
+            gravity = android.view.Gravity.CENTER
+            // Four flexible edit buttons plus one fixed circular record button.
+            weightSum = 4f
         }
         controls.addView(makeIconButton(R.drawable.ic_clear_all_24, R.string.ime_remove_session) {
             removeSessionText()
@@ -101,7 +94,7 @@ class GovorunInputMethodService : InputMethodService() {
             val ime = insets.getInsets(WindowInsets.Type.ime()).bottom
             // The inset is exactly the system-owned touch area. Do not add
             // an extra fixed spacer: it makes the voice panel unnecessarily tall.
-            view.setPadding(view.paddingLeft, view.paddingTop, view.paddingRight, maxOf(nav, ime))
+            view.setPadding(view.paddingLeft, view.paddingTop, view.paddingRight, maxOf(nav, ime) + dp(12))
             insets
         }
         root.requestApplyInsets()
@@ -111,10 +104,13 @@ class GovorunInputMethodService : InputMethodService() {
     private fun makeIconButton(iconRes: Int, descriptionRes: Int, action: () -> Unit): MaterialButton =
         MaterialButton(themedContext).apply {
             contentDescription = getString(descriptionRes)
+            tooltipText = getString(descriptionRes)
             icon = ContextCompat.getDrawable(themedContext, iconRes)
             iconTint = ColorStateList.valueOf(onSurfaceVariantColor())
             iconGravity = MaterialButton.ICON_GRAVITY_TEXT_START
             iconPadding = 0
+            iconSize = dp(28)
+            gravity = android.view.Gravity.CENTER
             text = ""
             minWidth = 0
             minHeight = 0
@@ -131,6 +127,7 @@ class GovorunInputMethodService : InputMethodService() {
         makeIconButton(R.drawable.ic_mic_24, R.string.ime_start) {
             if (recording) stopRecording() else startRecording()
         }.apply {
+            iconSize = dp(32)
             cornerRadius = dp(32)
             backgroundTintList = ColorStateList.valueOf(primaryColor())
             iconTint = ColorStateList.valueOf(onPrimaryColor())
@@ -176,17 +173,17 @@ class GovorunInputMethodService : InputMethodService() {
     private fun startRecording() {
         if (recording) return
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-            hint.text = getString(R.string.ime_mic_permission)
+            recordButton.tooltipText = getString(R.string.ime_mic_permission)
             return
         }
         if (!GigaAmModel.isInstalled(this)) {
-            hint.text = getString(R.string.ime_model_not_ready)
+            recordButton.tooltipText = getString(R.string.ime_model_not_ready)
             return
         }
         sessionText.clear()
         recording = true
         updateRecordButton()
-        hint.text = getString(R.string.ime_listening)
+        recordButton.tooltipText = getString(R.string.ime_listening)
         val currentRecorder = VadRecorder(this)
         recorder = currentRecorder
         currentRecorder.start(
@@ -202,7 +199,7 @@ class GovorunInputMethodService : InputMethodService() {
                 recording = false
                 recorder = null
                 updateRecordButton()
-                hint.text = getString(R.string.ime_hint)
+                recordButton.tooltipText = getString(R.string.ime_start)
             },
             useVad = true,
         )
@@ -210,7 +207,7 @@ class GovorunInputMethodService : InputMethodService() {
 
     private fun stopRecording() {
         if (!recording) return
-        hint.text = getString(R.string.ime_processing)
+        recordButton.tooltipText = getString(R.string.ime_processing)
         recorder?.stop()
     }
 
@@ -226,9 +223,9 @@ class GovorunInputMethodService : InputMethodService() {
         recordButton.iconTint = ColorStateList.valueOf(
             if (recording) onErrorColor() else onPrimaryColor()
         )
-        recordButton.contentDescription = getString(
-            if (recording) R.string.ime_stop else R.string.ime_start,
-        )
+        val label = if (recording) R.string.ime_stop else R.string.ime_start
+        recordButton.contentDescription = getString(label)
+        recordButton.tooltipText = getString(label)
     }
 
     private fun commitInserted(text: String) {

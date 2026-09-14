@@ -222,6 +222,7 @@ class GovorunInputMethodService : InputMethodService() {
         var lastRawX = 0f
         var accumulatedPixels = 0f
         var continuationActive = false
+        var continuationDirection = 0
         val edgeZone = dp(64)
         val screenWidth = resources.displayMetrics.widthPixels
         val selectThreshold = dp(24)
@@ -354,21 +355,30 @@ class GovorunInputMethodService : InputMethodService() {
                             moveByPixels(totalDelta)
                         }
                     } else if (selecting) {
-                        if (continuationActive) {
-                            moveByPixels(event.rawX - lastRawX)
-                        } else {
+                        val atEdge = event.rawX <= edgeZone || event.rawX >= screenWidth - edgeZone
+                        // While the finger remains in the edge zone, keep the
+                        // original continuation direction. Tiny reverse
+                        // movements at the corner must not undo selection.
+                        // Reverse adjustment becomes active only after the
+                        // finger leaves the edge zone.
+                        if (!(continuationActive && atEdge)) {
+                            if (!atEdge) continuationActive = false
                             moveByPixels(event.rawX - lastRawX)
                         }
                         lastRawX = event.rawX
                     }
                     if (selecting) {
-                        lastRawX = event.rawX
                         val atEdge = event.rawX <= edgeZone || event.rawX >= screenWidth - edgeZone
                         if (atEdge) {
-                            continuationActive = true
+                            if (!continuationActive) {
+                                continuationActive = true
+                                continuationDirection = lastDirection
+                            }
+                            lastDirection = continuationDirection
                             touchHandler.removeCallbacks(edgeRepeat)
                             touchHandler.post(edgeRepeat)
                         } else {
+                            continuationActive = false
                             touchHandler.removeCallbacks(edgeRepeat)
                         }
                     }

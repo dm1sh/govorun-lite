@@ -11,6 +11,7 @@
     <string name="ime_hint">Нажмите кнопку и говорите</string>
     <string name="ime_start">Начать диктовку</string>
     <string name="ime_stop">Остановить</string>
+    <string name="ime_locked">Диктовка зафиксирована</string>
     <string name="ime_backspace">Удалить символ</string>
     <string name="ime_backspace_word">Удалить слово</string>
     <string name="ime_newline">Новая строка</string>

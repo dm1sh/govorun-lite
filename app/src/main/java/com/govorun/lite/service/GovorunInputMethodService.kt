@@ -14,6 +14,7 @@ import android.view.View
 import android.view.ViewConfiguration
 import android.view.WindowInsets
 import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.ExtractedTextRequest
 import android.widget.LinearLayout
 import androidx.core.content.ContextCompat
 import com.google.android.material.button.MaterialButton
@@ -24,6 +25,7 @@ import com.govorun.lite.model.GigaAmModel
 import com.govorun.lite.stats.StatsStore
 import com.govorun.lite.transcriber.OfflineTranscriber
 import com.govorun.lite.util.Prefs
+import com.govorun.lite.util.Haptics
 import com.govorun.lite.transcriber.VadRecorder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -87,22 +89,28 @@ class GovorunInputMethodService : InputMethodService() {
         controls.addView(makeIconButton(R.drawable.ic_clear_all_24, R.string.ime_remove_session) {
             removeSessionText()
         }, weightedButtonParams())
-        controls.addView(makeIconButton(R.drawable.ic_backspace_word_24, R.string.ime_backspace_word) {
+        val wordBackspace = makeIconButton(R.drawable.ic_backspace_word_24, R.string.ime_backspace_word) {
             deletePreviousWord()
-        }, weightedButtonParams())
+        }
+        configureDeletionTouch(wordBackspace, wholeWord = true)
+        controls.addView(wordBackspace, weightedButtonParams())
         recordButton = makeRecordButton()
         configureRecordTouch()
         controls.addView(recordButton, recordButtonParams())
-        controls.addView(makeIconButton(R.drawable.ic_backspace_24, R.string.ime_backspace) {
+        val backspace = makeIconButton(R.drawable.ic_backspace_24, R.string.ime_backspace) {
             deletePreviousCodePoint()
-        }, weightedButtonParams())
+        }
+        configureDeletionTouch(backspace, wholeWord = false)
+        controls.addView(backspace, weightedButtonParams())
         val enterButton = makeIconButton(R.drawable.ic_keyboard_return_24, R.string.ime_newline) {
             if (!performEditorActionIfSupported()) commitInserted("\n")
+            Haptics.tap(this)
         }
         // Long-press is intentionally different from a tap: it always inserts
         // a literal newline, even for search/go/done editor actions.
         enterButton.setOnLongClickListener {
             commitInserted("\n")
+            Haptics.tap(this)
             true
         }
         controls.addView(enterButton, weightedButtonParams())
@@ -156,6 +164,126 @@ class GovorunInputMethodService : InputMethodService() {
             insetBottom = dp(4)
         }
 
+    private fun configureDeletionTouch(button: MaterialButton, wholeWord: Boolean) {
+        var downX = 0f
+        var selecting = false
+        var anchor = 0
+        var target = 0
+        var lastDirection = 0
+        var waitingToReverse = false
+        var repeatStarted = false
+
+        val repeat = object : Runnable {
+            override fun run() {
+                if (repeatStarted && !selecting) {
+                    if (wholeWord) deletePreviousWord() else deletePreviousCodePoint()
+                    touchHandler.postDelayed(this, 85L)
+                }
+            }
+        }
+        val edgeRepeat = object : Runnable {
+            override fun run() {
+                if (!selecting) return
+                if (target != anchor) {
+                    target = (target + lastDirection).coerceIn(0, extractedLength())
+                    setSelection(anchor, target)
+                    touchHandler.postDelayed(this, 70L)
+                }
+            }
+        }
+
+        fun stopRunnables() {
+            repeatStarted = false
+            touchHandler.removeCallbacks(repeat)
+            touchHandler.removeCallbacks(edgeRepeat)
+        }
+
+        button.setOnTouchListener { view, event ->
+            when (event.actionMasked) {
+                MotionEvent.ACTION_DOWN -> {
+                    downX = event.x
+                    selecting = false
+                    repeatStarted = false
+                    lastDirection = 0
+                    waitingToReverse = false
+                    touchHandler.postDelayed({
+                        if (!selecting) {
+                            repeatStarted = true
+                            if (wholeWord) deletePreviousWord() else deletePreviousCodePoint()
+                            touchHandler.postDelayed(repeat, 300L)
+                        }
+                    }, ViewConfiguration.getLongPressTimeout().toLong())
+                    true
+                }
+                MotionEvent.ACTION_MOVE -> {
+                    val delta = event.x - downX
+                    if (!selecting && kotlin.math.abs(delta) >= dp(12)) {
+                        stopRunnables()
+                        val extracted = currentInputConnection?.getExtractedText(
+                            ExtractedTextRequest(), 0
+                        )
+                        if (extracted != null) {
+                            selecting = true
+                            anchor = extracted.selectionEnd
+                            target = anchor
+                            setSelection(anchor, anchor)
+                        }
+                    }
+                    if (selecting) {
+                        val direction = if (delta < 0) -1 else 1
+                        if (lastDirection != 0 && direction != lastDirection && target != anchor) {
+                            // Requested behavior: crossing the anchor first
+                            // collapses the selection; the next movement starts
+                            // selecting in the opposite direction.
+                            target = anchor
+                            setSelection(anchor, anchor)
+                            waitingToReverse = true
+                        } else if (!waitingToReverse || direction == lastDirection) {
+                            waitingToReverse = false
+                            lastDirection = direction
+                            val steps = (kotlin.math.abs(delta) / dp(12)).toInt().coerceAtLeast(1)
+                            target = (anchor + direction * steps).coerceIn(0, extractedLength())
+                            setSelection(anchor, target)
+                        } else {
+                            lastDirection = direction
+                        }
+                        if (event.x <= dp(12) || event.x >= view.width - dp(12)) {
+                            touchHandler.removeCallbacks(edgeRepeat)
+                            touchHandler.post(edgeRepeat)
+                        } else {
+                            touchHandler.removeCallbacks(edgeRepeat)
+                        }
+                    }
+                    true
+                }
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    val wasRepeating = repeatStarted
+                    stopRunnables()
+                    if (selecting && event.actionMasked == MotionEvent.ACTION_UP) {
+                        currentInputConnection?.commitText("", 1)
+                        Haptics.tap(this)
+                    } else if (!wasRepeating && !selecting && event.actionMasked == MotionEvent.ACTION_UP) {
+                        if (wholeWord) deletePreviousWord() else deletePreviousCodePoint()
+                        Haptics.tap(this)
+                    } else if (wasRepeating && event.actionMasked == MotionEvent.ACTION_UP) {
+                        Haptics.tap(this)
+                    }
+                    true
+                }
+                else -> true
+            }
+        }
+    }
+
+    private fun extractedLength(): Int =
+        currentInputConnection?.getExtractedText(ExtractedTextRequest(), 0)?.text?.length ?: 0
+
+    private fun setSelection(anchor: Int, target: Int) {
+        val start = minOf(anchor, target)
+        val end = maxOf(anchor, target)
+        currentInputConnection?.setSelection(start, end)
+    }
+
     private fun configureRecordTouch() {
         recordButton.setOnTouchListener { _, event ->
             if (!Prefs.isImeWalkieTalkieEnabled(this)) return@setOnTouchListener false
@@ -179,6 +307,8 @@ class GovorunInputMethodService : InputMethodService() {
                     ) {
                         // Slide upward to lock recording after release.
                         walkieLocked = true
+                        Haptics.doubleTap(this)
+                        updateRecordButton()
                         recordButton.isPressed = false
                     }
                     true
@@ -254,6 +384,7 @@ class GovorunInputMethodService : InputMethodService() {
         }
         sessionText.clear()
         recording = true
+        Haptics.longPress(this)
         updateRecordButton()
         recordButton.tooltipText = getString(R.string.ime_listening)
         val currentRecorder = VadRecorder(this)
@@ -269,6 +400,7 @@ class GovorunInputMethodService : InputMethodService() {
             },
             onDone = {
                 recording = false
+                walkieLocked = false
                 recorder = null
                 updateRecordButton()
                 recordButton.tooltipText = getString(R.string.ime_start)
@@ -279,6 +411,7 @@ class GovorunInputMethodService : InputMethodService() {
 
     private fun stopRecording() {
         if (!recording) return
+        Haptics.tap(this)
         recordButton.tooltipText = getString(R.string.ime_processing)
         recorder?.stop()
     }
@@ -287,7 +420,11 @@ class GovorunInputMethodService : InputMethodService() {
         if (!::recordButton.isInitialized) return
         recordButton.icon = ContextCompat.getDrawable(
             themedContext,
-            if (recording) R.drawable.ic_stop_24 else R.drawable.ic_mic_24,
+            when {
+                recording && walkieLocked -> R.drawable.ic_lock_24
+                recording -> R.drawable.ic_stop_24
+                else -> R.drawable.ic_mic_24
+            },
         )
         recordButton.backgroundTintList = ColorStateList.valueOf(
             if (recording) errorColor() else primaryColor()
@@ -295,7 +432,11 @@ class GovorunInputMethodService : InputMethodService() {
         recordButton.iconTint = ColorStateList.valueOf(
             if (recording) onErrorColor() else onPrimaryColor()
         )
-        val label = if (recording) R.string.ime_stop else R.string.ime_start
+        val label = when {
+            recording && walkieLocked -> R.string.ime_locked
+            recording -> R.string.ime_stop
+            else -> R.string.ime_start
+        }
         recordButton.contentDescription = getString(label)
         recordButton.tooltipText = getString(label)
     }
@@ -343,6 +484,7 @@ class GovorunInputMethodService : InputMethodService() {
         if (!before.endsWith(text)) return
         connection.deleteSurroundingTextInCodePoints(text.codePointCount(0, text.length), 0)
         sessionText.clear()
+        Haptics.tap(this)
     }
 
     private fun exitToPreviousInputMethod() {

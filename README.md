@@ -89,7 +89,9 @@ adb install --user 0 -r app/build/outputs/apk/debug/app-debug.apk
 
 The debug build uses the application ID `com.govorun.lite.debug`, so it can be
 installed next to the regular `com.govorun.lite` app. GitHub Actions also builds
-this APK automatically and publishes it as a workflow artifact.
+this APK automatically and publishes it as a workflow artifact. CI assigns a
+higher Android version code to every workflow build, so a newly downloaded APK
+updates the previously installed debug build.
 
 ## Установка собранного APK вручную
 

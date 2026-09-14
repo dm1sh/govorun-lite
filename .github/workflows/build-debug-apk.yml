@@ -36,7 +36,11 @@ jobs:
         run: ./scripts/download-model.sh
 
       - name: Build debug APK
-        run: ./gradlew --no-daemon assembleDebug
+        # Run number is monotonic; the attempt component also makes a
+        # manually re-run workflow produce a newer installable APK.
+        run: |
+          VERSION_CODE=$((19 + GITHUB_RUN_NUMBER * 100 + GITHUB_RUN_ATTEMPT))
+          ./gradlew --no-daemon assembleDebug -PversionCode="$VERSION_CODE"
 
       - name: Upload debug APK
         uses: actions/upload-artifact@v4

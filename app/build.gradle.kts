@@ -14,6 +14,12 @@ val keystoreProps = Properties().apply {
     if (f.exists()) load(f.inputStream())
 }
 
+// CI supplies a monotonically increasing version code so every downloaded
+// debug APK can update the previous GitHub Actions build.
+val ciVersionCode = providers.gradleProperty("versionCode")
+    .orNull
+    ?.toIntOrNull()
+
 android {
     namespace = "com.govorun.lite"
     compileSdk = 35
@@ -22,8 +28,8 @@ android {
         applicationId = "com.govorun.lite"
         minSdk = 33
         targetSdk = 35
-        versionCode = 19
-        versionName = "1.0.15"
+        versionCode = ciVersionCode ?: 19
+        versionName = "1.0.15" + (ciVersionCode?.let { "+$it" } ?: "")
         ndk {
             abiFilters += "arm64-v8a"
         }

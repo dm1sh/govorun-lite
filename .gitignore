@@ -16,6 +16,7 @@ captures/
 # Keystore (never commit)
 *.jks
 *.keystore
+!debug.keystore
 keystore.properties
 
 # Local secrets (VT API key etc) — never commit

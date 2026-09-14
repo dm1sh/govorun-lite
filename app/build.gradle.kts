@@ -36,6 +36,16 @@ android {
     }
 
     signingConfigs {
+        // Keep the debug signing key stable across GitHub Actions runners.
+        // Android refuses to update an APK signed by a different key even
+        // when its application ID and versionCode are higher.
+        create("stableDebug") {
+            storeFile = rootProject.file("debug.keystore")
+            storePassword = "govorun-debug"
+            keyAlias = "govorun-debug"
+            keyPassword = "govorun-debug"
+        }
+
         if (keystoreProps.containsKey("storeFile")) {
             create("release") {
                 storeFile = rootProject.file(keystoreProps.getProperty("storeFile"))
@@ -51,6 +61,7 @@ android {
             // Keep the development APK installable next to the store/release app.
             applicationIdSuffix = ".debug"
             versionNameSuffix = "-debug"
+            signingConfig = signingConfigs.getByName("stableDebug")
         }
         release {
             isMinifyEnabled = true

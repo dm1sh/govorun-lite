@@ -13,7 +13,6 @@ import com.govorun.lite.model.GigaAmModel
 import com.govorun.lite.stats.StatsStore
 import com.govorun.lite.transcriber.OfflineTranscriber
 import com.govorun.lite.transcriber.VadRecorder
-import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -29,7 +28,7 @@ class GovorunInputMethodService : InputMethodService() {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
     private var recorder: VadRecorder? = null
     private var recording = false
-    private lateinit var button: MaterialButton
+    private lateinit var button: android.widget.Button
     private lateinit var hint: TextView
 
     override fun onCreateInputView(): View {
@@ -41,7 +40,7 @@ class GovorunInputMethodService : InputMethodService() {
             text = getString(R.string.ime_hint)
             setPadding(0, 0, 0, 8)
         }
-        button = MaterialButton(this).apply {
+        button = android.widget.Button(this).apply {
             text = getString(R.string.ime_start)
             setOnClickListener { if (recording) stopRecording() else startRecording() }
         }

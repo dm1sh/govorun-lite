@@ -6,6 +6,7 @@ import android.speech.RecognitionService
 import android.speech.SpeechRecognizer
 import android.util.Log
 import com.govorun.lite.model.GigaAmModel
+import com.govorun.lite.stats.StatsStore
 import com.govorun.lite.transcriber.OfflineTranscriber
 import com.govorun.lite.transcriber.VadRecorder
 import kotlinx.coroutines.CoroutineScope
@@ -41,13 +42,17 @@ class GovorunRecognitionService : RecognitionService() {
                 if (text.isNotBlank()) {
                     if (recognized.isNotEmpty()) recognized.append(' ')
                     recognized.append(text)
+                    StatsStore.addWords(applicationContext, StatsStore.countWords(text))
                     callback?.partialResults(resultBundle(recognized.toString()))
                 }
             },
             onDone = {
                 val text = recognized.toString().trim()
-                callback?.results(resultBundle(text))
+                // SpeechRecognizer clients expect endOfSpeech before the final
+                // results callback. Some keyboards ignore results delivered in
+                // the opposite order and appear to do nothing.
                 callback?.endOfSpeech()
+                callback?.results(resultBundle(text))
                 clearSession()
             },
             useVad = true,

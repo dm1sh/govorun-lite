@@ -86,9 +86,16 @@ class GovorunInputMethodService : InputMethodService() {
             // Four flexible edit buttons plus one fixed circular record button.
             weightSum = 4f
         }
-        controls.addView(makeIconButton(R.drawable.ic_clear_all_24, R.string.ime_remove_session) {
+        val clearButton = makeIconButton(R.drawable.ic_clear_all_24, R.string.ime_remove_session) {
             removeSessionText()
-        }, weightedButtonParams())
+        }
+        clearButton.setOnLongClickListener {
+            clearButton.tooltipText = getString(R.string.ime_clear_field)
+            clearEntireField()
+            Haptics.longPress(this)
+            true
+        }
+        controls.addView(clearButton, weightedButtonParams())
         val wordBackspace = makeIconButton(R.drawable.ic_backspace_word_24, R.string.ime_backspace_word) {
             deletePreviousWord()
         }
@@ -173,6 +180,7 @@ class GovorunInputMethodService : InputMethodService() {
         var waitingToReverse = false
         var repeatStarted = false
         var lastSelectionStep = 0
+        var wasInContinuationEdge = false
         // Use screen coordinates, not view coordinates. The record/edit
         // buttons are only about 64dp wide, so checking event.x against the
         // button bounds would make the continuation zone active immediately
@@ -219,6 +227,7 @@ class GovorunInputMethodService : InputMethodService() {
                     lastDirection = 0
                     waitingToReverse = false
                     lastSelectionStep = 0
+                    wasInContinuationEdge = false
                     touchHandler.postDelayed({
                         if (!selecting) {
                             repeatStarted = true
@@ -229,6 +238,14 @@ class GovorunInputMethodService : InputMethodService() {
                     true
                 }
                 MotionEvent.ACTION_MOVE -> {
+                    val inContinuationEdge = event.rawX <= edgeZone || event.rawX >= screenWidth - edgeZone
+                    if (wasInContinuationEdge && !inContinuationEdge) {
+                        // Keep the virtual target reached by edge continuation;
+                        // start a fresh physical baseline so moving away from
+                        // the corner does not jump the selection endpoint.
+                        downX = event.x
+                        lastSelectionStep = 0
+                    }
                     val delta = event.x - downX
                     if (!selecting && kotlin.math.abs(delta) >= dp(24)) {
                         stopRunnables()
@@ -272,12 +289,13 @@ class GovorunInputMethodService : InputMethodService() {
                             lastDirection = direction
                         }
 
-                        if (event.rawX <= edgeZone || event.rawX >= screenWidth - edgeZone) {
+                        if (inContinuationEdge) {
                             touchHandler.removeCallbacks(edgeRepeat)
                             touchHandler.post(edgeRepeat)
                         } else {
                             touchHandler.removeCallbacks(edgeRepeat)
                         }
+                        wasInContinuationEdge = inContinuationEdge
                     }
                     true
                 }
@@ -523,7 +541,16 @@ class GovorunInputMethodService : InputMethodService() {
         sessionText.append(text)
     }
 
+    private fun deleteSelectedTextIfAny(): Boolean {
+        val connection = currentInputConnection ?: return false
+        val selected = connection.getSelectedText(0)?.toString()
+        if (selected.isNullOrEmpty()) return false
+        connection.commitText("", 1)
+        return true
+    }
+
     private fun deletePreviousCodePoint() {
+        if (deleteSelectedTextIfAny()) return
         val connection = currentInputConnection ?: return
         if (connection.getTextBeforeCursor(1, 0)?.isNotEmpty() == true) {
             connection.deleteSurroundingTextInCodePoints(1, 0)
@@ -532,6 +559,7 @@ class GovorunInputMethodService : InputMethodService() {
 
     /** Attached punctuation stays part of the preceding word/token. */
     private fun deletePreviousWord() {
+        if (deleteSelectedTextIfAny()) return
         val connection = currentInputConnection ?: return
         val before = connection.getTextBeforeCursor(512, 0)?.toString() ?: return
         if (before.isEmpty()) return
@@ -542,6 +570,16 @@ class GovorunInputMethodService : InputMethodService() {
         if (start == end) return
         val token = before.substring(start)
         connection.deleteSurroundingTextInCodePoints(token.codePointCount(0, token.length), 0)
+    }
+
+    private fun clearEntireField() {
+        val connection = currentInputConnection ?: return
+        val extracted = extractedText() ?: return
+        val text = extracted.text ?: return
+        if (text.isEmpty()) return
+        connection.setSelection(0, text.length)
+        connection.commitText("", 1)
+        sessionText.clear()
     }
 
     private fun removeSessionText() {

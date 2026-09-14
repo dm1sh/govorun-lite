@@ -174,6 +174,14 @@ class SettingsActivity : AppCompatActivity() {
         }
         imeWalkieRow.setOnClickListener { imeWalkieSwitch.toggle() }
 
+        val imeRepeatDeleteSwitch = findViewById<MaterialSwitch>(R.id.imeRepeatDeleteSwitch)
+        val imeRepeatDeleteRow = findViewById<View>(R.id.imeRepeatDeleteRow)
+        imeRepeatDeleteSwitch.isChecked = Prefs.isImeRepeatDeleteEnabled(this)
+        imeRepeatDeleteSwitch.setOnCheckedChangeListener { _, checked ->
+            Prefs.setImeRepeatDeleteEnabled(this, checked)
+        }
+        imeRepeatDeleteRow.setOnClickListener { imeRepeatDeleteSwitch.toggle() }
+
         val keepScreenSwitch = findViewById<MaterialSwitch>(R.id.keepScreenSwitch)
         val keepScreenRow = findViewById<View>(R.id.keepScreenRow)
         val keepScreenBody = findViewById<MaterialTextView>(R.id.keepScreenBody)
@@ -296,6 +304,7 @@ class SettingsActivity : AppCompatActivity() {
             Prefs.setAutoStopMinutes(this, Prefs.AUTO_STOP_DEFAULT)
             Prefs.setImeAutoStartEnabled(this, true)
             Prefs.setImeWalkieTalkieEnabled(this, false)
+            Prefs.setImeRepeatDeleteEnabled(this, false)
 
             sizeSlider.value = Prefs.BUBBLE_SIZE_DEFAULT
             transparencySlider.value = Prefs.BUBBLE_ALPHA_DEFAULT
@@ -304,6 +313,7 @@ class SettingsActivity : AppCompatActivity() {
             hideInSearchSwitch.isChecked = false
             imeAutoStartSwitch.isChecked = true
             imeWalkieSwitch.isChecked = false
+            imeRepeatDeleteSwitch.isChecked = false
             sideGroup.check(R.id.sideRight)
             pauseGroup.check(R.id.pauseShort)
             pauseHint.setText(hintForPause(Prefs.PAUSE_DEFAULT))

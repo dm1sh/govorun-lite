@@ -27,6 +27,7 @@ object Prefs {
     private const val KEY_AUTO_STOP_MINUTES = "auto_stop_minutes"
     private const val KEY_IME_AUTO_START = "ime_auto_start"
     private const val KEY_IME_WALKIE_TALKIE = "ime_walkie_talkie"
+    private const val KEY_IME_REPEAT_DELETE = "ime_repeat_delete"
     // One-shot flag: marks that we've already run the 1.0.8 migration that
     // bumps existing users from Short → Medium. Without this we'd reset
     // the pref on every cold start, which would override the user's
@@ -404,6 +405,17 @@ object Prefs {
     fun setImeWalkieTalkieEnabled(context: Context, enabled: Boolean) {
         context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE)
             .edit().putBoolean(KEY_IME_WALKIE_TALKIE, enabled).apply()
+    }
+
+    /** When true, holding backspace repeats deletion. When false (default),
+     * holding and dragging enters selection mode instead. */
+    fun isImeRepeatDeleteEnabled(context: Context): Boolean =
+        context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE)
+            .getBoolean(KEY_IME_REPEAT_DELETE, false)
+
+    fun setImeRepeatDeleteEnabled(context: Context, enabled: Boolean) {
+        context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE)
+            .edit().putBoolean(KEY_IME_REPEAT_DELETE, enabled).apply()
     }
 
     // App filter — controls in which apps the bubble appears.

@@ -89,12 +89,7 @@ class GovorunInputMethodService : InputMethodService() {
         val clearButton = makeIconButton(R.drawable.ic_clear_all_24, R.string.ime_remove_session) {
             removeSessionText()
         }
-        clearButton.setOnLongClickListener {
-            clearButton.tooltipText = getString(R.string.ime_clear_field)
-            clearEntireField()
-            Haptics.longPress(this)
-            true
-        }
+        configureClearTouch(clearButton)
         controls.addView(clearButton, weightedButtonParams())
         val wordBackspace = makeIconButton(R.drawable.ic_backspace_word_24, R.string.ime_backspace_word) {
             deletePreviousWord()
@@ -171,30 +166,73 @@ class GovorunInputMethodService : InputMethodService() {
             insetBottom = dp(4)
         }
 
+    private fun configureClearTouch(button: MaterialButton) {
+        var longPressed = false
+        val longPress = Runnable {
+            longPressed = true
+            clearEntireField()
+            Haptics.tap(this)
+        }
+        button.setOnTouchListener { _, event ->
+            when (event.actionMasked) {
+                MotionEvent.ACTION_DOWN -> {
+                    longPressed = false
+                    touchHandler.postDelayed(longPress, ViewConfiguration.getLongPressTimeout().toLong())
+                    true
+                }
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    touchHandler.removeCallbacks(longPress)
+                    if (!longPressed && event.actionMasked == MotionEvent.ACTION_UP) {
+                        removeSessionText()
+                    }
+                    true
+                }
+                else -> true
+            }
+        }
+    }
+
+    private fun clearEntireField() {
+        val connection = currentInputConnection ?: return
+        val extracted = extractedText() ?: return
+        val text = extracted.text ?: return
+        val start = extracted.startOffset
+        val end = start + text.length
+        connection.setSelection(start, end)
+        connection.commitText("", 1)
+        sessionText.clear()
+    }
+
+    private fun hasSelectedText(): Boolean =
+        currentInputConnection?.getSelectedText(0)?.isNotEmpty() == true
+
+    private fun deleteSelectedTextIfAny(): Boolean {
+        if (!hasSelectedText()) return false
+        currentInputConnection?.commitText("", 1)
+        return true
+    }
+
     private fun configureDeletionTouch(button: MaterialButton, wholeWord: Boolean) {
-        var downX = 0f
         var selecting = false
         var anchor = 0
         var target = 0
         var lastDirection = 0
         var waitingToReverse = false
         var repeatStarted = false
-        var lastSelectionStep = 0
-        var wasInContinuationEdge = false
-        // Use screen coordinates, not view coordinates. The record/edit
-        // buttons are only about 64dp wide, so checking event.x against the
-        // button bounds would make the continuation zone active immediately
-        // on every horizontal drag.
+        var downRawX = 0f
+        var lastRawX = 0f
+        var accumulatedPixels = 0f
+        var continuationActive = false
         val edgeZone = dp(64)
         val screenWidth = resources.displayMetrics.widthPixels
-        val charStepPx = dp(24)
-        val wordStepPx = dp(48)
+        val selectThreshold = dp(24)
+        val stepPixels = if (wholeWord) dp(48).toFloat() else dp(24).toFloat()
 
         val repeat = object : Runnable {
             override fun run() {
                 if (repeatStarted && !selecting) {
                     if (wholeWord) deletePreviousWord() else deletePreviousCodePoint()
-                    touchHandler.postDelayed(this, 85L)
+                    touchHandler.postDelayed(this, if (wholeWord) 220L else 100L)
                 }
             }
         }
@@ -211,91 +249,94 @@ class GovorunInputMethodService : InputMethodService() {
                 }
             }
         }
+        lateinit var longPress: Runnable
+        longPress = Runnable {
+            if (!selecting && Prefs.isImeRepeatDeleteEnabled(this)) {
+                repeatStarted = true
+                if (wholeWord) deletePreviousWord() else deletePreviousCodePoint()
+                touchHandler.postDelayed(repeat, if (wholeWord) 300L else 260L)
+            }
+        }
 
         fun stopRunnables() {
             repeatStarted = false
+            touchHandler.removeCallbacks(longPress)
             touchHandler.removeCallbacks(repeat)
             touchHandler.removeCallbacks(edgeRepeat)
+        }
+
+        fun moveByPixels(delta: Float) {
+            accumulatedPixels += delta
+            var steps = (kotlin.math.abs(accumulatedPixels) / stepPixels).toInt()
+            if (steps == 0) return
+            val direction = if (accumulatedPixels < 0f) -1 else 1
+            accumulatedPixels -= direction * steps * stepPixels
+
+            if (lastDirection != 0 && direction != lastDirection && target != anchor) {
+                // Crossing the anchor collapses first; subsequent movement in
+                // the new direction starts a fresh selection on that side.
+                target = anchor
+                accumulatedPixels = 0f
+                waitingToReverse = true
+                lastDirection = direction
+                setSelection(anchor, anchor)
+                return
+            }
+            if (waitingToReverse) waitingToReverse = false
+            lastDirection = direction
+            val text = extractedText()?.text ?: return
+            repeat(steps) {
+                target = moveSelectionTarget(text, target, direction, wholeWord)
+            }
+            setSelection(anchor, target)
         }
 
         button.setOnTouchListener { _, event ->
             when (event.actionMasked) {
                 MotionEvent.ACTION_DOWN -> {
-                    downX = event.x
+                    downRawX = event.rawX
+                    lastRawX = event.rawX
+                    accumulatedPixels = 0f
                     selecting = false
+                    continuationActive = false
                     repeatStarted = false
                     lastDirection = 0
                     waitingToReverse = false
-                    lastSelectionStep = 0
-                    wasInContinuationEdge = false
-                    touchHandler.postDelayed({
-                        if (!selecting) {
-                            repeatStarted = true
-                            if (wholeWord) deletePreviousWord() else deletePreviousCodePoint()
-                            touchHandler.postDelayed(repeat, 300L)
-                        }
-                    }, ViewConfiguration.getLongPressTimeout().toLong())
+                    touchHandler.postDelayed(longPress, ViewConfiguration.getLongPressTimeout().toLong())
                     true
                 }
                 MotionEvent.ACTION_MOVE -> {
-                    val inContinuationEdge = event.rawX <= edgeZone || event.rawX >= screenWidth - edgeZone
-                    if (wasInContinuationEdge && !inContinuationEdge) {
-                        // Keep the virtual target reached by edge continuation;
-                        // start a fresh physical baseline so moving away from
-                        // the corner does not jump the selection endpoint.
-                        downX = event.x
-                        lastSelectionStep = 0
-                    }
-                    val delta = event.x - downX
-                    if (!selecting && kotlin.math.abs(delta) >= dp(24)) {
+                    val totalDelta = event.rawX - downRawX
+                    if (!selecting && kotlin.math.abs(totalDelta) >= selectThreshold) {
                         stopRunnables()
                         val extracted = extractedText()
                         if (extracted != null) {
                             selecting = true
                             anchor = extracted.selectionEnd
                             target = anchor
+                            lastRawX = downRawX
+                            accumulatedPixels = 0f
                             setSelection(anchor, anchor)
+                            moveByPixels(totalDelta)
                         }
+                    } else if (selecting) {
+                        if (continuationActive) {
+                            moveByPixels(event.rawX - lastRawX)
+                        } else {
+                            moveByPixels(event.rawX - lastRawX)
+                        }
+                        lastRawX = event.rawX
                     }
                     if (selecting) {
-                        val direction = if (delta < 0) -1 else 1
-                        if (lastDirection != 0 && direction != lastDirection && target != anchor) {
-                            // Crossing the anchor first collapses the selection.
-                            target = anchor
-                            lastSelectionStep = 0
-                            lastDirection = direction
-                            setSelection(anchor, anchor)
-                            waitingToReverse = true
-                        } else if (!waitingToReverse || direction == lastDirection) {
-                            waitingToReverse = false
-                            lastDirection = direction
-                            val stepPx = if (wholeWord) wordStepPx else charStepPx
-                            // Add hysteresis so tiny finger jitter does not move
-                            // the selection endpoint back and forth.
-                            val steps = ((kotlin.math.abs(delta) - dp(6)) / stepPx)
-                                .toInt().coerceAtLeast(1)
-                            if (steps != lastSelectionStep || direction != lastDirection) {
-                                val text = extractedText()?.text
-                                if (text != null) {
-                                    val proposed = moveFromAnchor(text, anchor, direction, steps, wholeWord)
-                                    if (proposed != target) {
-                                        target = proposed
-                                        setSelection(anchor, target)
-                                    }
-                                }
-                                lastSelectionStep = steps
-                            }
-                        } else {
-                            lastDirection = direction
-                        }
-
-                        if (inContinuationEdge) {
+                        lastRawX = event.rawX
+                        val atEdge = event.rawX <= edgeZone || event.rawX >= screenWidth - edgeZone
+                        if (atEdge) {
+                            continuationActive = true
                             touchHandler.removeCallbacks(edgeRepeat)
                             touchHandler.post(edgeRepeat)
                         } else {
                             touchHandler.removeCallbacks(edgeRepeat)
                         }
-                        wasInContinuationEdge = inContinuationEdge
                     }
                     true
                 }
@@ -541,14 +582,6 @@ class GovorunInputMethodService : InputMethodService() {
         sessionText.append(text)
     }
 
-    private fun deleteSelectedTextIfAny(): Boolean {
-        val connection = currentInputConnection ?: return false
-        val selected = connection.getSelectedText(0)?.toString()
-        if (selected.isNullOrEmpty()) return false
-        connection.commitText("", 1)
-        return true
-    }
-
     private fun deletePreviousCodePoint() {
         if (deleteSelectedTextIfAny()) return
         val connection = currentInputConnection ?: return
@@ -570,16 +603,6 @@ class GovorunInputMethodService : InputMethodService() {
         if (start == end) return
         val token = before.substring(start)
         connection.deleteSurroundingTextInCodePoints(token.codePointCount(0, token.length), 0)
-    }
-
-    private fun clearEntireField() {
-        val connection = currentInputConnection ?: return
-        val extracted = extractedText() ?: return
-        val text = extracted.text ?: return
-        if (text.isEmpty()) return
-        connection.setSelection(0, text.length)
-        connection.commitText("", 1)
-        sessionText.clear()
     }
 
     private fun removeSessionText() {

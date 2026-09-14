@@ -172,6 +172,15 @@ class GovorunInputMethodService : InputMethodService() {
         var lastDirection = 0
         var waitingToReverse = false
         var repeatStarted = false
+        var lastSelectionStep = 0
+        // Use screen coordinates, not view coordinates. The record/edit
+        // buttons are only about 64dp wide, so checking event.x against the
+        // button bounds would make the continuation zone active immediately
+        // on every horizontal drag.
+        val edgeZone = dp(64)
+        val screenWidth = resources.displayMetrics.widthPixels
+        val charStepPx = dp(24)
+        val wordStepPx = dp(48)
 
         val repeat = object : Runnable {
             override fun run() {
@@ -183,9 +192,12 @@ class GovorunInputMethodService : InputMethodService() {
         }
         val edgeRepeat = object : Runnable {
             override fun run() {
-                if (!selecting) return
-                if (target != anchor) {
-                    target = (target + lastDirection).coerceIn(0, extractedLength())
+                if (!selecting || lastDirection == 0) return
+                if (waitingToReverse) waitingToReverse = false
+                val text = extractedText()?.text ?: return
+                val next = moveSelectionTarget(text, target, lastDirection, wholeWord)
+                if (next != target) {
+                    target = next
                     setSelection(anchor, target)
                     touchHandler.postDelayed(this, 70L)
                 }
@@ -198,7 +210,7 @@ class GovorunInputMethodService : InputMethodService() {
             touchHandler.removeCallbacks(edgeRepeat)
         }
 
-        button.setOnTouchListener { view, event ->
+        button.setOnTouchListener { _, event ->
             when (event.actionMasked) {
                 MotionEvent.ACTION_DOWN -> {
                     downX = event.x
@@ -206,6 +218,7 @@ class GovorunInputMethodService : InputMethodService() {
                     repeatStarted = false
                     lastDirection = 0
                     waitingToReverse = false
+                    lastSelectionStep = 0
                     touchHandler.postDelayed({
                         if (!selecting) {
                             repeatStarted = true
@@ -217,11 +230,9 @@ class GovorunInputMethodService : InputMethodService() {
                 }
                 MotionEvent.ACTION_MOVE -> {
                     val delta = event.x - downX
-                    if (!selecting && kotlin.math.abs(delta) >= dp(12)) {
+                    if (!selecting && kotlin.math.abs(delta) >= dp(24)) {
                         stopRunnables()
-                        val extracted = currentInputConnection?.getExtractedText(
-                            ExtractedTextRequest(), 0
-                        )
+                        val extracted = extractedText()
                         if (extracted != null) {
                             selecting = true
                             anchor = extracted.selectionEnd
@@ -232,22 +243,36 @@ class GovorunInputMethodService : InputMethodService() {
                     if (selecting) {
                         val direction = if (delta < 0) -1 else 1
                         if (lastDirection != 0 && direction != lastDirection && target != anchor) {
-                            // Requested behavior: crossing the anchor first
-                            // collapses the selection; the next movement starts
-                            // selecting in the opposite direction.
+                            // Crossing the anchor first collapses the selection.
                             target = anchor
+                            lastSelectionStep = 0
+                            lastDirection = direction
                             setSelection(anchor, anchor)
                             waitingToReverse = true
                         } else if (!waitingToReverse || direction == lastDirection) {
                             waitingToReverse = false
                             lastDirection = direction
-                            val steps = (kotlin.math.abs(delta) / dp(12)).toInt().coerceAtLeast(1)
-                            target = (anchor + direction * steps).coerceIn(0, extractedLength())
-                            setSelection(anchor, target)
+                            val stepPx = if (wholeWord) wordStepPx else charStepPx
+                            // Add hysteresis so tiny finger jitter does not move
+                            // the selection endpoint back and forth.
+                            val steps = ((kotlin.math.abs(delta) - dp(6)) / stepPx)
+                                .toInt().coerceAtLeast(1)
+                            if (steps != lastSelectionStep || direction != lastDirection) {
+                                val text = extractedText()?.text
+                                if (text != null) {
+                                    val proposed = moveFromAnchor(text, anchor, direction, steps, wholeWord)
+                                    if (proposed != target) {
+                                        target = proposed
+                                        setSelection(anchor, target)
+                                    }
+                                }
+                                lastSelectionStep = steps
+                            }
                         } else {
                             lastDirection = direction
                         }
-                        if (event.x <= dp(12) || event.x >= view.width - dp(12)) {
+
+                        if (event.rawX <= edgeZone || event.rawX >= screenWidth - edgeZone) {
                             touchHandler.removeCallbacks(edgeRepeat)
                             touchHandler.post(edgeRepeat)
                         } else {
@@ -273,6 +298,49 @@ class GovorunInputMethodService : InputMethodService() {
                 else -> true
             }
         }
+    }
+
+    private fun extractedText(): android.view.inputmethod.ExtractedText? =
+        currentInputConnection?.getExtractedText(ExtractedTextRequest(), 0)
+
+    private fun moveFromAnchor(
+        text: CharSequence,
+        anchor: Int,
+        direction: Int,
+        steps: Int,
+        wholeWord: Boolean,
+    ): Int {
+        var position = anchor.coerceIn(0, text.length)
+        repeat(steps) {
+            position = moveSelectionTarget(text, position, direction, wholeWord)
+        }
+        return position
+    }
+
+    private fun moveSelectionTarget(
+        text: CharSequence,
+        from: Int,
+        direction: Int,
+        wholeWord: Boolean,
+    ): Int {
+        if (direction < 0) {
+            if (from <= 0) return 0
+            var p = from
+            if (wholeWord) {
+                while (p > 0 && text[p - 1].isWhitespace()) p--
+                while (p > 0 && !text[p - 1].isWhitespace()) p--
+                return p
+            }
+            return text.toString().offsetByCodePoints(p, -1)
+        }
+        if (from >= text.length) return text.length
+        var p = from
+        if (wholeWord) {
+            while (p < text.length && text[p].isWhitespace()) p++
+            while (p < text.length && !text[p].isWhitespace()) p++
+            return p
+        }
+        return text.toString().offsetByCodePoints(p, 1)
     }
 
     private fun extractedLength(): Int =

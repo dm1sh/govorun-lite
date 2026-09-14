@@ -42,7 +42,9 @@ android {
 
     buildTypes {
         debug {
-            // Default Android debug signing.
+            // Keep the development APK installable next to the store/release app.
+            applicationIdSuffix = ".debug"
+            versionNameSuffix = "-debug"
         }
         release {
             isMinifyEnabled = true

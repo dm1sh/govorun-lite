@@ -70,6 +70,19 @@
     <string name="onb_step_soon">Этот шаг будет достроен в ближайших обновлениях. Пока просто нажмите «Далее».</string>
     <string name="onb_open_app_settings">Открыть настройки приложения</string>
 
+    <!-- Shared audio transcription -->
+    <string name="share_transcription_title">Расшифровка аудио</string>
+    <string name="share_transcription_audio_file">Аудиофайл</string>
+    <string name="share_transcription_preparing">Подготавливаем аудио и запускаем офлайн-распознавание…</string>
+    <string name="share_transcription_done">Готово. Распознанный текст:</string>
+    <string name="share_transcription_copy">Скопировать текст</string>
+    <string name="share_transcription_share_again">Поделиться текстом</string>
+    <string name="share_transcription_share_chooser">Поделиться расшифровкой</string>
+    <string name="share_transcription_copied">Текст скопирован</string>
+    <string name="share_transcription_no_file">Не удалось получить аудиофайл</string>
+    <string name="share_transcription_empty">В аудиофайле не найдено речи</string>
+    <string name="share_transcription_failed">Не удалось расшифровать аудио: %1$s</string>
+
     <!-- Main screen -->
     <string name="main_ready">Всё готово</string>
     <string name="main_needs_setup">Нужна настройка</string>

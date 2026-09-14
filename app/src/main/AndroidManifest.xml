@@ -48,6 +48,19 @@
             tools:ignore="LockedOrientationActivity" />
 
         <activity
+            android:name=".ui.ShareTranscriptionActivity"
+            android:exported="true"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.GovorunLite"
+            tools:ignore="LockedOrientationActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="audio/*" />
+            </intent-filter>
+        </activity>
+
+        <activity
             android:name=".ui.FuturePlansActivity"
             android:exported="false"
             android:parentActivityName=".ui.MainActivity"

@@ -101,7 +101,7 @@ class GovorunInputMethodService : InputMethodService() {
         MaterialButton(themedContext).apply {
             contentDescription = getString(descriptionRes)
             icon = ContextCompat.getDrawable(themedContext, iconRes)
-            iconGravity = MaterialButton.ICON_GRAVITY_TEXT
+            iconGravity = MaterialButton.ICON_GRAVITY_TEXT_START
             iconPadding = 0
             text = ""
             minWidth = 0

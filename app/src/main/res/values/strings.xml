@@ -11,6 +11,11 @@
     <string name="ime_hint">Нажмите кнопку и говорите</string>
     <string name="ime_start">Начать диктовку</string>
     <string name="ime_stop">Остановить</string>
+    <string name="ime_backspace">Удалить символ</string>
+    <string name="ime_backspace_word">Удалить слово</string>
+    <string name="ime_newline">Новая строка</string>
+    <string name="ime_remove_session">Удалить текст последней диктовки</string>
+    <string name="ime_exit">Вернуться к предыдущей клавиатуре</string>
     <string name="ime_listening">Слушаю…</string>
     <string name="ime_processing">Распознаю…</string>
     <string name="ime_mic_permission">Разрешите доступ к микрофону в настройках приложения</string>

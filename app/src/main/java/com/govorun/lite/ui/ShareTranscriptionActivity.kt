@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.govorun.lite.R
 import com.govorun.lite.model.GigaAmModel
+import com.govorun.lite.stats.StatsStore
 import com.govorun.lite.transcriber.AudioFileDecoder
 import com.govorun.lite.transcriber.OfflineTranscriber
 import com.google.android.material.button.MaterialButton
@@ -21,16 +22,22 @@ import kotlinx.coroutines.withContext
 
 /** Receives an audio file from Android's share sheet and transcribes it offline. */
 class ShareTranscriptionActivity : AppCompatActivity() {
+    companion object {
+        private const val KEY_STATS_RECORDED = "share_stats_recorded"
+    }
+
     private lateinit var status: MaterialTextView
     private lateinit var result: MaterialTextView
     private lateinit var progress: LinearProgressIndicator
     private lateinit var copy: MaterialButton
     private lateinit var shareAgain: MaterialButton
     private var transcript = ""
+    private var statsRecorded = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_share_transcription)
+        statsRecorded = savedInstanceState?.getBoolean(KEY_STATS_RECORDED, false) ?: false
         val toolbar = findViewById<com.google.android.material.appbar.MaterialToolbar>(R.id.shareToolbar)
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -85,6 +92,10 @@ class ShareTranscriptionActivity : AppCompatActivity() {
                 if (text.isBlank()) {
                     showError(getString(R.string.share_transcription_empty))
                 } else {
+                    if (!statsRecorded) {
+                        StatsStore.addWords(applicationContext, StatsStore.countWords(text))
+                        statsRecorded = true
+                    }
                     status.text = getString(R.string.share_transcription_done)
                     result.text = text
                     result.visibility = View.VISIBLE
@@ -95,6 +106,11 @@ class ShareTranscriptionActivity : AppCompatActivity() {
                 showError(getString(R.string.share_transcription_failed, t.message ?: ""))
             }
         }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putBoolean(KEY_STATS_RECORDED, statsRecorded)
+        super.onSaveInstanceState(outState)
     }
 
     private fun showError(message: String) {

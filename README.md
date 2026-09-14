@@ -78,6 +78,10 @@ echo "sdk.dir=/path/to/android-sdk" > local.properties
 adb install --user 0 -r app/build/outputs/apk/debug/app-debug.apk
 ```
 
+The debug build uses the application ID `com.govorun.lite.debug`, so it can be
+installed next to the regular `com.govorun.lite` app. GitHub Actions also builds
+this APK automatically and publishes it as a workflow artifact.
+
 ## Установка собранного APK вручную
 
 Если ставите APK в обход магазина (например, скачали готовый файл или

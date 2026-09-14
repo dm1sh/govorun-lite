@@ -217,7 +217,6 @@ class GovorunInputMethodService : InputMethodService() {
         var anchor = 0
         var target = 0
         var lastDirection = 0
-        var waitingToReverse = false
         var repeatStarted = false
         var downRawX = 0f
         var lastRawX = 0f
@@ -239,13 +238,17 @@ class GovorunInputMethodService : InputMethodService() {
         val edgeRepeat = object : Runnable {
             override fun run() {
                 if (!selecting || lastDirection == 0) return
-                if (waitingToReverse) waitingToReverse = false
                 val text = extractedText()?.text ?: return
-                val next = moveSelectionTarget(text, target, lastDirection, wholeWord)
+                val proposed = moveSelectionTarget(text, target, lastDirection, wholeWord)
+                val next = when {
+                    lastDirection < 0 && target > anchor -> maxOf(anchor, proposed)
+                    lastDirection > 0 && target < anchor -> minOf(anchor, proposed)
+                    else -> proposed
+                }
                 if (next != target) {
                     target = next
                     setSelection(anchor, target)
-                    touchHandler.postDelayed(this, 70L)
+                    touchHandler.postDelayed(this, if (wholeWord) 170L else 90L)
                 }
             }
         }
@@ -265,31 +268,59 @@ class GovorunInputMethodService : InputMethodService() {
             touchHandler.removeCallbacks(edgeRepeat)
         }
 
+        fun selectionStepPixels(
+            text: CharSequence,
+            from: Int,
+            direction: Int,
+            wholeWord: Boolean,
+        ): Float {
+            if (!wholeWord) return dp(24).toFloat()
+            var p = from.coerceIn(0, text.length)
+            if (direction < 0) {
+                while (p > 0 && text[p - 1].isWhitespace()) p--
+                val end = p
+                while (p > 0 && !text[p - 1].isWhitespace()) p--
+                val chars = (end - p).coerceAtLeast(1)
+                return maxOf(dp(48).toFloat(), chars * dp(12).toFloat())
+            }
+            while (p < text.length && text[p].isWhitespace()) p++
+            val start = p
+            while (p < text.length && !text[p].isWhitespace()) p++
+            val chars = (p - start).coerceAtLeast(1)
+            return maxOf(dp(48).toFloat(), chars * dp(12).toFloat())
+        }
+
         fun moveByPixels(delta: Float) {
             accumulatedPixels += delta
-            var steps = (kotlin.math.abs(accumulatedPixels) / stepPixels).toInt()
-            if (steps == 0) return
-            val direction = if (accumulatedPixels < 0f) -1 else 1
-            accumulatedPixels -= direction * steps * stepPixels
+            while (kotlin.math.abs(accumulatedPixels) >= selectionStepPixels(
+                    extractedText()?.text ?: return,
+                    target,
+                    if (accumulatedPixels < 0f) -1 else 1,
+                    wholeWord,
+                )
+            ) {
+                val text = extractedText()?.text ?: return
+                val direction = if (accumulatedPixels < 0f) -1 else 1
+                val threshold = selectionStepPixels(text, target, direction, wholeWord)
+                val before = target
+                val proposed = moveSelectionTarget(text, target, direction, wholeWord)
 
-            if (lastDirection != 0 && direction != lastDirection && target != anchor) {
-                // Crossing the anchor collapses first; subsequent movement in
-                // the new direction starts a fresh selection on that side.
-                target = anchor
-                accumulatedPixels = 0f
-                waitingToReverse = true
-                lastDirection = direction
-                setSelection(anchor, anchor)
-                return
-            }
-            if (waitingToReverse) waitingToReverse = false
-            lastDirection = direction
-            val text = extractedText()?.text ?: return
-            repeat(steps) {
-                target = moveSelectionTarget(text, target, direction, wholeWord)
+                // Moving back toward the anchor shrinks the selection instead
+                // of clearing it immediately. The endpoint cannot cross the
+                // anchor during this step, so a small reverse movement only
+                // adjusts the already selected range.
+                target = when {
+                    direction < 0 && target > anchor -> maxOf(anchor, proposed)
+                    direction > 0 && target < anchor -> minOf(anchor, proposed)
+                    else -> proposed
+                }
+                accumulatedPixels -= direction * threshold
+                if (target == before) break
             }
             setSelection(anchor, target)
         }
+
+
 
         button.setOnTouchListener { _, event ->
             when (event.actionMasked) {
@@ -301,7 +332,6 @@ class GovorunInputMethodService : InputMethodService() {
                     continuationActive = false
                     repeatStarted = false
                     lastDirection = 0
-                    waitingToReverse = false
                     touchHandler.postDelayed(longPress, ViewConfiguration.getLongPressTimeout().toLong())
                     true
                 }

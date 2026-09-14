@@ -18,6 +18,11 @@
             <action android:name="android.intent.action.MAIN" />
             <category android:name="android.intent.category.LAUNCHER" />
         </intent>
+        <!-- Make the offline RecognitionService discoverable to Android's
+             SpeechRecognizer framework and keyboard voice-input clients. -->
+        <intent>
+            <action android:name="android.speech.RecognitionService" />
+        </intent>
     </queries>
 
     <application

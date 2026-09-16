@@ -76,6 +76,11 @@ class GovorunInputMethodService : InputMethodService() {
             R.string.ime_exit,
         ) { exitToPreviousInputMethod() }
         topRow.addView(exitButton, LinearLayout.LayoutParams(dp(56), dp(48)))
+        topRow.addView(LinearLayout(themedContext), LinearLayout.LayoutParams(0, 1, 1f))
+        val undoButton = makeIconButton(R.drawable.ic_undo_24, R.string.ime_undo) {
+            undoLastEdit()
+        }
+        topRow.addView(undoButton, LinearLayout.LayoutParams(dp(56), dp(48)))
         root.addView(topRow, LinearLayout.LayoutParams(-1, -2))
 
         // Fixed order: clear, whole-word backspace, start/stop, character
@@ -83,18 +88,14 @@ class GovorunInputMethodService : InputMethodService() {
         val controls = LinearLayout(themedContext).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = android.view.Gravity.CENTER
-            // Five flexible edit buttons plus one fixed circular record button.
-            weightSum = 5f
+            // Four flexible edit buttons plus one fixed circular record button.
+            weightSum = 4f
         }
         val clearButton = makeIconButton(R.drawable.ic_clear_all_24, R.string.ime_remove_session) {
             removeSessionText()
         }
         configureClearTouch(clearButton)
         controls.addView(clearButton, weightedButtonParams())
-        val undoButton = makeIconButton(R.drawable.ic_undo_24, R.string.ime_undo) {
-            undoLastEdit()
-        }
-        controls.addView(undoButton, weightedButtonParams())
         val wordBackspace = makeIconButton(R.drawable.ic_backspace_word_24, R.string.ime_backspace_word) {
             deletePreviousWord()
         }

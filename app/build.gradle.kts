@@ -29,7 +29,7 @@ android {
         minSdk = 33
         targetSdk = 35
         versionCode = ciVersionCode ?: 19
-        versionName = "1.0.15" + (ciVersionCode?.let { "+$it" } ?: "")
+        versionName = "1.0.17" + (ciVersionCode?.let { "+$it" } ?: "")
         ndk {
             abiFilters += "arm64-v8a"
         }

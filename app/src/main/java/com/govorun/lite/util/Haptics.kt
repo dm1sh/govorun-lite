@@ -2,7 +2,6 @@ package com.govorun.lite.util
 
 import android.app.Activity
 import android.content.Context
-import android.media.AudioAttributes
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
@@ -18,14 +17,10 @@ import com.govorun.lite.service.LiteAccessibilityService
 /**
  * Single source of truth for all haptic feedback in the app.
  *
- * Strategy: prefer [View.performHapticFeedback] with FLAG_IGNORE_GLOBAL_SETTING
- * over the low-level Vibrator API. Reasons:
- *
- *  • Immune to the system "Touch feedback" toggle, DnD, Battery Saver —
- *    user can't accidentally mute our haptics by toggling unrelated stuff.
- *  • Routes through the system haptic-feedback pipeline → device-native
- *    feel (sharp click on Pixel, soft tap on Samsung, etc.) instead of the
- *    flat "bzzz" of a raw waveform.
+ * Strategy: prefer [View.performHapticFeedback] over the low-level Vibrator
+ * API. This routes through the system haptic-feedback pipeline and gives a
+ * device-native feel (sharp click on Pixel, soft tap on Samsung, etc.) instead
+ * of the flat "bzzz" of a raw waveform.
  *  • One mechanism across the whole project — no half-and-half where
  *    bubble haptics fire but settings haptics don't.
  *
@@ -75,11 +70,10 @@ object Haptics {
     }
 
     private fun performHaptic(view: View, type: Int, repeats: Int) {
-        val flags = HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING
-        view.performHapticFeedback(type, flags)
+        view.performHapticFeedback(type)
         if (repeats > 1) {
             view.postDelayed({
-                view.performHapticFeedback(type, flags)
+                view.performHapticFeedback(type)
             }, DOUBLE_TAP_GAP_MS)
         }
     }
@@ -89,19 +83,10 @@ object Haptics {
         if (!v.hasVibrator()) return
         val timings = if (repeats >= 2) longArrayOf(0L, 50L, 80L, 50L) else longArrayOf(0L, 50L)
         val effect = VibrationEffect.createWaveform(timings, -1)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            val attrs = VibrationAttributes.Builder()
-                .setUsage(VibrationAttributes.USAGE_TOUCH)
-                .build()
-            v.vibrate(effect, attrs)
-        } else {
-            @Suppress("DEPRECATION")
-            val audioAttrs = AudioAttributes.Builder()
-                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                .setUsage(AudioAttributes.USAGE_ASSISTANCE_SONIFICATION)
-                .build()
-            v.vibrate(effect, audioAttrs)
-        }
+        val attrs = VibrationAttributes.Builder()
+            .setUsage(VibrationAttributes.USAGE_TOUCH)
+            .build()
+        v.vibrate(effect, attrs)
         Log.d(TAG, "Fallback vibrator path (no view available, repeats=$repeats)")
     }
 

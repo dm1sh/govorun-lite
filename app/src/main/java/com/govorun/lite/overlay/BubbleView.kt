@@ -90,7 +90,7 @@ class BubbleView @JvmOverloads constructor(
         color = processingFill; style = Paint.Style.FILL
     }
     private val pulsePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = 0x40E53935.toInt(); style = Paint.Style.FILL
+        color = 0x40E53935; style = Paint.Style.FILL
     }
     // Soft pulsing halo behind the idle bubble — an expanding filled disc
     // whose alpha fades to zero as it grows. Replaces the old swept stroke

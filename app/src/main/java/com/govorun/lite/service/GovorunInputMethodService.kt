@@ -83,14 +83,18 @@ class GovorunInputMethodService : InputMethodService() {
         val controls = LinearLayout(themedContext).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = android.view.Gravity.CENTER
-            // Four flexible edit buttons plus one fixed circular record button.
-            weightSum = 4f
+            // Five flexible edit buttons plus one fixed circular record button.
+            weightSum = 5f
         }
         val clearButton = makeIconButton(R.drawable.ic_clear_all_24, R.string.ime_remove_session) {
             removeSessionText()
         }
         configureClearTouch(clearButton)
         controls.addView(clearButton, weightedButtonParams())
+        val undoButton = makeIconButton(R.drawable.ic_undo_24, R.string.ime_undo) {
+            undoLastEdit()
+        }
+        controls.addView(undoButton, weightedButtonParams())
         val wordBackspace = makeIconButton(R.drawable.ic_backspace_word_24, R.string.ime_backspace_word) {
             deletePreviousWord()
         }
@@ -165,6 +169,12 @@ class GovorunInputMethodService : InputMethodService() {
             insetTop = dp(4)
             insetBottom = dp(4)
         }
+
+    private fun undoLastEdit() {
+        if (currentInputConnection?.performContextMenuAction(android.R.id.undo) == true) {
+            Haptics.tap(this)
+        }
+    }
 
     private fun configureClearTouch(button: MaterialButton) {
         var longPressed = false

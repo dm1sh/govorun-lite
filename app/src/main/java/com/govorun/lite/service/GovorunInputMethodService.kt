@@ -49,13 +49,7 @@ class GovorunInputMethodService : InputMethodService() {
     private lateinit var themedContext: Context
     private var currentEditorInfo: EditorInfo? = null
 
-    private data class DeletionUndo(
-        val text: String,
-        val start: Int,
-        val end: Int,
-    )
-
-    private var lastDeletion: DeletionUndo? = null
+    private lateinit var undoButton: MaterialButton
     private val sessionText = StringBuilder()
 
     override fun onCreateInputView(): View {
@@ -85,10 +79,15 @@ class GovorunInputMethodService : InputMethodService() {
         ) { exitToPreviousInputMethod() }
         topRow.addView(exitButton, LinearLayout.LayoutParams(dp(56), dp(48)))
         topRow.addView(LinearLayout(themedContext), LinearLayout.LayoutParams(0, 1, 1f))
-        val undoButton = makeIconButton(R.drawable.ic_undo_24, R.string.ime_undo) {
+        undoButton = makeIconButton(R.drawable.ic_undo_24, R.string.ime_undo) {
             undoLastEdit()
         }
+        updateUndoButton()
         topRow.addView(undoButton, LinearLayout.LayoutParams(dp(56), dp(48)))
+        val redoButton = makeIconButton(R.drawable.ic_redo_24, R.string.ime_redo) {
+            redoLastEdit()
+        }
+        topRow.addView(redoButton, LinearLayout.LayoutParams(dp(56), dp(48)))
         root.addView(topRow, LinearLayout.LayoutParams(-1, -2))
 
         // Fixed order: clear, whole-word backspace, start/stop, character
@@ -179,13 +178,23 @@ class GovorunInputMethodService : InputMethodService() {
             insetBottom = dp(4)
         }
 
+    private fun updateUndoButton() {
+        if (!::undoButton.isInitialized) return
+        // Availability is controlled by the target editor's own undo stack.
+        undoButton.isEnabled = true
+        undoButton.alpha = 1f
+    }
+
     private fun undoLastEdit() {
-        val deletion = lastDeletion ?: return
-        val connection = currentInputConnection ?: return
-        connection.setSelection(deletion.start, deletion.end)
-        connection.commitText(deletion.text, 1)
-        lastDeletion = null
-        Haptics.tap(this)
+        if (currentInputConnection?.performContextMenuAction(android.R.id.undo) == true) {
+            Haptics.tap(this)
+        }
+    }
+
+    private fun redoLastEdit() {
+        if (currentInputConnection?.performContextMenuAction(android.R.id.redo) == true) {
+            Haptics.tap(this)
+        }
     }
 
     private fun configureClearTouch(button: MaterialButton) {
@@ -220,7 +229,6 @@ class GovorunInputMethodService : InputMethodService() {
         val text = extracted.text ?: return
         val start = extracted.startOffset
         val end = start + text.length
-        lastDeletion = DeletionUndo(text.toString(), start, end)
         connection.setSelection(start, end)
         connection.commitText("", 1)
         sessionText.clear()
@@ -230,12 +238,6 @@ class GovorunInputMethodService : InputMethodService() {
         val connection = currentInputConnection ?: return false
         val selected = connection.getSelectedText(0)?.toString() ?: return false
         if (selected.isEmpty()) return false
-        val extracted = extractedText()
-        if (extracted != null) {
-            val start = extracted.startOffset + extracted.selectionStart
-            val end = extracted.startOffset + extracted.selectionEnd
-            lastDeletion = DeletionUndo(selected, start, end)
-        }
         connection.commitText("", 1)
         return true
     }
@@ -668,7 +670,6 @@ class GovorunInputMethodService : InputMethodService() {
             first.isLetterOrDigit() &&
             previous !in "([\\{\\\"'«"
         val inserted = if (needsSpace) " $text" else text
-        lastDeletion = null
         connection.commitText(inserted, 1)
         sessionText.append(inserted)
     }
@@ -678,9 +679,6 @@ class GovorunInputMethodService : InputMethodService() {
         val connection = currentInputConnection ?: return
         val before = connection.getTextBeforeCursor(4, 0)?.toString().orEmpty()
         if (before.isEmpty()) return
-        val deleted = before.substring(before.offsetByCodePoints(before.length, -1))
-        val cursor = extractedText()?.selectionEnd ?: before.length
-        lastDeletion = DeletionUndo(deleted, cursor - deleted.length, cursor)
         connection.deleteSurroundingTextInCodePoints(1, 0)
     }
 
@@ -696,8 +694,6 @@ class GovorunInputMethodService : InputMethodService() {
         while (start > 0 && !before[start - 1].isWhitespace()) start--
         if (start == end) return
         val token = before.substring(start)
-        val cursor = extractedText()?.selectionEnd ?: before.length
-        lastDeletion = DeletionUndo(token, cursor - token.length, cursor)
         connection.deleteSurroundingTextInCodePoints(token.codePointCount(0, token.length), 0)
     }
 
@@ -707,8 +703,6 @@ class GovorunInputMethodService : InputMethodService() {
         if (text.isEmpty()) return
         val before = connection.getTextBeforeCursor(text.length + 8, 0)?.toString() ?: return
         if (!before.endsWith(text)) return
-        val cursor = extractedText()?.selectionEnd ?: before.length
-        lastDeletion = DeletionUndo(text, cursor - text.length, cursor)
         connection.deleteSurroundingTextInCodePoints(text.codePointCount(0, text.length), 0)
         sessionText.clear()
         Haptics.tap(this)

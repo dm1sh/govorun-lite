@@ -48,6 +48,14 @@ class GovorunInputMethodService : InputMethodService() {
     private lateinit var recordButton: MaterialButton
     private lateinit var themedContext: Context
     private var currentEditorInfo: EditorInfo? = null
+
+    private data class DeletionUndo(
+        val text: String,
+        val start: Int,
+        val end: Int,
+    )
+
+    private var lastDeletion: DeletionUndo? = null
     private val sessionText = StringBuilder()
 
     override fun onCreateInputView(): View {
@@ -172,9 +180,12 @@ class GovorunInputMethodService : InputMethodService() {
         }
 
     private fun undoLastEdit() {
-        if (currentInputConnection?.performContextMenuAction(android.R.id.undo) == true) {
-            Haptics.tap(this)
-        }
+        val deletion = lastDeletion ?: return
+        val connection = currentInputConnection ?: return
+        connection.setSelection(deletion.start, deletion.end)
+        connection.commitText(deletion.text, 1)
+        lastDeletion = null
+        Haptics.tap(this)
     }
 
     private fun configureClearTouch(button: MaterialButton) {
@@ -209,17 +220,23 @@ class GovorunInputMethodService : InputMethodService() {
         val text = extracted.text ?: return
         val start = extracted.startOffset
         val end = start + text.length
+        lastDeletion = DeletionUndo(text.toString(), start, end)
         connection.setSelection(start, end)
         connection.commitText("", 1)
         sessionText.clear()
     }
 
-    private fun hasSelectedText(): Boolean =
-        currentInputConnection?.getSelectedText(0)?.isNotEmpty() == true
-
     private fun deleteSelectedTextIfAny(): Boolean {
-        if (!hasSelectedText()) return false
-        currentInputConnection?.commitText("", 1)
+        val connection = currentInputConnection ?: return false
+        val selected = connection.getSelectedText(0)?.toString() ?: return false
+        if (selected.isEmpty()) return false
+        val extracted = extractedText()
+        if (extracted != null) {
+            val start = extracted.startOffset + extracted.selectionStart
+            val end = extracted.startOffset + extracted.selectionEnd
+            lastDeletion = DeletionUndo(selected, start, end)
+        }
+        connection.commitText("", 1)
         return true
     }
 
@@ -399,7 +416,7 @@ class GovorunInputMethodService : InputMethodService() {
                     val wasRepeating = repeatStarted
                     stopRunnables()
                     if (selecting && event.actionMasked == MotionEvent.ACTION_UP) {
-                        currentInputConnection?.commitText("", 1)
+                        deleteSelectedTextIfAny()
                         Haptics.tap(this)
                     } else if (!wasRepeating && !selecting && event.actionMasked == MotionEvent.ACTION_UP) {
                         if (wholeWord) deletePreviousWord() else deletePreviousCodePoint()
@@ -651,6 +668,7 @@ class GovorunInputMethodService : InputMethodService() {
             first.isLetterOrDigit() &&
             previous !in "([\\{\\\"'«"
         val inserted = if (needsSpace) " $text" else text
+        lastDeletion = null
         connection.commitText(inserted, 1)
         sessionText.append(inserted)
     }
@@ -658,9 +676,12 @@ class GovorunInputMethodService : InputMethodService() {
     private fun deletePreviousCodePoint() {
         if (deleteSelectedTextIfAny()) return
         val connection = currentInputConnection ?: return
-        if (connection.getTextBeforeCursor(1, 0)?.isNotEmpty() == true) {
-            connection.deleteSurroundingTextInCodePoints(1, 0)
-        }
+        val before = connection.getTextBeforeCursor(4, 0)?.toString().orEmpty()
+        if (before.isEmpty()) return
+        val deleted = before.substring(before.offsetByCodePoints(before.length, -1))
+        val cursor = extractedText()?.selectionEnd ?: before.length
+        lastDeletion = DeletionUndo(deleted, cursor - deleted.length, cursor)
+        connection.deleteSurroundingTextInCodePoints(1, 0)
     }
 
     /** Attached punctuation stays part of the preceding word/token. */
@@ -675,6 +696,8 @@ class GovorunInputMethodService : InputMethodService() {
         while (start > 0 && !before[start - 1].isWhitespace()) start--
         if (start == end) return
         val token = before.substring(start)
+        val cursor = extractedText()?.selectionEnd ?: before.length
+        lastDeletion = DeletionUndo(token, cursor - token.length, cursor)
         connection.deleteSurroundingTextInCodePoints(token.codePointCount(0, token.length), 0)
     }
 
@@ -684,6 +707,8 @@ class GovorunInputMethodService : InputMethodService() {
         if (text.isEmpty()) return
         val before = connection.getTextBeforeCursor(text.length + 8, 0)?.toString() ?: return
         if (!before.endsWith(text)) return
+        val cursor = extractedText()?.selectionEnd ?: before.length
+        lastDeletion = DeletionUndo(text, cursor - text.length, cursor)
         connection.deleteSurroundingTextInCodePoints(text.codePointCount(0, text.length), 0)
         sessionText.clear()
         Haptics.tap(this)

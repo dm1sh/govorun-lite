@@ -630,8 +630,18 @@ class GovorunInputMethodService : InputMethodService() {
 
     private fun commitInserted(text: String) {
         if (text.isEmpty()) return
-        currentInputConnection?.commitText(text, 1)
-        sessionText.append(text)
+        val connection = currentInputConnection ?: return
+        val before = connection.getTextBeforeCursor(2, 0)?.toString().orEmpty()
+        val previous = before.lastOrNull()
+        val first = text.firstOrNull()
+        val needsSpace = previous != null &&
+            !previous.isWhitespace() &&
+            first != null &&
+            first.isLetterOrDigit() &&
+            previous !in "([\\{\\\"'«"
+        val inserted = if (needsSpace) " $text" else text
+        connection.commitText(inserted, 1)
+        sessionText.append(inserted)
     }
 
     private fun deletePreviousCodePoint() {

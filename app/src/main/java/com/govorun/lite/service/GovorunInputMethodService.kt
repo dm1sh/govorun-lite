@@ -282,7 +282,7 @@ class GovorunInputMethodService : InputMethodService() {
                     // Continuous whole-word movement is deliberately slower
                     // than normal finger movement so a word is not skipped
                     // before the user can reverse direction.
-                    touchHandler.postDelayed(this, if (wholeWord) 450L else 220L)
+                    touchHandler.postDelayed(this, if (wholeWord) 900L else 220L)
                 }
             }
         }

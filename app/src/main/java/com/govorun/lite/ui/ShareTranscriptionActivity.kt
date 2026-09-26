@@ -7,6 +7,10 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
 import com.govorun.lite.R
 import com.govorun.lite.model.GigaAmModel
@@ -36,7 +40,15 @@ class ShareTranscriptionActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         setContentView(R.layout.activity_share_transcription)
+        val shareRoot = findViewById<View>(R.id.shareRoot)
+        ViewCompat.setOnApplyWindowInsetsListener(shareRoot) { view, insets ->
+            val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            view.updatePadding(top = bars.top, bottom = bars.bottom)
+            insets
+        }
+        ViewCompat.requestApplyInsets(shareRoot)
         statsRecorded = savedInstanceState?.getBoolean(KEY_STATS_RECORDED, false) ?: false
         val toolbar = findViewById<com.google.android.material.appbar.MaterialToolbar>(R.id.shareToolbar)
         setSupportActionBar(toolbar)

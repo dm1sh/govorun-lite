@@ -200,6 +200,10 @@ class MainActivity : AppCompatActivity() {
             Settings.Secure.getUriFor("accessibility_shortcut_target_service"),
             false, accessibilityObserver,
         )
+        cr.registerContentObserver(
+            Settings.Secure.getUriFor(Settings.Secure.ENABLED_INPUT_METHODS),
+            false, accessibilityObserver,
+        )
     }
 
     override fun onPause() {
@@ -333,8 +337,13 @@ class MainActivity : AppCompatActivity() {
 
     private fun isVoiceKeyboardEnabled(): Boolean {
         val imm = getSystemService(InputMethodManager::class.java) ?: return false
-        val id = "$packageName/${com.govorun.lite.service.GovorunInputMethodService::class.java.name}"
-        return imm.enabledInputMethodList.any { it.id == id }
+        val serviceName = com.govorun.lite.service.GovorunInputMethodService::class.java.name
+        return imm.enabledInputMethodList.any { info ->
+            // Compare the parsed component fields instead of only InputMethodInfo.id.
+            // Some Android builds report the same enabled IME with a normalized
+            // component string, which made the old exact-id check return false.
+            info.packageName == packageName && info.serviceName == serviceName
+        }
     }
 
     private fun openAppDetails() {

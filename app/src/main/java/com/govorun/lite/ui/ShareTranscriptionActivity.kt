@@ -79,13 +79,6 @@ class ShareTranscriptionActivity : AppCompatActivity() {
             try {
                 withContext(Dispatchers.IO) {
                     GigaAmModel.ensureInstalled(this@ShareTranscriptionActivity)
-                    val pcm = AudioFileDecoder.decode(this@ShareTranscriptionActivity, uri)
-                    if (pcm.isEmpty()) return@withContext
-                    withContext(Dispatchers.Main) {
-                        progress.isIndeterminate = false
-                        progress.max = 100
-                        progress.progress = 0
-                    }
                     val transcriber = OfflineTranscriber.getInstance(this@ShareTranscriptionActivity)
                     val segmenter = SpeechSegmenter(this@ShareTranscriptionActivity)
 
@@ -108,20 +101,31 @@ class ShareTranscriptionActivity : AppCompatActivity() {
                     }
 
                     try {
-                        // These are transport blocks only. Speech boundaries
-                        // are still produced exclusively by SpeechSegmenter/VAD.
-                        val blockSamples = 16_000
-                        var offset = 0
-                        while (offset < pcm.size) {
-                            val end = minOf(offset + blockSamples, pcm.size)
-                            transcribeSegments(segmenter.acceptPcm(pcm.copyOfRange(offset, end)))
-                            offset = end
-                            withContext(Dispatchers.Main) {
-                                progress.progress = (offset * 100L / pcm.size).toInt().coerceIn(0, 99)
-                            }
-                        }
+                        // Decoding, VAD, and recognition now form one streaming
+                        // pipeline. No complete-file PCM buffer or extra time
+                        // segmentation is created.
+                        AudioFileDecoder.decodeStreaming(
+                            context = this@ShareTranscriptionActivity,
+                            uri = uri,
+                            onPcm = { pcmChunk ->
+                                transcribeSegments(segmenter.acceptPcm(pcmChunk))
+                            },
+                            onProgress = { positionUs, durationUs ->
+                                if (durationUs > 0L) {
+                                    withContext(Dispatchers.Main) {
+                                        progress.isIndeterminate = false
+                                        progress.max = 100
+                                        progress.progress =
+                                            (positionUs * 100L / durationUs).toInt().coerceIn(0, 99)
+                                    }
+                                }
+                            },
+                        )
                         transcribeSegments(segmenter.flush())
-                        withContext(Dispatchers.Main) { progress.progress = 100 }
+                        withContext(Dispatchers.Main) {
+                            progress.isIndeterminate = false
+                            progress.progress = 100
+                        }
                     } finally {
                         segmenter.close()
                     }

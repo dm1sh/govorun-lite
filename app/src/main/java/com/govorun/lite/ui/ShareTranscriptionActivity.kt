@@ -17,6 +17,7 @@ import com.govorun.lite.model.GigaAmModel
 import com.govorun.lite.stats.StatsStore
 import com.govorun.lite.transcriber.AudioFileDecoder
 import com.govorun.lite.transcriber.OfflineTranscriber
+import com.govorun.lite.transcriber.SpeechSegmenter
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.google.android.material.textview.MaterialTextView
@@ -82,22 +83,40 @@ class ShareTranscriptionActivity : AppCompatActivity() {
                     val pcm = AudioFileDecoder.decode(this@ShareTranscriptionActivity, uri)
                     if (pcm.isEmpty()) return@withContext ""
                     val transcriber = OfflineTranscriber.getInstance(this@ShareTranscriptionActivity)
-                    transcriber.startAudio()
-                    val bytes = ByteArray(pcm.size * 2)
-                    for (i in pcm.indices) {
-                        bytes[i * 2] = (pcm[i].toInt() and 0xff).toByte()
-                        bytes[i * 2 + 1] = (pcm[i].toInt() shr 8).toByte()
+                    val segmenter = SpeechSegmenter(this@ShareTranscriptionActivity)
+                    val result = StringBuilder()
+
+                    suspend fun transcribeSegments(segments: List<ShortArray>) {
+                        for (segment in segments) {
+                            if (segment.isEmpty()) continue
+                            val bytes = ByteArray(segment.size * 2)
+                            for (i in segment.indices) {
+                                val sample = segment[i].toInt()
+                                bytes[i * 2] = (sample and 0xff).toByte()
+                                bytes[i * 2 + 1] = (sample shr 8).toByte()
+                            }
+                            // This is intentionally the same lifecycle as
+                            // microphone/VAD transcription: one VAD segment,
+                            // one recognizer stream.
+                            transcriber.startAudio()
+                            transcriber.sendAudioChunk(bytes)
+                            val part = transcriber.stopAudioAndGetTranscript()
+                            if (part.isNotBlank()) {
+                                if (result.isNotEmpty()) result.append(' ')
+                                result.append(part)
+                            }
+                        }
                     }
-                    // Keep memory use bounded for long files while using the same
-                    // streaming API as microphone dictation.
-                    var offset = 0
-                    val chunk = 64 * 1024
-                    while (offset < bytes.size) {
-                        val end = minOf(offset + chunk, bytes.size)
-                        transcriber.sendAudioChunk(bytes.copyOfRange(offset, end))
-                        offset = end
+
+                    try {
+                        // Feed the complete decoded PCM through the same 512-
+                        // sample VAD segmentation used for microphone input.
+                        transcribeSegments(segmenter.acceptPcm(pcm))
+                        transcribeSegments(segmenter.flush())
+                    } finally {
+                        segmenter.close()
                     }
-                    transcriber.stopAudioAndGetTranscript()
+                    result.toString()
                 }
                 transcript = text
                 progress.visibility = View.GONE

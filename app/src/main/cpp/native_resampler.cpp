@@ -21,7 +21,7 @@ static void throwIllegalState(JNIEnv* env, const char* message) {
 }
 
 extern "C" JNIEXPORT jlong JNICALL
-Java_com_govorun_lite_transcriber_NativeResampler_nativeCreate(
+Java_com_govorun_lite_transcriber_NativeResampler_00024Companion_nativeCreate(
         JNIEnv* env, jclass, jint sample_rate, jint channels) {
     if (sample_rate <= 0 || channels <= 0) {
         throwIllegalState(env, "Invalid input audio format");
@@ -68,7 +68,7 @@ static jshortArray convert(JNIEnv* env, Resampler* r, const uint8_t* input,
 }
 
 extern "C" JNIEXPORT jshortArray JNICALL
-Java_com_govorun_lite_transcriber_NativeResampler_nativeProcess(
+Java_com_govorun_lite_transcriber_NativeResampler_00024Companion_nativeProcess(
         JNIEnv* env, jclass, jlong handle, jobject buffer, jint byte_count) {
     auto* r = reinterpret_cast<Resampler*>(handle);
     auto* input = static_cast<uint8_t*>(env->GetDirectBufferAddress(buffer));
@@ -80,7 +80,7 @@ Java_com_govorun_lite_transcriber_NativeResampler_nativeProcess(
 }
 
 extern "C" JNIEXPORT jshortArray JNICALL
-Java_com_govorun_lite_transcriber_NativeResampler_nativeFlush(
+Java_com_govorun_lite_transcriber_NativeResampler_00024Companion_nativeFlush(
         JNIEnv* env, jclass, jlong handle) {
     auto* r = reinterpret_cast<Resampler*>(handle);
     if (!r) return env->NewShortArray(0);
@@ -88,7 +88,7 @@ Java_com_govorun_lite_transcriber_NativeResampler_nativeFlush(
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_govorun_lite_transcriber_NativeResampler_nativeRelease(
+Java_com_govorun_lite_transcriber_NativeResampler_00024Companion_nativeRelease(
         JNIEnv*, jclass, jlong handle) {
     auto* r = reinterpret_cast<Resampler*>(handle);
     if (!r) return;

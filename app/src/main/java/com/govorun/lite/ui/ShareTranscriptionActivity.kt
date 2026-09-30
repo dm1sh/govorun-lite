@@ -18,6 +18,7 @@ import com.govorun.lite.stats.StatsStore
 import com.govorun.lite.transcriber.AudioFileDecoder
 import com.govorun.lite.transcriber.OfflineTranscriber
 import com.govorun.lite.transcriber.SpeechSegmenter
+import com.govorun.lite.util.Prefs
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.google.android.material.textview.MaterialTextView
@@ -27,6 +28,7 @@ import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.ArrayDeque
 
 /** Receives an audio file from Android's share sheet and transcribes it offline. */
 class ShareTranscriptionActivity : AppCompatActivity() {
@@ -88,7 +90,9 @@ class ShareTranscriptionActivity : AppCompatActivity() {
                 withContext(Dispatchers.IO) {
                     GigaAmModel.ensureInstalled(this@ShareTranscriptionActivity)
                     val transcriber = OfflineTranscriber.getInstance(this@ShareTranscriptionActivity)
-                    val segmenter = SpeechSegmenter(this@ShareTranscriptionActivity)
+                    val useVad = Prefs.isFileVadEnabled(this@ShareTranscriptionActivity)
+                    val segmenter = if (useVad) SpeechSegmenter(this@ShareTranscriptionActivity) else null
+                    val maxChunkSamples = 30 * 16_000
 
                     suspend fun transcribeSegments(segments: List<ShortArray>) {
                         for (segment in segments) {
@@ -115,6 +119,15 @@ class ShareTranscriptionActivity : AppCompatActivity() {
                         // the previous one. No arbitrary time-based segments are
                         // introduced; queue items are produced only by VAD.
                         val segmentQueue = Channel<ShortArray>(capacity = 2)
+                        val fixedBuffer = ArrayDeque<Short>(maxChunkSamples)
+                        suspend fun enqueueFixedChunks(input: ShortArray) {
+                            for (sample in input) fixedBuffer.addLast(sample)
+                            while (fixedBuffer.size >= maxChunkSamples) {
+                                val chunk = ShortArray(maxChunkSamples)
+                                for (i in chunk.indices) chunk[i] = fixedBuffer.removeFirst()
+                                segmentQueue.send(chunk)
+                            }
+                        }
                         coroutineScope {
                             val decoderJob = launch {
                                 try {
@@ -122,8 +135,12 @@ class ShareTranscriptionActivity : AppCompatActivity() {
                                         context = this@ShareTranscriptionActivity,
                                         uri = uri,
                                         onPcm = { pcmChunk ->
-                                            for (segment in segmenter.acceptPcm(pcmChunk)) {
-                                                segmentQueue.send(segment)
+                                            if (useVad) {
+                                                for (segment in segmenter!!.acceptPcm(pcmChunk)) {
+                                                    segmentQueue.send(segment)
+                                                }
+                                            } else {
+                                                enqueueFixedChunks(pcmChunk)
                                             }
                                         },
                                         onProgress = { positionUs, durationUs ->
@@ -138,8 +155,14 @@ class ShareTranscriptionActivity : AppCompatActivity() {
                                             }
                                         },
                                     )
-                                    for (segment in segmenter.flush()) {
-                                        segmentQueue.send(segment)
+                                    if (useVad) {
+                                        for (segment in segmenter!!.flush()) {
+                                            segmentQueue.send(segment)
+                                        }
+                                    } else if (fixedBuffer.isNotEmpty()) {
+                                        val tail = ShortArray(fixedBuffer.size)
+                                        for (i in tail.indices) tail[i] = fixedBuffer.removeFirst()
+                                        segmentQueue.send(tail)
                                     }
                                 } finally {
                                     segmentQueue.close()
@@ -158,7 +181,7 @@ class ShareTranscriptionActivity : AppCompatActivity() {
                             progress.progress = 100
                         }
                     } finally {
-                        segmenter.close()
+                        segmenter?.close()
                     }
                 }
                 progress.visibility = View.GONE

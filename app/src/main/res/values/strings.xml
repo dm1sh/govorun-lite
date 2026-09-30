@@ -29,6 +29,8 @@
     <string name="settings_ime_walkie_body">Удерживайте микрофон для диктовки. Проведите вверх, чтобы зафиксировать запись; отпустите для остановки.</string>
     <string name="settings_ime_repeat_delete_title">Повторять удаление при удержании</string>
     <string name="settings_ime_repeat_delete_body">При выключении удержание кнопки backspace выбирает текст для удаления вместо непрерывного удаления.</string>
+    <string name="settings_file_vad_title">VAD для файлов</string>
+    <string name="settings_file_vad_body">Разделять файл по речи. При выключении файл распознаётся фиксированными блоками до 30 секунд.</string>
     <string name="voice_recognition_listening">Говорите…</string>
     <string name="voice_recognition_processing">Распознаю…</string>
     <string name="voice_recognition_stop">Остановить и вставить</string>

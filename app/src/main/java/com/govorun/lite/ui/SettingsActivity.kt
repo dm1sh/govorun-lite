@@ -182,6 +182,14 @@ class SettingsActivity : AppCompatActivity() {
         }
         imeRepeatDeleteRow.setOnClickListener { imeRepeatDeleteSwitch.toggle() }
 
+        val fileVadSwitch = findViewById<MaterialSwitch>(R.id.fileVadSwitch)
+        val fileVadRow = findViewById<View>(R.id.fileVadRow)
+        fileVadSwitch.isChecked = Prefs.isFileVadEnabled(this)
+        fileVadSwitch.setOnCheckedChangeListener { _, checked ->
+            Prefs.setFileVadEnabled(this, checked)
+        }
+        fileVadRow.setOnClickListener { fileVadSwitch.toggle() }
+
         val keepScreenSwitch = findViewById<MaterialSwitch>(R.id.keepScreenSwitch)
         val keepScreenRow = findViewById<View>(R.id.keepScreenRow)
         val keepScreenBody = findViewById<MaterialTextView>(R.id.keepScreenBody)
@@ -314,6 +322,7 @@ class SettingsActivity : AppCompatActivity() {
             imeAutoStartSwitch.isChecked = true
             imeWalkieSwitch.isChecked = false
             imeRepeatDeleteSwitch.isChecked = false
+            fileVadSwitch.isChecked = true
             sideGroup.check(R.id.sideRight)
             pauseGroup.check(R.id.pauseShort)
             pauseHint.setText(hintForPause(Prefs.PAUSE_DEFAULT))

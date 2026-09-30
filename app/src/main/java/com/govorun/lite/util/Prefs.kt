@@ -28,6 +28,7 @@ object Prefs {
     private const val KEY_IME_AUTO_START = "ime_auto_start"
     private const val KEY_IME_WALKIE_TALKIE = "ime_walkie_talkie"
     private const val KEY_IME_REPEAT_DELETE = "ime_repeat_delete"
+    private const val KEY_FILE_VAD = "file_vad"
     // One-shot flag: marks that we've already run the 1.0.8 migration that
     // bumps existing users from Short → Medium. Without this we'd reset
     // the pref on every cold start, which would override the user's
@@ -416,6 +417,15 @@ object Prefs {
     fun setImeRepeatDeleteEnabled(context: Context, enabled: Boolean) {
         context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE)
             .edit().putBoolean(KEY_IME_REPEAT_DELETE, enabled).apply()
+    }
+
+    fun isFileVadEnabled(context: Context): Boolean =
+        context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE)
+            .getBoolean(KEY_FILE_VAD, true)
+
+    fun setFileVadEnabled(context: Context, enabled: Boolean) {
+        context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE)
+            .edit().putBoolean(KEY_FILE_VAD, enabled).apply()
     }
 
     // App filter — controls in which apps the bubble appears.

@@ -74,17 +74,20 @@ class ShareTranscriptionActivity : AppCompatActivity() {
     }
 
     private fun transcribe(uri: android.net.Uri) {
+        progress.isIndeterminate = true
         lifecycleScope.launch {
             try {
-                val text = withContext(Dispatchers.IO) {
-                    // Application startup normally extracts this in parallel; doing
-                    // it here as well makes a share received immediately after install safe.
+                withContext(Dispatchers.IO) {
                     GigaAmModel.ensureInstalled(this@ShareTranscriptionActivity)
                     val pcm = AudioFileDecoder.decode(this@ShareTranscriptionActivity, uri)
-                    if (pcm.isEmpty()) return@withContext ""
+                    if (pcm.isEmpty()) return@withContext
+                    withContext(Dispatchers.Main) {
+                        progress.isIndeterminate = false
+                        progress.max = 100
+                        progress.progress = 0
+                    }
                     val transcriber = OfflineTranscriber.getInstance(this@ShareTranscriptionActivity)
                     val segmenter = SpeechSegmenter(this@ShareTranscriptionActivity)
-                    val result = StringBuilder()
 
                     suspend fun transcribeSegments(segments: List<ShortArray>) {
                         for (segment in segments) {
@@ -95,40 +98,43 @@ class ShareTranscriptionActivity : AppCompatActivity() {
                                 bytes[i * 2] = (sample and 0xff).toByte()
                                 bytes[i * 2 + 1] = (sample shr 8).toByte()
                             }
-                            // This is intentionally the same lifecycle as
-                            // microphone/VAD transcription: one VAD segment,
-                            // one recognizer stream.
                             transcriber.startAudio()
                             transcriber.sendAudioChunk(bytes)
                             val part = transcriber.stopAudioAndGetTranscript()
                             if (part.isNotBlank()) {
-                                if (result.isNotEmpty()) result.append(' ')
-                                result.append(part)
+                                withContext(Dispatchers.Main) { appendTranscriptPart(part) }
                             }
                         }
                     }
 
                     try {
-                        // Feed the complete decoded PCM through the same 512-
-                        // sample VAD segmentation used for microphone input.
-                        transcribeSegments(segmenter.acceptPcm(pcm))
+                        // These are transport blocks only. Speech boundaries
+                        // are still produced exclusively by SpeechSegmenter/VAD.
+                        val blockSamples = 16_000
+                        var offset = 0
+                        while (offset < pcm.size) {
+                            val end = minOf(offset + blockSamples, pcm.size)
+                            transcribeSegments(segmenter.acceptPcm(pcm.copyOfRange(offset, end)))
+                            offset = end
+                            withContext(Dispatchers.Main) {
+                                progress.progress = (offset * 100L / pcm.size).toInt().coerceIn(0, 99)
+                            }
+                        }
                         transcribeSegments(segmenter.flush())
+                        withContext(Dispatchers.Main) { progress.progress = 100 }
                     } finally {
                         segmenter.close()
                     }
-                    result.toString()
                 }
-                transcript = text
                 progress.visibility = View.GONE
-                if (text.isBlank()) {
+                if (transcript.isBlank()) {
                     showError(getString(R.string.share_transcription_empty))
                 } else {
                     if (!statsRecorded) {
-                        StatsStore.addWords(applicationContext, StatsStore.countWords(text))
+                        StatsStore.addWords(applicationContext, StatsStore.countWords(transcript))
                         statsRecorded = true
                     }
                     status.text = getString(R.string.share_transcription_done)
-                    result.text = text
                     result.visibility = View.VISIBLE
                     copy.visibility = View.VISIBLE
                     shareAgain.visibility = View.VISIBLE
@@ -137,6 +143,20 @@ class ShareTranscriptionActivity : AppCompatActivity() {
                 showError(getString(R.string.share_transcription_failed, t.message ?: ""))
             }
         }
+    }
+
+    private fun appendTranscriptPart(part: String) {
+        val clean = part.trim()
+        if (clean.isEmpty()) return
+        val previous = transcript.lastOrNull()
+        val first = clean.first()
+        val needsSpace = previous != null &&
+            !previous.isWhitespace() &&
+            first.isLetterOrDigit() &&
+            previous !in "([\\{\\\"'«"
+        transcript += if (needsSpace) " $clean" else clean
+        result.text = transcript
+        result.visibility = View.VISIBLE
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

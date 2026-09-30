@@ -28,8 +28,8 @@ android {
         applicationId = "com.govorun.lite"
         minSdk = 33
         targetSdk = 35
-        versionCode = ciVersionCode ?: 19
-        versionName = "1.0.17" + (ciVersionCode?.let { "+$it" } ?: "")
+        versionCode = ciVersionCode ?: 20
+        versionName = "1.1.0" + (ciVersionCode?.let { "+$it" } ?: "")
         ndk {
             abiFilters += "arm64-v8a"
         }

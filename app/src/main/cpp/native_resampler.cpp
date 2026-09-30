@@ -33,13 +33,13 @@ Java_com_govorun_lite_transcriber_NativeResampler_nativeCreate(
     AVChannelLayout in_layout;
     av_channel_layout_default(&in_layout, channels);
     AVChannelLayout out_layout = AV_CHANNEL_LAYOUT_MONO;
-    r->context = swr_alloc_set_opts2(
-        nullptr,
+    const int allocResult = swr_alloc_set_opts2(
+        &r->context,
         &out_layout, AV_SAMPLE_FMT_S16, 16000,
         &in_layout, AV_SAMPLE_FMT_S16, sample_rate,
         0, nullptr);
     av_channel_layout_uninit(&in_layout);
-    if (r->context == nullptr || swr_init(r->context) < 0) {
+    if (allocResult < 0 || r->context == nullptr || swr_init(r->context) < 0) {
         if (r->context) swr_free(&r->context);
         delete r;
         throwIllegalState(env, "Unable to initialize native resampler");

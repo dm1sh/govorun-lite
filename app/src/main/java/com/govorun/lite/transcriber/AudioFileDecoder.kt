@@ -96,7 +96,7 @@ object AudioFileDecoder {
     private class PcmStreamConverter(
         private val sourceRate: Int,
         private val channels: Int,
-        private val emit: (ShortArray) -> Unit,
+        private val emit: suspend (ShortArray) -> Unit,
     ) {
         private val output = ArrayList<Short>(4096)
         private var frameIndex = 0L
@@ -104,7 +104,7 @@ object AudioFileDecoder {
         private var hasPrevious = false
         private var nextOutputPosition = 0.0
 
-        fun accept(bytes: ByteBuffer) {
+        suspend fun accept(bytes: ByteBuffer) {
             val samples = bytes.asShortBuffer()
             val frames = samples.remaining() / channels
             repeat(frames) {
@@ -128,7 +128,7 @@ object AudioFileDecoder {
             }
         }
 
-        fun finish() {
+        suspend fun finish() {
             if (hasPrevious) {
                 while (nextOutputPosition < frameIndex) {
                     output.add(previous.toInt().coerceIn(-32768, 32767).toShort())
@@ -138,7 +138,7 @@ object AudioFileDecoder {
             emitOutput()
         }
 
-        private fun emitOutput() {
+        private suspend fun emitOutput() {
             if (output.isEmpty()) return
             emit(output.toShortArray())
             output.clear()

@@ -38,7 +38,8 @@ class SpeechSegmenter(context: Context) : AutoCloseable {
     ))
     private val pending = ShortArray(WINDOW_SIZE)
     private var pendingCount = 0
-    private val tail = ArrayList<Short>(MAX_TAIL_SAMPLES)
+    private val tail = ShortArray(MAX_TAIL_SAMPLES)
+    private var tailCount = 0
 
     fun acceptPcm(input: ShortArray): List<ShortArray> {
         val result = ArrayList<ShortArray>()
@@ -71,10 +72,10 @@ class SpeechSegmenter(context: Context) : AutoCloseable {
         }
         vad.flush()
         drain(result)
-        if (result.isEmpty() && tail.size >= MIN_TAIL_SAMPLES) {
-            result += tail.toShortArray()
+        if (result.isEmpty() && tailCount >= MIN_TAIL_SAMPLES) {
+            result += tail.copyOf(tailCount)
         }
-        tail.clear()
+        tailCount = 0
         return result
     }
 
@@ -86,16 +87,23 @@ class SpeechSegmenter(context: Context) : AutoCloseable {
                 (segment.samples[it] * 32767f).toInt().coerceIn(-32768, 32767).toShort()
             }
             if (pcm.isNotEmpty()) result += pcm
-            tail.clear()
+            tailCount = 0
         }
     }
 
     private fun appendTail(samples: ShortArray) {
-        tail.addAll(samples.toList())
-        if (tail.size > MAX_TAIL_SAMPLES) {
-            val drop = tail.size - MAX_TAIL_SAMPLES
-            repeat(drop) { tail.removeAt(0) }
+        if (samples.size >= MAX_TAIL_SAMPLES) {
+            samples.copyInto(tail, 0, samples.size - MAX_TAIL_SAMPLES, samples.size)
+            tailCount = MAX_TAIL_SAMPLES
+            return
         }
+        val overflow = tailCount + samples.size - MAX_TAIL_SAMPLES
+        if (overflow > 0) {
+            tail.copyInto(tail, 0, overflow, tailCount)
+            tailCount -= overflow
+        }
+        samples.copyInto(tail, tailCount)
+        tailCount += samples.size
     }
 
     override fun close() {

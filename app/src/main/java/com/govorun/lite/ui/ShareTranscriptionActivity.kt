@@ -28,7 +28,6 @@ import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.ArrayDeque
 
 /** Receives an audio file from Android's share sheet and transcribes it offline. */
 class ShareTranscriptionActivity : AppCompatActivity() {
@@ -119,13 +118,20 @@ class ShareTranscriptionActivity : AppCompatActivity() {
                         // the previous one. No arbitrary time-based segments are
                         // introduced; queue items are produced only by VAD.
                         val segmentQueue = Channel<ShortArray>(capacity = 2)
-                        val fixedBuffer = ArrayDeque<Short>(maxChunkSamples)
+                        var fixedBuffer = ShortArray(maxChunkSamples)
+                        var fixedCount = 0
                         suspend fun enqueueFixedChunks(input: ShortArray) {
-                            for (sample in input) fixedBuffer.addLast(sample)
-                            while (fixedBuffer.size >= maxChunkSamples) {
-                                val chunk = ShortArray(maxChunkSamples)
-                                for (i in chunk.indices) chunk[i] = fixedBuffer.removeFirst()
-                                segmentQueue.send(chunk)
+                            var offset = 0
+                            while (offset < input.size) {
+                                val count = minOf(maxChunkSamples - fixedCount, input.size - offset)
+                                input.copyInto(fixedBuffer, fixedCount, offset, offset + count)
+                                fixedCount += count
+                                offset += count
+                                if (fixedCount == maxChunkSamples) {
+                                    segmentQueue.send(fixedBuffer)
+                                    fixedBuffer = ShortArray(maxChunkSamples)
+                                    fixedCount = 0
+                                }
                             }
                         }
                         coroutineScope {
@@ -159,10 +165,8 @@ class ShareTranscriptionActivity : AppCompatActivity() {
                                         for (segment in segmenter!!.flush()) {
                                             segmentQueue.send(segment)
                                         }
-                                    } else if (fixedBuffer.isNotEmpty()) {
-                                        val tail = ShortArray(fixedBuffer.size)
-                                        for (i in tail.indices) tail[i] = fixedBuffer.removeFirst()
-                                        segmentQueue.send(tail)
+                                    } else if (fixedCount > 0) {
+                                        segmentQueue.send(fixedBuffer.copyOf(fixedCount))
                                     }
                                 } finally {
                                     segmentQueue.close()

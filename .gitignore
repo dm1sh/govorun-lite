@@ -23,9 +23,11 @@ keystore.properties
 .env
 scripts/.env
 
-# Large native deps downloaded by script
+# Large native deps downloaded/built by scripts
 app/libs/*.aar
 app/src/main/assets/models/
+.ffmpeg-src/
+ffmpeg-build/
 
 # Logs
 *.log

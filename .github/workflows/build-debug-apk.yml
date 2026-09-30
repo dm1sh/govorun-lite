@@ -35,6 +35,9 @@ jobs:
       - name: Download GigaAM model
         run: ./scripts/download-model.sh
 
+      - name: Build native FFmpeg resampler
+        run: ./scripts/build-ffmpeg-swresample.sh
+
       - name: Build debug APK
         # Run number is monotonic; the attempt component also makes a
         # manually re-run workflow produce a newer installable APK.

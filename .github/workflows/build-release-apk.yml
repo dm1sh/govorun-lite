@@ -68,6 +68,9 @@ jobs:
       - name: Download GigaAM model
         run: ./scripts/download-model.sh
 
+      - name: Build native FFmpeg resampler
+        run: ./scripts/build-ffmpeg-swresample.sh
+
       - name: Build signed release APK
         env:
           # Keep release builds monotonically versioned for upgrade installs.

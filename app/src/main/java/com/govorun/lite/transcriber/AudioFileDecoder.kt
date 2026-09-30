@@ -91,6 +91,7 @@ object AudioFileDecoder {
                 converter.finish()
                 onProgress(durationUs, durationUs)
             } finally {
+                converter.close()
                 codec.stop()
                 codec.release()
             }
@@ -100,63 +101,22 @@ object AudioFileDecoder {
     }
 
     private class PcmStreamConverter(
-        private val sourceRate: Int,
-        private val channels: Int,
+        sourceRate: Int,
+        channels: Int,
         private val emit: suspend (ShortArray) -> Unit,
-    ) {
-        // Primitive output storage avoids boxing every PCM sample into
-        // ArrayList<Short> while decoding long files.
-        private val output = ShortArray(8192)
-        private var outputCount = 0
-        private var frameIndex = 0L
-        private var previous = 0f
-        private var hasPrevious = false
-        private var nextOutputPosition = 0.0
+    ) : AutoCloseable {
+        private val native = NativeResampler(sourceRate, channels)
 
         suspend fun accept(bytes: ByteBuffer) {
-            val samples = bytes.asShortBuffer()
-            val frames = samples.remaining() / channels
-            var frame = 0
-            while (frame < frames) {
-                var sum = 0f
-                var channel = 0
-                while (channel < channels) {
-                    sum += samples.get().toFloat()
-                    channel++
-                }
-                val current = sum / channels
-                if (!hasPrevious) {
-                    previous = current
-                    hasPrevious = true
-                } else {
-                    while (nextOutputPosition <= frameIndex) {
-                        val fraction = (nextOutputPosition - (frameIndex - 1)).toFloat()
-                        val value = previous + (current - previous) * fraction
-                        output[outputCount++] = value.toInt().coerceIn(-32768, 32767).toShort()
-                        nextOutputPosition += sourceRate.toDouble() / 16_000.0
-                        if (outputCount == output.size) emitOutput()
-                    }
-                    previous = current
-                }
-                frameIndex++
-                frame++
-            }
+            val output = native.process(bytes, bytes.remaining())
+            if (output.isNotEmpty()) emit(output)
         }
 
         suspend fun finish() {
-            if (hasPrevious) {
-                while (nextOutputPosition < frameIndex) {
-                    output[outputCount++] = previous.toInt().coerceIn(-32768, 32767).toShort()
-                    nextOutputPosition += sourceRate.toDouble() / 16_000.0
-                }
-            }
-            emitOutput()
+            val output = native.flush()
+            if (output.isNotEmpty()) emit(output)
         }
 
-        private suspend fun emitOutput() {
-            if (outputCount == 0) return
-            emit(output.copyOf(outputCount))
-            outputCount = 0
-        }
+        override fun close() = native.close()
     }
 }

@@ -75,6 +75,13 @@ android {
         buildConfig = true
     }
 
+    externalNativeBuild {
+        cmake {
+            path = file("src/main/cpp/CMakeLists.txt")
+            version = "3.22.1"
+        }
+    }
+
     // Bundled GigaAM .onnx files are already highly-compressed tensor data;
     // compressing them in the APK adds ~5% at best and forces a full unpack
     // to /data/app_extracted on install. Skipping compression lets the PM

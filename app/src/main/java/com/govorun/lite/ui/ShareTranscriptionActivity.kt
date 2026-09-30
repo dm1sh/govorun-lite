@@ -22,6 +22,9 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.google.android.material.textview.MaterialTextView
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -106,28 +109,50 @@ class ShareTranscriptionActivity : AppCompatActivity() {
                     }
 
                     try {
-                        // Decoding, VAD, and recognition now form one streaming
-                        // pipeline. No complete-file PCM buffer or extra time
-                        // segmentation is created.
-                        AudioFileDecoder.decodeStreaming(
-                            context = this@ShareTranscriptionActivity,
-                            uri = uri,
-                            onPcm = { pcmChunk ->
-                                transcribeSegments(segmenter.acceptPcm(pcmChunk))
-                            },
-                            onProgress = { positionUs, durationUs ->
-                                if (durationUs > 0L) {
-                                    withContext(Dispatchers.Main) {
-                                        progress.isIndeterminate = false
-                                        progress.max = 100
-                                        progress.progress =
-                                            (positionUs * 100L / durationUs).toInt().coerceIn(0, 99)
-                                        progressTime.text = "${formatTime(positionUs)} / ${formatTime(durationUs)}"
+                        // Keep a small bounded queue between decoding/VAD and
+                        // recognition. The decoder and VAD can continue producing
+                        // completed speech segments while the recognizer handles
+                        // the previous one. No arbitrary time-based segments are
+                        // introduced; queue items are produced only by VAD.
+                        val segmentQueue = Channel<ShortArray>(capacity = 2)
+                        coroutineScope {
+                            val decoderJob = launch {
+                                try {
+                                    AudioFileDecoder.decodeStreaming(
+                                        context = this@ShareTranscriptionActivity,
+                                        uri = uri,
+                                        onPcm = { pcmChunk ->
+                                            for (segment in segmenter.acceptPcm(pcmChunk)) {
+                                                segmentQueue.send(segment)
+                                            }
+                                        },
+                                        onProgress = { positionUs, durationUs ->
+                                            if (durationUs > 0L) {
+                                                withContext(Dispatchers.Main) {
+                                                    progress.isIndeterminate = false
+                                                    progress.max = 100
+                                                    progress.progress =
+                                                        (positionUs * 100L / durationUs).toInt().coerceIn(0, 99)
+                                                    progressTime.text = "${formatTime(positionUs)} / ${formatTime(durationUs)}"
+                                                }
+                                            }
+                                        },
+                                    )
+                                    for (segment in segmenter.flush()) {
+                                        segmentQueue.send(segment)
                                     }
+                                } finally {
+                                    segmentQueue.close()
                                 }
-                            },
-                        )
-                        transcribeSegments(segmenter.flush())
+                            }
+                            try {
+                                for (segment in segmentQueue) {
+                                    transcribeSegments(listOf(segment))
+                                }
+                            } finally {
+                                decoderJob.cancelAndJoin()
+                            }
+                        }
                         withContext(Dispatchers.Main) {
                             progress.isIndeterminate = false
                             progress.progress = 100

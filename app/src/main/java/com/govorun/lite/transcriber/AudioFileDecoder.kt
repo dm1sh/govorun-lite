@@ -7,10 +7,11 @@ import android.media.MediaFormat
 import android.net.Uri
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
-import kotlin.math.min
 
 /** Streams a media file's first audio track as 16 kHz mono 16-bit PCM. */
 object AudioFileDecoder {
+    private const val PROGRESS_INTERVAL_US = 250_000L
+
     suspend fun decodeStreaming(
         context: Context,
         uri: Uri,
@@ -48,6 +49,7 @@ object AudioFileDecoder {
             val converter = PcmStreamConverter(sourceRate, sourceChannels, onPcm)
             var inputDone = false
             var outputDone = false
+            var lastProgressUs = Long.MIN_VALUE
             try {
                 while (!outputDone) {
                     if (!inputDone) {
@@ -75,7 +77,11 @@ object AudioFileDecoder {
                                 output.position(info.offset)
                                 output.limit(info.offset + info.size)
                                 converter.accept(output.slice().order(ByteOrder.LITTLE_ENDIAN))
-                                onProgress(info.presentationTimeUs.coerceAtLeast(0L), durationUs)
+                                val positionUs = info.presentationTimeUs.coerceAtLeast(0L)
+                                if (lastProgressUs == Long.MIN_VALUE || positionUs - lastProgressUs >= PROGRESS_INTERVAL_US) {
+                                    onProgress(positionUs, durationUs)
+                                    lastProgressUs = positionUs
+                                }
                             }
                             codec.releaseOutputBuffer(outputIndex, false)
                             if (info.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM != 0) outputDone = true
@@ -98,7 +104,10 @@ object AudioFileDecoder {
         private val channels: Int,
         private val emit: suspend (ShortArray) -> Unit,
     ) {
-        private val output = ArrayList<Short>(4096)
+        // Primitive output storage avoids boxing every PCM sample into
+        // ArrayList<Short> while decoding long files.
+        private val output = ShortArray(8192)
+        private var outputCount = 0
         private var frameIndex = 0L
         private var previous = 0f
         private var hasPrevious = false
@@ -107,9 +116,14 @@ object AudioFileDecoder {
         suspend fun accept(bytes: ByteBuffer) {
             val samples = bytes.asShortBuffer()
             val frames = samples.remaining() / channels
-            repeat(frames) {
+            var frame = 0
+            while (frame < frames) {
                 var sum = 0f
-                repeat(channels) { sum += samples.get().toFloat() }
+                var channel = 0
+                while (channel < channels) {
+                    sum += samples.get().toFloat()
+                    channel++
+                }
                 val current = sum / channels
                 if (!hasPrevious) {
                     previous = current
@@ -118,20 +132,21 @@ object AudioFileDecoder {
                     while (nextOutputPosition <= frameIndex) {
                         val fraction = (nextOutputPosition - (frameIndex - 1)).toFloat()
                         val value = previous + (current - previous) * fraction
-                        output.add((value * 1f).toInt().coerceIn(-32768, 32767).toShort())
+                        output[outputCount++] = value.toInt().coerceIn(-32768, 32767).toShort()
                         nextOutputPosition += sourceRate.toDouble() / 16_000.0
-                        if (output.size >= 4096) emitOutput()
+                        if (outputCount == output.size) emitOutput()
                     }
                     previous = current
                 }
                 frameIndex++
+                frame++
             }
         }
 
         suspend fun finish() {
             if (hasPrevious) {
                 while (nextOutputPosition < frameIndex) {
-                    output.add(previous.toInt().coerceIn(-32768, 32767).toShort())
+                    output[outputCount++] = previous.toInt().coerceIn(-32768, 32767).toShort()
                     nextOutputPosition += sourceRate.toDouble() / 16_000.0
                 }
             }
@@ -139,9 +154,9 @@ object AudioFileDecoder {
         }
 
         private suspend fun emitOutput() {
-            if (output.isEmpty()) return
-            emit(output.toShortArray())
-            output.clear()
+            if (outputCount == 0) return
+            emit(output.copyOf(outputCount))
+            outputCount = 0
         }
     }
 }

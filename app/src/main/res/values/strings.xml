@@ -139,15 +139,12 @@
     <string name="main_card_battery_body">Без этого Android со временем может выгрузить Говоруна, и птичка перестанет появляться — пока вы заново не откроете приложение.</string>
     <string name="main_card_battery_button">Разрешить</string>
 
-    <!-- One-time "What's new in 1.0.4" card. Shown on the main screen
-         only after the user has cleared all setup problems (no missing-
-         mic / missing-service / missing-battery cards visible), so it
-         doesn't compete with action items. Disappears for good after the
-         user taps "Понятно". -->
-    <string name="main_card_whats_new_title">Что нового</string>
-    <string name="main_card_whats_new_line1">• Статистика — сколько слов наговорили сегодня теперь на первом плане.</string>
-    <string name="main_card_whats_new_line2">• Тест скорости — новый инструмент в Настройках: насколько быстро Говорун работает на вашем телефоне.</string>
-    <string name="main_card_whats_new_line3">• Поделитесь Говоруном — новая кнопка на главном экране, чтобы рассказать друзьям.</string>
+    <!-- One-time "What's new" card for the current release. Shown on the
+         main screen only after setup problems are cleared. -->
+    <string name="main_card_whats_new_title">Что нового в 1.1.0</string>
+    <string name="main_card_whats_new_line1">• Говорун работает как системная голосовая клавиатура — диктуйте в любом приложении кнопкой микрофона.</string>
+    <string name="main_card_whats_new_line2">• Аудио и видеофайлы можно открыть в Говоруне или передать через «Поделиться» и получить расшифровку.</string>
+    <string name="main_card_whats_new_line3">• Для длинных файлов видны прогресс и время, а текст появляется по мере обработки.</string>
 
     <string name="main_card_whats_new_dismiss">Понятно</string>
     <string name="main_needs_setup_sub">Несколько мелочей надо подкрутить — карточки ниже подскажут, что и где.</string>

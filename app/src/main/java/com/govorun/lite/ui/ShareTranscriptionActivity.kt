@@ -34,6 +34,7 @@ class ShareTranscriptionActivity : AppCompatActivity() {
     private lateinit var status: MaterialTextView
     private lateinit var result: MaterialTextView
     private lateinit var progress: LinearProgressIndicator
+    private lateinit var progressTime: MaterialTextView
     private lateinit var copy: MaterialButton
     private lateinit var shareAgain: MaterialButton
     private var transcript = ""
@@ -58,6 +59,7 @@ class ShareTranscriptionActivity : AppCompatActivity() {
         status = findViewById(R.id.shareStatus)
         result = findViewById(R.id.shareResult)
         progress = findViewById(R.id.shareProgress)
+        progressTime = findViewById(R.id.shareProgressTime)
         copy = findViewById(R.id.shareCopy)
         shareAgain = findViewById(R.id.shareAgain)
         copy.setOnClickListener { copyTranscript() }
@@ -118,6 +120,7 @@ class ShareTranscriptionActivity : AppCompatActivity() {
                                         progress.max = 100
                                         progress.progress =
                                             (positionUs * 100L / durationUs).toInt().coerceIn(0, 99)
+                                        progressTime.text = "${formatTime(positionUs)} / ${formatTime(durationUs)}"
                                     }
                                 }
                             },
@@ -162,6 +165,19 @@ class ShareTranscriptionActivity : AppCompatActivity() {
         transcript += if (needsSpace) " $clean" else clean
         result.text = transcript
         result.visibility = View.VISIBLE
+    }
+
+    private fun formatTime(micros: Long): String {
+        if (micros <= 0L) return "0:00"
+        val totalSeconds = micros / 1_000_000L
+        val seconds = totalSeconds % 60
+        val minutes = (totalSeconds / 60) % 60
+        val hours = totalSeconds / 3_600
+        return if (hours > 0) {
+            "%d:%02d:%02d".format(hours, minutes, seconds)
+        } else {
+            "%d:%02d".format(minutes, seconds)
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

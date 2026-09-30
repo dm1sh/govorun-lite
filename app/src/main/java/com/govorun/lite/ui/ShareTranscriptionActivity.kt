@@ -33,6 +33,7 @@ class ShareTranscriptionActivity : AppCompatActivity() {
 
     private lateinit var status: MaterialTextView
     private lateinit var result: MaterialTextView
+    private lateinit var shareScroll: View
     private lateinit var progress: LinearProgressIndicator
     private lateinit var progressTime: MaterialTextView
     private lateinit var copy: MaterialButton
@@ -58,6 +59,7 @@ class ShareTranscriptionActivity : AppCompatActivity() {
         toolbar.setNavigationOnClickListener { finish() }
         status = findViewById(R.id.shareStatus)
         result = findViewById(R.id.shareResult)
+        shareScroll = findViewById(R.id.shareScroll)
         progress = findViewById(R.id.shareProgress)
         progressTime = findViewById(R.id.shareProgressTime)
         copy = findViewById(R.id.shareCopy)
@@ -162,9 +164,14 @@ class ShareTranscriptionActivity : AppCompatActivity() {
             !previous.isWhitespace() &&
             first.isLetterOrDigit() &&
             previous !in "([\\{\\\"'«"
+        val scrollX = shareScroll.scrollX
+        val scrollY = shareScroll.scrollY
         transcript += if (needsSpace) " $clean" else clean
         result.text = transcript
         result.visibility = View.VISIBLE
+        // Updating TextView layout can otherwise reset the parent ScrollView's
+        // viewport. Restore the exact position after the new layout is measured.
+        shareScroll.post { shareScroll.scrollTo(scrollX, scrollY) }
     }
 
     private fun formatTime(micros: Long): String {

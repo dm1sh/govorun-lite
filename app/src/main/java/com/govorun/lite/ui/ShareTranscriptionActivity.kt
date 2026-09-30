@@ -64,6 +64,7 @@ class ShareTranscriptionActivity : AppCompatActivity() {
         shareAgain.setOnClickListener { shareTranscript() }
 
         val uri = intent.getParcelableExtra(Intent.EXTRA_STREAM, android.net.Uri::class.java)
+            ?: intent.data
         if (uri == null) {
             showError(getString(R.string.share_transcription_no_file))
             return

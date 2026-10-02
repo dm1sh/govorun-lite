@@ -40,7 +40,7 @@
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="140dp">
-                <com.govorun.lite.overlay.BubbleView
+                <ru.dm1sh.rechka.overlay.BubbleView
                     android:id="@+id/previewBubble"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

@@ -74,7 +74,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
-                    <!-- Decorative Говорун mascot, bottom-right of card.
+                    <!-- Decorative Речка mascot, bottom-right of card.
                          Tinted colorPrimary at low alpha so it reads as a
                          subtle brand accent rather than a second focal
                          point competing with the numbers. -->

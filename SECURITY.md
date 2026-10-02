@@ -14,9 +14,9 @@
 Не публикуйте уязвимости в открытых issues, пока они не исправлены.
 
 **Через GitHub (рекомендуется):**
-[Открыть приватный отчёт](https://github.com/amidexe/govorun-lite/security/advisories/new)
+[Открыть приватный отчёт](https://github.com/dm1sh/rechka-lite/security/advisories/new)
 
 **По почте:**
-govorun@i-lo.org
+rechka@i-lo.org
 
 Постараемся ответить в течение нескольких дней. Если уязвимость подтверждена — выпустим исправление в ближайшем релизе и опубликуем security advisory.

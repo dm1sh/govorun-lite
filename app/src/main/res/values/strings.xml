@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Говорун</string>
+    <string name="app_name">Речка</string>
 
     <!-- Accessibility service -->
-    <string name="accessibility_service_label">Говорун — голосовой ввод</string>
-    <string name="accessibility_description">Показывает плавающего Говоруна и вставляет распознанный текст в поле ввода. Работает без интернета. Звук не отправляется никуда.</string>
+    <string name="accessibility_service_label">Речка — голосовой ввод</string>
+    <string name="accessibility_description">Показывает плавающую Речку и вставляет распознанный текст в поле ввода. Работает без интернета. Звук не отправляется никуда.</string>
 
     <!-- System voice-input keyboard -->
-    <string name="ime_label">Говорун — голосовой ввод</string>
+    <string name="ime_label">Речка — голосовой ввод</string>
     <string name="ime_hint">Нажмите кнопку и говорите</string>
     <string name="ime_start">Начать диктовку</string>
     <string name="ime_stop">Остановить</string>
@@ -36,8 +36,8 @@
     <string name="voice_recognition_stop">Остановить и вставить</string>
 
     <!-- Notifications -->
-    <string name="notif_channel_overlay">Говорун</string>
-    <string name="notif_overlay_title">Говорун</string>
+    <string name="notif_channel_overlay">Речка</string>
+    <string name="notif_overlay_title">Речка</string>
     <string name="notif_overlay_text">Голосовой ввод готов</string>
     <string name="notif_channel_download">Установка модели</string>
     <string name="notif_download_title">Установка модели распознавания</string>
@@ -48,23 +48,23 @@
     <string name="action_done">Готово</string>
 
     <!-- Onboarding: welcome -->
-    <string name="onb_welcome_title">Привет! Я — Говорун</string>
+    <string name="onb_welcome_title">Привет! Я — Речка</string>
     <string name="onb_welcome_body">Превращаю речь в текст. Без интернета, без аккаунтов.</string>
     <string name="onb_welcome_note">Пара коротких шагов — и поехали.</string>
 
     <!-- Onboarding: accessibility service -->
-    <string name="onb_accessibility_title">Разрешите Говоруну использовать специальные возможности</string>
-    <string name="onb_accessibility_body_pending">Без них Говорун не сможет вставлять текст в другие программы.</string>
-    <string name="onb_accessibility_body_enabled">Готово — Говорун может работать в других программах</string>
+    <string name="onb_accessibility_title">Разрешите Речке использовать специальные возможности</string>
+    <string name="onb_accessibility_body_pending">Без них Речка не сможет вставлять текст в другие программы.</string>
+    <string name="onb_accessibility_body_enabled">Готово — Речка может работать в других программах</string>
     <string name="onb_accessibility_open">Разрешить специальные возможности</string>
     <string name="onb_skip">Пропустить</string>
 
     <!-- Onboarding: optional voice keyboard -->
     <string name="onb_keyboard_title">Голосовая клавиатура</string>
-    <string name="onb_keyboard_pending">Включите «Говорун — голосовой ввод» в настройках экранной клавиатуры, чтобы запускать диктовку кнопкой микрофона в других клавиатурах.</string>
+    <string name="onb_keyboard_pending">Включите «Речка — голосовой ввод» в настройках экранной клавиатуры, чтобы запускать диктовку кнопкой микрофона в других клавиатурах.</string>
     <string name="onb_keyboard_enabled">Голосовая клавиатура включена. Её можно выбрать кнопкой смены клавиатуры или кнопкой микрофона в AOSP Keyboard и HeliBoard.</string>
     <string name="onb_keyboard_open">Открыть настройки клавиатур</string>
-    <string name="onb_accessibility_do_row">Говорун — голосовой ввод (включить)</string>
+    <string name="onb_accessibility_do_row">Речка — голосовой ввод (включить)</string>
     <string name="onb_accessibility_dont_row">Быстрый запуск (не включать)</string>
 
     <!-- Onboarding: inline "try it" demo right after mic permission.
@@ -93,12 +93,12 @@
          floating button next to our bubble that would disable the service
          when tapped. -->
     <string name="main_shortcut_card_title">Выключите быстрый запуск</string>
-    <string name="main_shortcut_card_body">Перейдите в <b>специальные возможности</b> → <b>«Говорун — голосовой ввод»</b> → выключите <b>«Быстрый запуск»</b>.</string>
+    <string name="main_shortcut_card_body">Перейдите в <b>специальные возможности</b> → <b>«Речка — голосовой ввод»</b> → выключите <b>«Быстрый запуск»</b>.</string>
     <string name="main_shortcut_card_button">Открыть специальные возможности</string>
 
     <!-- Onboarding: battery optimization (optional) -->
     <string name="onb_battery_title">Почти у цели — работа в фоне</string>
-    <string name="onb_battery_body">Android может останавливать приложения в фоне для экономии батареи — тогда Говорун пропадает в самый неподходящий момент. Можно попросить систему этого не делать. Это последний шаг.</string>
+    <string name="onb_battery_body">Android может останавливать приложения в фоне для экономии батареи — тогда Речка пропадает в самый неподходящий момент. Можно попросить систему этого не делать. Это последний шаг.</string>
     <string name="onb_battery_body_done">Работа в фоне уже разрешена. Можно нажать «Готово».</string>
     <string name="onb_battery_open">Разрешить работу в фоне</string>
     <string name="onb_battery_skip_note">Шаг не обязательный — можно сразу нажать «Готово» и настроить позже.</string>
@@ -127,36 +127,36 @@
     <string name="main_hint">Откройте любое поле для ввода текста — птичка появится рядом с клавиатурой. Нажмите на неё — и говорите.</string>
     <string name="main_engine_credit">Движок — GigaAM v3 от Сбера, лицензия MIT.</string>
     <string name="main_card_mic_title">Включите микрофон</string>
-    <string name="main_card_mic_body">Без микрофона Говорун не услышит, что вы говорите. Выберите Разрешения → Микрофон → Разрешить во время использования приложения.</string>
+    <string name="main_card_mic_body">Без микрофона Речка не услышит, что вы говорите. Выберите Разрешения → Микрофон → Разрешить во время использования приложения.</string>
     <string name="main_card_mic_button">Перейти в настройки</string>
-    <string name="main_card_service_title">Включите Говоруна</string>
-    <string name="main_card_service_body">Птичка не появится в других программах, пока вы не включили «Говорун — голосовой ввод» в специальных возможностях.</string>
+    <string name="main_card_service_title">Включите Речку</string>
+    <string name="main_card_service_body">Птичка не появится в других программах, пока вы не включили «Речка — голосовой ввод» в специальных возможностях.</string>
     <string name="main_card_service_button">Разрешить специальные возможности</string>
     <string name="main_card_keyboard_title">Включите голосовую клавиатуру</string>
-    <string name="main_card_keyboard_body">Можно использовать Говорун без специальных возможностей — включите «Говорун — голосовой ввод» в настройках клавиатур и запускайте диктовку кнопкой микрофона.</string>
+    <string name="main_card_keyboard_body">Можно использовать Речка без специальных возможностей — включите «Речка — голосовой ввод» в настройках клавиатур и запускайте диктовку кнопкой микрофона.</string>
     <string name="main_card_keyboard_button">Открыть настройки клавиатур</string>
     <string name="main_card_battery_title">Разрешите работу в фоне</string>
-    <string name="main_card_battery_body">Без этого Android со временем может выгрузить Говоруна, и птичка перестанет появляться — пока вы заново не откроете приложение.</string>
+    <string name="main_card_battery_body">Без этого Android со временем может выгрузить Речку, и птичка перестанет появляться — пока вы заново не откроете приложение.</string>
     <string name="main_card_battery_button">Разрешить</string>
 
     <!-- One-time "What's new" card for the current release. Shown on the
          main screen only after setup problems are cleared. -->
     <string name="main_card_whats_new_title">Что нового в 1.1.0</string>
-    <string name="main_card_whats_new_line1">• Говорун работает как системная голосовая клавиатура — диктуйте в любом приложении кнопкой микрофона.</string>
-    <string name="main_card_whats_new_line2">• Аудио и видеофайлы можно открыть в Говоруне или передать через «Поделиться» и получить расшифровку.</string>
+    <string name="main_card_whats_new_line1">• Речка работает как системная голосовая клавиатура — диктуйте в любом приложении кнопкой микрофона.</string>
+    <string name="main_card_whats_new_line2">• Аудио и видеофайлы можно открыть в Речке или передать через «Поделиться» и получить расшифровку.</string>
     <string name="main_card_whats_new_line3">• Для длинных файлов видны прогресс и время, а текст появляется по мере обработки.</string>
 
     <string name="main_card_whats_new_dismiss">Понятно</string>
     <string name="main_needs_setup_sub">Несколько мелочей надо подкрутить — карточки ниже подскажут, что и где.</string>
-    <string name="main_disable_service">Выключить Говоруна</string>
-    <string name="main_disable_service_title">Выключить Говоруна?</string>
-    <string name="main_disable_service_hint">Говорун перестанет работать прямо сейчас. Птичка пропадёт во всех программах. Чтобы включить обратно, придётся снова открыть «Специальные возможности» Android и заново разрешить там Говоруну работать.</string>
+    <string name="main_disable_service">Выключить Речку</string>
+    <string name="main_disable_service_title">Выключить Речку?</string>
+    <string name="main_disable_service_hint">Речка перестанет работать прямо сейчас. Птичка пропадёт во всех программах. Чтобы включить обратно, придётся снова открыть «Специальные возможности» Android и заново разрешить там Речке работать.</string>
 
-    <!-- Settings: tapping the switch while Говорун is OFF opens this dialog
+    <!-- Settings: tapping the switch while Речка is OFF opens this dialog
          so the user isn't left without a way back into the accessibility
          settings screen. -->
-    <string name="main_enable_service_title">Говорун сейчас выключен</string>
-    <string name="main_enable_service_body">Чтобы снова видеть птичку над клавиатурой, включите Говоруна в специальных возможностях Android.</string>
+    <string name="main_enable_service_title">Речка сейчас выключен</string>
+    <string name="main_enable_service_body">Чтобы снова видеть птичку над клавиатурой, включите Речку в специальных возможностях Android.</string>
     <string name="main_open_accessibility">Открыть специальные возможности</string>
 
     <!-- Main screen: usage stats -->
@@ -166,12 +166,12 @@
     <string name="main_stats_words_only_fmt">всего %1$s слов</string>
     <string name="main_stats_words_label">слов распознано</string>
     <string name="main_stats_minutes_label">минут диктовки</string>
-    <string name="main_stats_empty">Ещё ничего не наговорили — попробуйте открыть любое поле ввода и нажать на Говоруна.</string>
+    <string name="main_stats_empty">Ещё ничего не наговорили — попробуйте открыть любое поле ввода и нажать на Речку.</string>
     <!-- "Tell friends" card on main screen -->
     <string name="main_share_card_title">Расскажите о приложении</string>
     <string name="main_share_card_body">Порекомендуйте друзьям и коллегам</string>
-    <string name="main_share_chooser">Порекомендовать Говорун</string>
-    <string name="main_share_app_text">Говорун: голос в текст. Голосовой ввод на русском без интернета.\nhttps://apps.rustore.ru/app/com.govorun.lite</string>
+    <string name="main_share_chooser">Порекомендовать Речка</string>
+    <string name="main_share_app_text">Речка: голос в текст. Голосовой ввод на русском без интернета.\nhttps://apps.rustore.ru/app/ru.dm1sh.rechka</string>
 
     <!-- Benchmark card on main screen -->
     <string name="main_benchmark_card_title">Тест скорости</string>
@@ -185,7 +185,7 @@
     <!-- Settings screen -->
     <string name="settings_title">Настройки</string>
     <string name="settings_section_bubble">Птичка</string>
-    <string name="settings_section_service">Говорун</string>
+    <string name="settings_section_service">Речка</string>
     <string name="settings_transparency_title">Прозрачность</string>
     <string name="settings_transparency_body">Насколько бабл просвечивает фон приложения, поверх которого он появляется.</string>
     <string name="settings_haptics_title">Вибрация</string>
@@ -204,11 +204,11 @@
          what tapping does. Toggle row tap leads to a confirmation dialog
          (main_disable_service_*) — the switch itself is non-interactive
          and only mirrors the system accessibility-enabled flag. -->
-    <string name="settings_service_on_title">Говорун включен</string>
+    <string name="settings_service_on_title">Речка включена</string>
     <string name="settings_service_on_body">Нажмите, чтобы выключить.</string>
-    <string name="settings_service_off_title">Говорун выключен</string>
-    <string name="settings_service_off_body">Нажмите, чтобы включить. Птичка не появляется, пока Говоруну не разрешены специальные возможности Android.</string>
-    <string name="settings_disable_body">Говорун перестанет появляться над клавиатурой.</string>
+    <string name="settings_service_off_title">Речка выключена</string>
+    <string name="settings_service_off_body">Нажмите, чтобы включить. Птичка не появляется, пока Речке не разрешены специальные возможности Android.</string>
+    <string name="settings_disable_body">Речка перестанет появляться над клавиатурой.</string>
 
     <string name="settings_bubble_size_title">Размер</string>
     <string name="settings_bubble_size_body">Какого размера птичка появляется над клавиатурой.</string>
@@ -222,17 +222,17 @@
 
     <!-- Main screen: promo card -->
     <string name="main_promo_title">Хотите больше возможностей?</string>
-    <string name="main_promo_body">Помогите нам сделать Говорун ещё удобнее.</string>
+    <string name="main_promo_body">Помогите нам сделать Речка ещё удобнее.</string>
 
     <!-- Future plans screen -->
-    <string name="future_title">Как развивается Говорун</string>
+    <string name="future_title">Как развивается Речка</string>
     <string name="main_pro_feat_filter_title">Фильтр по приложениям</string>
-    <string name="main_pro_feat_filter_body">Говорун показывается только там, где нужно — например, только в мессенджерах.</string>
+    <string name="main_pro_feat_filter_body">Речка показывается только там, где нужно — например, только в мессенджерах.</string>
     <string name="main_pro_follow_updates">Следите за обновлениями в RuStore, чтобы узнать, что появилось.</string>
 
     <!-- About screen -->
     <string name="about_title">О программе</string>
-    <string name="about_app_name">Говорун</string>
+    <string name="about_app_name">Речка</string>
     <string name="about_tagline">Офлайн голосовой ввод на русском</string>
     <string name="about_version_fmt">Версия %1$s</string>
 
@@ -244,12 +244,12 @@
     <string name="about_row_source_title">Открытый исходный код</string>
     <string name="about_row_source_body">Приложение бесплатное — код можно изучать и собирать самому</string>
     <string name="about_row_updates_title">Обновления через RuStore</string>
-    <string name="about_row_updates_body">Говорун сам предложит обновиться, когда выйдет новая версия</string>
+    <string name="about_row_updates_body">Речка сама предложит обновиться, когда выйдет новая версия</string>
 
     <!-- About: GitHub action row -->
     <string name="about_action_github_title">Исходный код на GitHub</string>
-    <string name="about_action_github_sub">github.com/amidexe/govorun-lite</string>
-    <string name="about_github_url">https://github.com/amidexe/govorun-lite</string>
+    <string name="about_action_github_sub">github.com/dm1sh/rechka-lite</string>
+    <string name="about_github_url">https://github.com/dm1sh/rechka-lite</string>
 
     <!-- About: licenses action row -->
     <string name="about_action_licenses_title">Лицензии</string>
@@ -258,30 +258,30 @@
     <!-- About: privacy policy action row -->
     <string name="about_action_privacy_title">Политика конфиденциальности</string>
     <string name="about_action_privacy_sub">Что приложение делает с вашими данными и условия использования</string>
-    <string name="about_privacy_url">https://amidexe.github.io/govorun-lite/privacy.html</string>
+    <string name="about_privacy_url">https://dm1sh.github.io/rechka-lite/privacy.html</string>
 
     <!-- Licenses screen -->
     <string name="licenses_title">Лицензии</string>
-    <string name="licenses_intro">Код приложения распространяется по лицензии MIT. Ниже — уведомления и тексты лицензий сторонних компонентов, которые входят в состав Говоруна.</string>
+    <string name="licenses_intro">Код приложения распространяется по лицензии MIT. Ниже — уведомления и тексты лицензий сторонних компонентов, которые входят в состав Речки.</string>
 
     <!-- About: author -->
     <string name="about_author_title">Автор</string>
-    <string name="about_author_body">Дмитрий Киселев. Если Говорун пригодился — оставьте отзыв в RuStore, это лучший способ сказать спасибо. Баги и предложения удобнее присылать в Issues на GitHub.</string>
+    <string name="about_author_body">Речка — форк, основанный на оригинальном приложении «Говорун». Автор форка — dm1sh. Если Речка пригодилась — оставьте отзыв в RuStore, это лучший способ сказать спасибо. Баги и предложения удобнее присылать в Issues на GitHub.</string>
 
     <!-- About: thanks -->
     <string name="about_thanks_title">Благодарности</string>
     <string name="about_thanks_body">Спасибо моему сыну Максиму — за идею и за помощь с тестированием.</string>
 
     <!-- About: compatibility + recognition-limits notes shown as plain muted text -->
-    <string name="about_devices_body">Приложение проверено на устройствах Google Pixel (6 и новее) на чистом Android 13–15. На смартфонах Xiaomi, Huawei и других производителях с агрессивной экономией батареи может потребоваться вручную добавить Говорун в «Автозапуск» и снять ограничения для Говоруна в специальных возможностях.</string>
+    <string name="about_devices_body">Приложение проверено на устройствах Google Pixel (6 и новее) на чистом Android 13–15. На смартфонах Xiaomi, Huawei и других производителях с агрессивной экономией батареи может потребоваться вручную добавить Речку в «Автозапуск» и снять ограничения для Речки в специальных возможностях.</string>
     <string name="about_disclaimer_body">Распознавание речи выполняется нейросетевой моделью и может содержать ошибки и неточности. Автор и приложение не несут ответственности за неверную интерпретацию распознанного текста и его последующее использование. Перед отправкой важных сообщений всегда перечитывайте результат.</string>
 
     <!-- About: footer -->
-    <string name="about_footer_fmt">Говорун · %1$s</string>
+    <string name="about_footer_fmt">Речка · %1$s</string>
 
     <!-- Future plans screen / RuStore review CTA -->
     <string name="main_pro_title">Новые функции</string>
-    <string name="main_pro_intro">Говорун — небольшой проект, и мы делаем его с душой. За несколько месяцев вышло 13 обновлений, добавлено пять новых функций. Если приложение пригодилось — оставьте отзыв в RuStore или расскажите друзьям и коллегам: это лучший способ помочь проекту.</string>
+    <string name="main_pro_intro">Речка — небольшой проект, и мы делаем его с душой. За несколько месяцев вышло 13 обновлений, добавлено пять новых функций. Если приложение пригодилось — оставьте отзыв в RuStore или расскажите друзьям и коллегам: это лучший способ помочь проекту.</string>
     <string name="main_pro_feat_heading">Реализовано благодаря вашим отзывам</string>
     <string name="main_pro_feat_bg_record_title">Режим удержания</string>
     <string name="main_pro_feat_bg_record_body">Запись пока держишь птичку — удобно для коротких фраз.</string>
@@ -292,13 +292,13 @@
     <string name="main_pro_feat_more">…и многое другое, реализованное благодаря вашим отзывам.</string>
     <string name="main_pro_review_button">Оставить отзыв в RuStore</string>
     <string name="main_pro_share_button">Расскажите о приложении</string>
-    <string name="main_pro_review_url">https://apps.rustore.ru/app/com.govorun.lite</string>
+    <string name="main_pro_review_url">https://apps.rustore.ru/app/ru.dm1sh.rechka</string>
 
     <!-- Dictionary screen -->
     <string name="dict_title">Свой словарь</string>
     <string name="dict_help_action">Справка</string>
     <string name="dict_help_dialog_title">Как заполнять</string>
-    <string name="dict_help_dialog_body">Каждое правило с новой строки в формате «ключ=значение». Регистр не важен.\n\nСтрока без знака «=» — слово будет вырезано из распознанного текста.\nСтрока, начинающаяся с «#» — комментарий, не учитывается.\n\nПравила применяются по порядку — длинные и более конкретные пишите выше.\n\nГоворун может слышать одно и то же слово по-разному (например, «джимэйл», «джимейл», «гмайл») — добавляйте все варианты звучания.\n\nСовет: можно попросить ChatGPT, Gemini, Claude или YandexGPT составить словарь под вашу профессию или хобби в формате «ключ=значение». Скопируйте результат и вставьте сюда долгим тапом по полю редактора.</string>
+    <string name="dict_help_dialog_body">Каждое правило с новой строки в формате «ключ=значение». Регистр не важен.\n\nСтрока без знака «=» — слово будет вырезано из распознанного текста.\nСтрока, начинающаяся с «#» — комментарий, не учитывается.\n\nПравила применяются по порядку — длинные и более конкретные пишите выше.\n\nРечка может слышать одно и то же слово по-разному (например, «джимэйл», «джимейл», «гмайл») — добавляйте все варианты звучания.\n\nСовет: можно попросить ChatGPT, Gemini, Claude или YandexGPT составить словарь под вашу профессию или хобби в формате «ключ=значение». Скопируйте результат и вставьте сюда долгим тапом по полю редактора.</string>
     <string name="dict_help_dialog_close">Понятно</string>
     <string name="dict_editor_hint">ключ=значение</string>
     <!-- Pre-filled when the dictionary is empty. Self-documents the format
@@ -329,7 +329,7 @@
     <string name="settings_auto_stop_off">Без огр.</string>
 
     <string name="settings_pause_title">Длина паузы</string>
-    <string name="settings_pause_body">Подстройте под ваш темп. После паузы Говорун заканчивает предложение - если точки ставятся раньше чем вы закончили мысль, попробуйте Среднюю или Длинную.</string>
+    <string name="settings_pause_body">Подстройте под ваш темп. После паузы Речка заканчивает предложение - если точки ставятся раньше чем вы закончили мысль, попробуйте Среднюю или Длинную.</string>
     <string name="settings_pause_short">Короткая</string>
     <string name="settings_pause_medium">Средняя</string>
     <string name="settings_pause_long">Длинная</string>
@@ -341,12 +341,12 @@
     <string name="stats_reset_message">Счётчик слов и время диктовки обнулятся. Это нельзя отменить.</string>
     <string name="stats_reset_action">Сбросить</string>
 
-    <string name="tile_label">Говорун: всегда</string>
+    <string name="tile_label">Речка: всегда</string>
     <string name="tile_subtitle_always">Птичка показана всегда</string>
     <string name="tile_subtitle_default">Стандартный режим</string>
     <string name="tile_subtitle_service_off">Включите в спец-возможностях</string>
 
-    <string name="tile_silence_label">Говорун</string>
+    <string name="tile_silence_label">Речка</string>
     <string name="tile_silence_subtitle_on">Птичка временно выключена</string>
     <string name="tile_silence_subtitle_off">Птичка работает</string>
 
@@ -357,7 +357,7 @@
     <string name="app_filter_desc_blacklist">Значок не появляется в отмеченных приложениях</string>
     <string name="app_filter_desc_whitelist">Значок появляется только в отмеченных приложениях</string>
     <string name="hint_search_app">Поиск</string>
-    <string name="app_filter_tile_note">Тайл «Говорун: всегда» показывает значок в любом приложении вне зависимости от этого фильтра</string>
+    <string name="app_filter_tile_note">Тайл «Речка: всегда» показывает значок в любом приложении вне зависимости от этого фильтра</string>
 
     <!-- Settings row for app filter -->
     <string name="settings_app_filter_title">Фильтр по приложениям</string>
@@ -383,7 +383,7 @@
     <string name="benchmark_hero_label">скорость распознавания</string>
     <string name="benchmark_help_action">Как считается</string>
     <string name="benchmark_help_title">Как считается результат</string>
-    <string name="benchmark_help_body">Говорун работает в режиме голосового ввода: вы говорите, делаете паузу — и текст появляется. Пауза между вашей речью и появлением текста складывается из двух частей: время распознавания тишины (около полсекунды) плюс время обработки аудио моделью. Именно это второе время и измеряет тест.\n\nЧем больше число — тем быстрее телефон обрабатывает речь и тем короче ощущаемая пауза. При результате ×16 обработка занимает доли секунды — пока вы формулируете следующую мысль, текст уже напечатан. При ×4–5 пауза заметна: приходится ждать 1–2 секунды после каждой остановки.\n\nЧто означает ваш результат:\n×3–4 — пауза после речи заметна\n×5–9 — комфортно\n×10 и выше — почти мгновенно\n\nТест полезен, если хотите сравнить разные устройства или разобраться, почему на конкретном телефоне Говорун работает медленнее.\n\nПервый запуск — медленнее: модель загружается с нуля. Повторный — реальная скорость в обычной работе. Длинный ролик (71 сек) проверяет, как устройство справляется с продолжительной записью.\n\nNNAPI — стандартный Android API для ускорения нейросетей. Какой именно чип он задействует (NPU, DSP или CPU) — решает сам Android в зависимости от устройства. Процессор — NNAPI недоступен, модель считает напрямую на CPU.\n\nТестовые ролики — официальные примеры GigaAM от Сбера, лицензия MIT:\nhttps://github.com/amidexe/govorun-lite/tree/main/app/src/main/assets</string>
+    <string name="benchmark_help_body">Речка работает в режиме голосового ввода: вы говорите, делаете паузу — и текст появляется. Пауза между вашей речью и появлением текста складывается из двух частей: время распознавания тишины (около полсекунды) плюс время обработки аудио моделью. Именно это второе время и измеряет тест.\n\nЧем больше число — тем быстрее телефон обрабатывает речь и тем короче ощущаемая пауза. При результате ×16 обработка занимает доли секунды — пока вы формулируете следующую мысль, текст уже напечатан. При ×4–5 пауза заметна: приходится ждать 1–2 секунды после каждой остановки.\n\nЧто означает ваш результат:\n×3–4 — пауза после речи заметна\n×5–9 — комфортно\n×10 и выше — почти мгновенно\n\nТест полезен, если хотите сравнить разные устройства или разобраться, почему на конкретном телефоне Речка работает медленнее.\n\nПервый запуск — медленнее: модель загружается с нуля. Повторный — реальная скорость в обычной работе. Длинный ролик (71 сек) проверяет, как устройство справляется с продолжительной записью.\n\nNNAPI — стандартный Android API для ускорения нейросетей. Какой именно чип он задействует (NPU, DSP или CPU) — решает сам Android в зависимости от устройства. Процессор — NNAPI недоступен, модель считает напрямую на CPU.\n\nТестовые ролики — официальные примеры GigaAM от Сбера, лицензия MIT:\nhttps://github.com/dm1sh/rechka-lite/tree/main/app/src/main/assets</string>
     <string name="benchmark_help_close">Понятно</string>
     <string name="benchmark_short_title">Короткий ролик (11 сек)</string>
     <string name="benchmark_cold_title">Первый запуск</string>

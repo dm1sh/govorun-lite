@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-labelledby="title desc">
+  <title id="title">Rechka blue wave icon</title>
+  <desc id="desc">A minimal blue flowing waveform on a white rounded square.</desc>
+  <rect width="1024" height="1024" rx="224" fill="#FFFFFF"/>
+  <path d="M178 554c83-119 151 119 234 0s151-119 234 0 151 119 234 0" fill="none" stroke="#2563EB" stroke-width="72" stroke-linecap="round"/>
+</svg>

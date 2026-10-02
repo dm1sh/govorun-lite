@@ -21,11 +21,11 @@ val ciVersionCode = providers.gradleProperty("versionCode")
     ?.toIntOrNull()
 
 android {
-    namespace = "com.govorun.lite"
+    namespace = "ru.dm1sh.rechka"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.govorun.lite"
+        applicationId = "ru.dm1sh.rechka"
         minSdk = 33
         targetSdk = 35
         versionCode = ciVersionCode ?: 20

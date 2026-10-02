@@ -33,7 +33,7 @@ ffmpeg-build/
 *.log
 rustore-screenshots/
 
-# Shotframe lives in its own repo — github.com/amidexe/shotframe
+# Shotframe lives in its own repo — github.com/dm1sh/shotframe
 scripts/shotframe/
 
 # Local-only dev tooling (test-phone IP is personal, hooks are per-machine,

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-labelledby="title desc">
+  <title id="title">Rechka river icon</title>
+  <desc id="desc">A stylized river forming an R on a warm pale background.</desc>
+  <defs>
+    <linearGradient id="river" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3157D5"/>
+      <stop offset="1" stop-color="#36B89A"/>
+    </linearGradient>
+  </defs>
+  <rect width="1024" height="1024" rx="224" fill="#F3F7F8"/>
+  <path d="M264 242c141 62 262 71 401 8 40-18 87 12 77 55-25 104-77 164-171 188 93 41 155 108 197 220" fill="none" stroke="url(#river)" stroke-width="90" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M273 272v495" fill="none" stroke="#172554" stroke-width="78" stroke-linecap="round"/>
+  <circle cx="750" cy="766" r="22" fill="#F26B5E"/>
+</svg>

@@ -19,7 +19,7 @@
             android:layout_height="96dp"
             android:layout_marginTop="16dp">
 
-            <com.govorun.lite.overlay.BubbleView
+            <ru.dm1sh.rechka.overlay.BubbleView
                 android:id="@+id/tryBubble"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

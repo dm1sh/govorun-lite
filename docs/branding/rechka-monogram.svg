@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-labelledby="title desc">
+  <title id="title">Rechka monogram icon</title>
+  <desc id="desc">A minimal white R-shaped river mark on a dark indigo rounded square.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#171A2B"/>
+      <stop offset="1" stop-color="#3949AB"/>
+    </linearGradient>
+  </defs>
+  <rect width="1024" height="1024" rx="224" fill="url(#bg)"/>
+  <path d="M300 760V264h184c123 0 198 56 198 151 0 82-54 132-140 148l176 197" fill="none" stroke="#FFF8E8" stroke-width="76" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M304 523h177" fill="none" stroke="#45D6E8" stroke-width="30" stroke-linecap="round"/>
+  <circle cx="772" cy="760" r="20" fill="#A7F3D0"/>
+</svg>

@@ -1,0 +1,92 @@
+package ru.dm1sh.rechka.service
+
+import android.content.Intent
+import android.os.Bundle
+import android.speech.RecognitionService
+import android.speech.SpeechRecognizer
+import android.util.Log
+import ru.dm1sh.rechka.model.GigaAmModel
+import ru.dm1sh.rechka.stats.StatsStore
+import ru.dm1sh.rechka.transcriber.OfflineTranscriber
+import ru.dm1sh.rechka.transcriber.VadRecorder
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+
+/** Exposes the same offline recognizer through Android's speech-recognition API. */
+class RechkaRecognitionService : RecognitionService() {
+    private var recorder: VadRecorder? = null
+    private var callback: Callback? = null
+    private var recognized = StringBuilder()
+    private var scope: CoroutineScope? = null
+
+    override fun onStartListening(intent: Intent?, listener: Callback) {
+        stopCurrent()
+        callback = listener
+        recognized = StringBuilder()
+        if (!GigaAmModel.isInstalled(this)) {
+            listener.error(SpeechRecognizer.ERROR_SERVER)
+            return
+        }
+        listener.readyForSpeech(Bundle())
+        listener.beginningOfSpeech()
+        val sessionScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+        scope = sessionScope
+        val currentRecorder = VadRecorder(this)
+        recorder = currentRecorder
+        currentRecorder.start(
+            scope = sessionScope,
+            transcriberProvider = { OfflineTranscriber.getInstance(this@RechkaRecognitionService) },
+            onSegment = { text ->
+                if (text.isNotBlank()) {
+                    if (recognized.isNotEmpty()) recognized.append(' ')
+                    recognized.append(text)
+                    StatsStore.addWords(applicationContext, StatsStore.countWords(text))
+                    callback?.partialResults(resultBundle(recognized.toString()))
+                }
+            },
+            onDone = {
+                val text = recognized.toString().trim()
+                // SpeechRecognizer clients expect endOfSpeech before the final
+                // results callback. Some keyboards ignore results delivered in
+                // the opposite order and appear to do nothing.
+                callback?.endOfSpeech()
+                callback?.results(resultBundle(text))
+                clearSession()
+            },
+            useVad = true,
+        )
+    }
+
+    override fun onStopListening(listener: Callback) {
+        recorder?.stop()
+    }
+
+    override fun onCancel(listener: Callback) {
+        stopCurrent()
+    }
+
+    private fun resultBundle(text: String): Bundle = Bundle().apply {
+        putStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION, arrayListOf(text))
+    }
+
+    private fun stopCurrent() {
+        recorder?.stop()
+        scope?.cancel()
+        recorder = null
+        scope = null
+    }
+
+    private fun clearSession() {
+        recorder = null
+        scope?.cancel()
+        scope = null
+        callback = null
+    }
+
+    override fun onDestroy() {
+        stopCurrent()
+        super.onDestroy()
+    }
+}

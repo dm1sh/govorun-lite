@@ -17,6 +17,6 @@
 # Strip the on-device file journal in release. AppLog.log is a development
 # aid only — AppLog.read/clear are unused, so R8 drops them via dead-code
 # elimination once log() calls are gone.
--assumenosideeffects class com.govorun.lite.util.AppLog {
+-assumenosideeffects class ru.dm1sh.rechka.util.AppLog {
     public void log(android.content.Context, java.lang.String);
 }

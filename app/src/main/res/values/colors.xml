@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="ic_launcher_background">#FFFFFF</color>
+    <color name="ic_launcher_background">#F5F5F7</color>
     <!-- Standard amber for the "rate us" star. Stays consistent in light/dark
          themes — магазины приложений связывают этот цвет с оценками. -->
     <color name="star_amber">#FFC107</color>

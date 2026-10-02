@@ -5,7 +5,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
-import android.widget.ImageView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -14,7 +13,6 @@ import androidx.core.view.updatePadding
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.color.DynamicColors
-import com.google.android.material.textview.MaterialTextView
 import ru.dm1sh.rechka.R
 
 /**
@@ -41,28 +39,12 @@ class FuturePlansActivity : AppCompatActivity() {
             insets
         }
 
-        bindFeatureRow(R.id.rowBgRecord, R.drawable.ic_check_circle_24,
-            R.string.main_pro_feat_bg_record_title, R.string.main_pro_feat_bg_record_body)
-        bindFeatureRow(R.id.rowDict, R.drawable.ic_check_circle_24,
-            R.string.main_pro_feat_dict_title, R.string.main_pro_feat_dict_body)
-        bindFeatureRow(R.id.rowTheme, R.drawable.ic_check_circle_24,
-            R.string.main_pro_feat_theme_title, R.string.main_pro_feat_theme_body)
-        bindFeatureRow(R.id.rowFilter, R.drawable.ic_check_circle_24,
-            R.string.main_pro_feat_filter_title, R.string.main_pro_feat_filter_body)
-
         findViewById<MaterialButton>(R.id.proReviewButton).setOnClickListener {
             openReview()
         }
         findViewById<MaterialButton>(R.id.proShareButton).setOnClickListener {
             shareApp()
         }
-    }
-
-    private fun bindFeatureRow(rowId: Int, iconRes: Int, titleRes: Int, bodyRes: Int) {
-        val row = findViewById<View>(rowId)
-        row.findViewById<ImageView>(R.id.rowIcon).setImageResource(iconRes)
-        row.findViewById<MaterialTextView>(R.id.rowTitle).setText(titleRes)
-        row.findViewById<MaterialTextView>(R.id.rowBody).setText(bodyRes)
     }
 
     private fun openReview() {

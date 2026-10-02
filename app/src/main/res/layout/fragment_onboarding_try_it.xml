@@ -27,8 +27,8 @@
         </FrameLayout>
 
         <!-- CTA lives directly under the bubble: the arrow of attention goes
-             bird → instruction → result card, which is the only logical
-             reading order when the bird is the tap target. -->
+             microphone → instruction → result card, which is the only logical
+             reading order when the microphone is the tap target. -->
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/tryHint"
             android:layout_width="match_parent"

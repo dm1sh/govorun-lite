@@ -56,8 +56,8 @@ object Prefs {
     const val PAUSE_LONG_SECONDS = 2.0f
 
     // Clamp range for the bubble fill alpha. Floor 0.0 = fully transparent
-    // background, only the bird silhouette visible. When idleAlphaFraction
-    // approaches zero, BubbleView smoothly switches the bird tint toward
+    // background, only the microphone icon visible. When idleAlphaFraction
+    // approaches zero, BubbleView smoothly switches the microphone tint toward
     // colorOnSurface — the MD3 "always readable on system surface" colour
     // that follows light/dark theme — so the outline stays visible on any
     // wallpaper or app underneath. Ceiling 1.0 is fully opaque.
@@ -71,7 +71,7 @@ object Prefs {
     // shift after upgrade.
     const val BUBBLE_ALPHA_STEP = 1f / 14f
     // Slight translucency by default — enough to blend with a patterned
-    // wallpaper, not so much that the bird gets lost. Lands on the
+    // wallpaper, not so much that the microphone gets lost. Lands on the
     // grid: 12 × (1/14) = 0.857, closest grid stop to the original 0.85
     // so existing users get the same visual.
     const val BUBBLE_ALPHA_DEFAULT = 12f / 14f

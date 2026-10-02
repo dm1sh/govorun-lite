@@ -15,7 +15,7 @@ import ru.dm1sh.rechka.R
 import ru.dm1sh.rechka.util.Prefs
 
 /**
- * The floating "Речка" — a round button with the bird mascot. Idle state
+ * The floating "Речка" — a round button with the microphone icon. Idle state
  * uses M3 colorPrimaryContainer (picks up Dynamic Colors from the wallpaper);
  * recording state is always red — the universal REC signal shouldn't be
  * tinted to the user's accent, that would blur the "you are being recorded"
@@ -31,13 +31,13 @@ class BubbleView @JvmOverloads constructor(
 ) : View(context, attrs, defStyleAttr) {
 
     private val dp = resources.displayMetrics.density
-    // Baseline 56dp disc with 32dp bird, both scaled by the user-chosen
+    // Baseline 56dp disc with 32dp microphone, both scaled by the user-chosen
     // size factor from Prefs (default 1.0×). All animation maths derives
     // from these — change the scale, everything (halo radius, recording
     // pulse range, breathing amplitude) re-anchors automatically.
     private var sizeScale: Float = Prefs.getBubbleSize(context)
     private var bubbleSize = (56 * dp * sizeScale).toInt()
-    // Bird silhouette reads a bit small at 24dp on a 56dp disc — bump it up
+    // Microphone silhouette reads a bit small at 24dp on a 56dp disc — bump it up
     // so the shape is recognisable at a glance.
     private var iconSize = (32 * dp * sizeScale).toInt()
 
@@ -48,7 +48,7 @@ class BubbleView @JvmOverloads constructor(
     private val fallbackIdleTint = 0xFFFFFFFF.toInt()
     private val recordingFill = 0xFFE53935.toInt()
     private val processingFill = 0xFFFFA726.toInt()
-    private val recordingBirdTint = 0xFFFFFFFF.toInt()
+    private val recordingMicrophoneTint = 0xFFFFFFFF.toInt()
 
     // Theme-derived RGB (without alpha) — so that changing the user-chosen
     // transparency doesn't require re-reading the theme, and theme refresh
@@ -57,15 +57,15 @@ class BubbleView @JvmOverloads constructor(
         com.google.android.material.R.attr.colorPrimaryContainer,
         fallbackIdleFill
     )
-    private var idleBirdTint = readThemeRgb(
+    private var idleMicrophoneTint = readThemeRgb(
         com.google.android.material.R.attr.colorOnPrimaryContainer,
         fallbackIdleTint
     ) or 0xFF000000.toInt()
-    // Bare-bird tint — used when the bubble background is fully transparent
+    // Bare-microphone tint — used when the bubble background is fully transparent
     // (idleAlphaFraction approaches 0). colorOnSurface adapts to the current
     // theme: dark on light backgrounds, light on dark backgrounds — so the
     // outline stays readable on any wallpaper or app behind us.
-    private var bareBirdTint = readThemeRgb(
+    private var bareMicrophoneTint = readThemeRgb(
         com.google.android.material.R.attr.colorOnSurface,
         fallbackIdleTint
     ) or 0xFF000000.toInt()
@@ -112,7 +112,7 @@ class BubbleView @JvmOverloads constructor(
     private var idleBubbleScale = 1f
     private var idleHaloAnimator: ValueAnimator? = null
 
-    private val birdIcon: Drawable? = ContextCompat.getDrawable(context, R.drawable.ic_bird_24)
+    private val micIcon: Drawable? = ContextCompat.getDrawable(context, R.drawable.ic_rechka_24)
 
     init { elevation = 6 * dp }
 
@@ -192,11 +192,11 @@ class BubbleView @JvmOverloads constructor(
             com.google.android.material.R.attr.colorPrimaryContainer,
             fallbackIdleFill
         )
-        idleBirdTint = readThemeRgb(
+        idleMicrophoneTint = readThemeRgb(
             com.google.android.material.R.attr.colorOnPrimaryContainer,
             fallbackIdleTint
         ) or 0xFF000000.toInt()
-        bareBirdTint = readThemeRgb(
+        bareMicrophoneTint = readThemeRgb(
             com.google.android.material.R.attr.colorOnSurface,
             fallbackIdleTint
         ) or 0xFF000000.toInt()
@@ -256,26 +256,26 @@ class BubbleView @JvmOverloads constructor(
         }
         canvas.drawCircle(cx, cy, radius, paint)
 
-        // 4. Bird on top. Tint swaps with state so contrast holds on any
+        // 4. Microphone on top. Tint swaps with state so contrast holds on any
         //    Dynamic-Colors palette. Icon scales with the bubble so the
         //    proportions stay right during the breathing animation.
-        birdIcon?.let {
-            // Recording / processing keep their fixed tints — the bird must
+        micIcon?.let {
+            // Recording / processing keep their fixed tints — the microphone must
             // read crisp white on red regardless of how transparent the user
             // made the idle bubble. In idle, smoothly interpolate between
-            // bareBirdTint (works on any wallpaper, used at alpha≈0) and
-            // idleBirdTint (high contrast against colorPrimaryContainer
+            // bareMicrophoneTint (works on any wallpaper, used at alpha≈0) and
+            // idleMicrophoneTint (high contrast against colorPrimaryContainer
             // disc, used at alpha≈1) by the current alpha fraction.
-            val birdTint = when {
-                isRecording || isProcessing -> recordingBirdTint
-                else -> lerpColor(bareBirdTint, idleBirdTint, idleAlphaFraction)
+            val micTint = when {
+                isRecording || isProcessing -> recordingMicrophoneTint
+                else -> lerpColor(bareMicrophoneTint, idleMicrophoneTint, idleAlphaFraction)
             }
-            it.setTint(birdTint)
+            it.setTint(micTint)
             val l = (cx - scaledIcon / 2).toInt()
             val t = (cy - scaledIcon / 2).toInt()
             it.setBounds(l, t, l + scaledIcon, t + scaledIcon)
             if (isProcessing) {
-                // Spin the bird around its centre while the model is thinking.
+                // Spin the microphone around its centre while the model is thinking.
                 canvas.save()
                 canvas.rotate(processingAngle, cx, cy)
                 it.draw(canvas)
@@ -387,7 +387,7 @@ class BubbleView @JvmOverloads constructor(
     }
 
     /** Linear interpolation between two ARGB colours. Used to smoothly
-     *  transition the bird tint from colorOnSurface (at alpha=0, "bare
+     *  transition the microphone tint from colorOnSurface (at alpha=0, "bare
      *  outline that reads on any wallpaper") to colorOnPrimaryContainer
      *  (at alpha=1, "high contrast against the filled disc"). */
     private fun lerpColor(from: Int, to: Int, t: Float): Int {

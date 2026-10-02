@@ -48,7 +48,7 @@
     <string name="action_done">Готово</string>
 
     <!-- Onboarding: welcome -->
-    <string name="onb_welcome_title">Привет! Я — Речка</string>
+    <string name="onb_welcome_title">Говорите свободно</string>
     <string name="onb_welcome_body">Превращаю речь в текст. Без интернета, без аккаунтов.</string>
     <string name="onb_welcome_note">Пара коротких шагов — и поехали.</string>
 
@@ -73,8 +73,8 @@
          app is real before sending them into the more involved accessibility
          setup. Borrowed UX idea from Whisper Flow. -->
     <string name="onb_try_title">Попробуйте</string>
-    <string name="onb_try_tap_to_start">Нажмите на птичку и попробуйте набрать текст голосом</string>
-    <string name="onb_try_tap_to_grant">Нажмите на птичку и попробуйте набрать текст голосом</string>
+    <string name="onb_try_tap_to_start">Нажмите на микрофон и попробуйте набрать текст голосом</string>
+    <string name="onb_try_tap_to_grant">Нажмите на микрофон и попробуйте набрать текст голосом</string>
     <!-- Sub-hint shown only at the moment the system mic-permission dialog is
          about to appear. Steers the user toward "При использовании
          приложения" — picking "Только в этот раз" causes Android to silently
@@ -98,7 +98,8 @@
 
     <!-- Onboarding: battery optimization (optional) -->
     <string name="onb_battery_title">Почти у цели — работа в фоне</string>
-    <string name="onb_battery_body">Android может останавливать приложения в фоне для экономии батареи — тогда Речка пропадает в самый неподходящий момент. Можно попросить систему этого не делать. Это последний шаг.</string>
+    <string name="onb_battery_body">Android может останавливать Речку в фоне для экономии батареи. Это разрешение нужно только для плавающего микрофона.</string>
+    <string name="onb_battery_not_needed">Для голосовой клавиатуры это разрешение не требуется.</string>
     <string name="onb_battery_body_done">Работа в фоне уже разрешена. Можно нажать «Готово».</string>
     <string name="onb_battery_open">Разрешить работу в фоне</string>
     <string name="onb_battery_skip_note">Шаг не обязательный — можно сразу нажать «Готово» и настроить позже.</string>
@@ -123,20 +124,20 @@
     <string name="main_ready">Всё готово</string>
     <string name="main_needs_setup">Нужна настройка</string>
     <string name="main_just_finished">Всё готово!</string>
-    <string name="main_just_finished_sub">Откройте любое поле для ввода текста — птичка появится рядом с клавиатурой. Нажмите на неё — и говорите.</string>
-    <string name="main_hint">Откройте любое поле для ввода текста — птичка появится рядом с клавиатурой. Нажмите на неё — и говорите.</string>
+    <string name="main_just_finished_sub">Диктуйте через плавающий микрофон, голосовую клавиатуру или расшифровывайте аудио и видеофайлы.</string>
+    <string name="main_hint">Используйте плавающий микрофон, голосовую клавиатуру или откройте аудио- и видеофайл для расшифровки.</string>
     <string name="main_engine_credit">Движок — GigaAM v3 от Сбера, лицензия MIT.</string>
     <string name="main_card_mic_title">Включите микрофон</string>
     <string name="main_card_mic_body">Без микрофона Речка не услышит, что вы говорите. Выберите Разрешения → Микрофон → Разрешить во время использования приложения.</string>
     <string name="main_card_mic_button">Перейти в настройки</string>
     <string name="main_card_service_title">Включите Речку</string>
-    <string name="main_card_service_body">Птичка не появится в других программах, пока вы не включили «Речка — голосовой ввод» в специальных возможностях.</string>
+    <string name="main_card_service_body">Микрофон не появится в других программах, пока вы не включили «Речка — голосовой ввод» в специальных возможностях.</string>
     <string name="main_card_service_button">Разрешить специальные возможности</string>
     <string name="main_card_keyboard_title">Включите голосовую клавиатуру</string>
     <string name="main_card_keyboard_body">Речку можно использовать без специальных возможностей — включите «Речка — голосовой ввод» в настройках клавиатур и запускайте диктовку кнопкой микрофона.</string>
     <string name="main_card_keyboard_button">Открыть настройки клавиатур</string>
     <string name="main_card_battery_title">Разрешите работу в фоне</string>
-    <string name="main_card_battery_body">Без этого Android со временем может выгрузить Речку, и птичка перестанет появляться — пока вы заново не откроете приложение.</string>
+    <string name="main_card_battery_body">Без этого Android со временем может выгрузить Речку, и микрофон перестанет появляться — пока вы заново не откроете приложение.</string>
     <string name="main_card_battery_button">Разрешить</string>
 
     <!-- One-time "What's new" card for the current release. Shown on the
@@ -150,13 +151,13 @@
     <string name="main_needs_setup_sub">Несколько мелочей надо подкрутить — карточки ниже подскажут, что и где.</string>
     <string name="main_disable_service">Выключить Речку</string>
     <string name="main_disable_service_title">Выключить Речку?</string>
-    <string name="main_disable_service_hint">Речка перестанет работать прямо сейчас. Птичка пропадёт во всех программах. Чтобы включить обратно, придётся снова открыть «Специальные возможности» Android и заново разрешить там Речке работать.</string>
+    <string name="main_disable_service_hint">Речка перестанет работать прямо сейчас. Микрофон пропадёт во всех программах. Чтобы включить обратно, придётся снова открыть «Специальные возможности» Android и заново разрешить там Речке работать.</string>
 
     <!-- Settings: tapping the switch while Речка is OFF opens this dialog
          so the user isn't left without a way back into the accessibility
          settings screen. -->
     <string name="main_enable_service_title">Речка сейчас выключена</string>
-    <string name="main_enable_service_body">Чтобы снова видеть птичку над клавиатурой, включите Речку в специальных возможностях Android.</string>
+    <string name="main_enable_service_body">Чтобы снова видеть микрофон над клавиатурой, включите Речку в специальных возможностях Android.</string>
     <string name="main_open_accessibility">Открыть специальные возможности</string>
 
     <!-- Main screen: usage stats -->
@@ -184,20 +185,20 @@
 
     <!-- Settings screen -->
     <string name="settings_title">Настройки</string>
-    <string name="settings_section_bubble">Птичка</string>
+    <string name="settings_section_bubble">Микрофон</string>
     <string name="settings_section_service">Речка</string>
     <string name="settings_transparency_title">Прозрачность</string>
     <string name="settings_transparency_body">Насколько бабл просвечивает фон приложения, поверх которого он появляется.</string>
     <string name="settings_haptics_title">Вибрация</string>
     <string name="settings_haptics_body">Короткая вибрация, когда запись начинается и заканчивается.</string>
     <string name="settings_hide_in_search_title">Прятать в строках поиска</string>
-    <string name="settings_hide_in_search_body">Птичка не появляется, когда открыта строка поиска.</string>
+    <string name="settings_hide_in_search_body">Микрофон не появляется, когда открыта строка поиска.</string>
     <string name="settings_section_appearance">Внешний вид</string>
     <string name="settings_section_visibility">Где показывать</string>
     <string name="settings_section_recording">Запись</string>
     <string name="settings_section_text">Текст</string>
     <string name="settings_bubble_lock_title">Зафиксировать позицию</string>
-    <string name="settings_bubble_lock_body">Птичка не двигается при случайных касаниях.</string>
+    <string name="settings_bubble_lock_body">Микрофон не двигается при случайных касаниях.</string>
     <string name="settings_voice_suffix_title">Добавлять пометку</string>
     <string name="settings_voice_suffix_body">Дописывает «[текст распознан с голоса]» на новой строке после каждой диктовки.</string>
     <!-- Show-service row labels: title shows current state, body explains
@@ -207,15 +208,15 @@
     <string name="settings_service_on_title">Речка включена</string>
     <string name="settings_service_on_body">Нажмите, чтобы выключить.</string>
     <string name="settings_service_off_title">Речка выключена</string>
-    <string name="settings_service_off_body">Нажмите, чтобы включить. Птичка не появляется, пока Речке не разрешены специальные возможности Android.</string>
+    <string name="settings_service_off_body">Нажмите, чтобы включить. Микрофон не появляется, пока Речке не разрешены специальные возможности Android.</string>
     <string name="settings_disable_body">Речка перестанет появляться над клавиатурой.</string>
 
     <string name="settings_bubble_size_title">Размер</string>
-    <string name="settings_bubble_size_body">Какого размера птичка появляется над клавиатурой.</string>
+    <string name="settings_bubble_size_body">Какого размера микрофон появляется над клавиатурой.</string>
     <string name="settings_bubble_edge_margin_title">Отступ от края</string>
-    <string name="settings_bubble_edge_margin_body">Насколько далеко птичка от края экрана.</string>
+    <string name="settings_bubble_edge_margin_body">Насколько далеко микрофон от края экрана.</string>
     <string name="settings_bubble_side_title">Положение</string>
-    <string name="settings_bubble_side_body">С какой стороны экрана появляется птичка.</string>
+    <string name="settings_bubble_side_body">С какой стороны экрана появляется микрофон.</string>
     <string name="settings_bubble_side_left">Слева</string>
     <string name="settings_bubble_side_right">Справа</string>
     <string name="settings_reset">Сбросить настройки</string>
@@ -226,8 +227,6 @@
 
     <!-- Future plans screen -->
     <string name="future_title">Как развивается Речка</string>
-    <string name="main_pro_feat_filter_title">Фильтр по приложениям</string>
-    <string name="main_pro_feat_filter_body">Речка показывается только там, где нужно — например, только в мессенджерах.</string>
     <string name="main_pro_follow_updates">Следите за обновлениями проекта на GitHub, чтобы узнать, что появилось.</string>
 
     <!-- About screen -->
@@ -269,8 +268,6 @@
     <string name="about_author_body">Речка — форк, основанный на оригинальном приложении «Говорун». Автор форка — dm1sh. Если Речка пригодилась — расскажите о ней или оставьте отзыв на GitHub, это лучший способ поддержать проект. Баги и предложения удобнее присылать в Issues на GitHub.</string>
 
     <!-- About: thanks -->
-    <string name="about_thanks_title">Благодарности</string>
-    <string name="about_thanks_body">Спасибо моему сыну Максиму — за идею и за помощь с тестированием.</string>
 
     <!-- About: compatibility + recognition-limits notes shown as plain muted text -->
     <string name="about_devices_body">Приложение проверено на устройствах Google Pixel (6 и новее) на чистом Android 13–15. На смартфонах Xiaomi, Huawei и других производителях с агрессивной экономией батареи может потребоваться вручную добавить Речку в «Автозапуск» и снять ограничения для Речки в специальных возможностях.</string>
@@ -281,15 +278,7 @@
 
     <!-- Future plans screen / отзыв о приложении -->
     <string name="main_pro_title">Новые функции</string>
-    <string name="main_pro_intro">Речка — небольшой проект, и мы делаем его с душой. За несколько месяцев вышло 13 обновлений, добавлено пять новых функций. Если приложение пригодилось — расскажите о приложении друзьям и коллегам или оставьте отзыв на GitHub: это лучший способ помочь проекту.</string>
-    <string name="main_pro_feat_heading">Реализовано благодаря вашим отзывам</string>
-    <string name="main_pro_feat_bg_record_title">Режим удержания</string>
-    <string name="main_pro_feat_bg_record_body">Запись пока держишь птичку — удобно для коротких фраз.</string>
-    <string name="main_pro_feat_dict_title">Словарь автозамен</string>
-    <string name="main_pro_feat_dict_body">Замена слов, аббревиатур и имён прямо при диктовке.</string>
-    <string name="main_pro_feat_theme_title">Блокировка и настройка пузыря</string>
-    <string name="main_pro_feat_theme_body">Фиксация в нужном месте, прозрачность и размер.</string>
-    <string name="main_pro_feat_more">…и многое другое, реализованное благодаря вашим отзывам.</string>
+    <string name="main_pro_intro">Речка развивается благодаря участию пользователей. Оставьте отзыв, сообщите об ошибке или предложите улучшение на GitHub.</string>
     <string name="main_pro_review_button">Оставить отзыв на GitHub</string>
     <string name="main_pro_share_button">Расскажите о приложении</string>
     <string name="main_pro_review_url">https://github.com/dm1sh/rechka/releases/latest</string>
@@ -319,7 +308,7 @@
 
     <string name="settings_keep_screen_title">Не выключать экран</string>
     <string name="settings_keep_screen_body_off">Экран блокируется как обычно</string>
-    <string name="settings_keep_screen_body_on">Птичка не даёт экрану блокироваться, пока слушает</string>
+    <string name="settings_keep_screen_body_on">Микрофон не даёт экрану блокироваться, пока слушает</string>
 
     <string name="settings_auto_stop_title">Останавливать распознавание</string>
     <string name="settings_auto_stop_body">Защита если забыли выключить</string>
@@ -342,13 +331,13 @@
     <string name="stats_reset_action">Сбросить</string>
 
     <string name="tile_label">Речка: всегда</string>
-    <string name="tile_subtitle_always">Птичка показана всегда</string>
+    <string name="tile_subtitle_always">Микрофон показана всегда</string>
     <string name="tile_subtitle_default">Стандартный режим</string>
     <string name="tile_subtitle_service_off">Включите в спец-возможностях</string>
 
     <string name="tile_silence_label">Речка</string>
-    <string name="tile_silence_subtitle_on">Птичка временно выключена</string>
-    <string name="tile_silence_subtitle_off">Птичка работает</string>
+    <string name="tile_silence_subtitle_on">Микрофон временно выключена</string>
+    <string name="tile_silence_subtitle_off">Микрофон работает</string>
 
     <!-- App filter screen -->
     <string name="title_app_filter">Фильтр по приложениям</string>

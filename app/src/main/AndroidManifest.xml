@@ -179,7 +179,7 @@
         <service
             android:name=".service.LiteTileService"
             android:exported="true"
-            android:icon="@drawable/ic_bird_eye_24"
+            android:icon="@drawable/ic_rechka_24"
             android:label="@string/tile_label"
             android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
             <intent-filter>
@@ -190,7 +190,7 @@
         <service
             android:name=".service.LiteSilenceTileService"
             android:exported="true"
-            android:icon="@drawable/ic_bird_power_off_24"
+            android:icon="@drawable/ic_rechka_24"
             android:label="@string/tile_silence_label"
             android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
             <intent-filter>

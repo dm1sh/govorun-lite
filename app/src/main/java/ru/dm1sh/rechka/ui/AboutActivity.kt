@@ -44,7 +44,7 @@ class AboutActivity : AppCompatActivity() {
             getString(R.string.about_footer_fmt, version)
 
         bindInfoRow(
-            R.id.rowEngine, R.drawable.ic_bird_24,
+            R.id.rowEngine, R.drawable.ic_rechka_24,
             R.string.about_row_engine_title, R.string.about_row_engine_body
         )
         bindInfoRow(

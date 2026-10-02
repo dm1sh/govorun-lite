@@ -38,7 +38,7 @@ import kotlinx.coroutines.withContext
 
 /**
  * «Попробуйте» step — combined just-in-time mic permission + live demo.
- * The big mascot button is the only path forward: tap it → if RECORD_AUDIO
+ * The big microphone button is the only path forward: tap it → if RECORD_AUDIO
  * isn't granted, the system dialog appears → on grant, recording starts
  * immediately. Speaking produces text in the result card with a blinking
  * cursor.
@@ -393,7 +393,7 @@ class TryItFragment : OnboardingStepFragment() {
         sp.setSpan(ForegroundColorSpan(cursorColor), full.length - 1, full.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
         resultText.text = sp
         // Card height is fixed; auto-scroll inside it so new dictation lines
-        // remain visible without pushing the bird button down the screen.
+        // remain visible without pushing the microphone button down the screen.
         if (!empty) resultScroll.post { resultScroll.fullScroll(View.FOCUS_DOWN) }
     }
 }

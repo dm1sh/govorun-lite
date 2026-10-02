@@ -13,6 +13,7 @@ import android.view.ViewGroup
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textview.MaterialTextView
 import ru.dm1sh.rechka.R
+import ru.dm1sh.rechka.util.AccessibilityHelper
 import ru.dm1sh.rechka.util.AppLog
 
 /**
@@ -92,8 +93,16 @@ class BatteryFragment : OnboardingStepFragment() {
     }
 
     private fun refreshState() {
-        val pm = requireContext().getSystemService(Context.POWER_SERVICE) as? PowerManager
-        val ignoring = pm?.isIgnoringBatteryOptimizations(requireContext().packageName) == true
+        val context = requireContext()
+        if (!AccessibilityHelper.isLiteServiceEnabled(context)) {
+            statusText.setText(R.string.onb_battery_not_needed)
+            openButton.visibility = View.GONE
+            hintText.visibility = View.GONE
+            return
+        }
+
+        val pm = context.getSystemService(Context.POWER_SERVICE) as? PowerManager
+        val ignoring = pm?.isIgnoringBatteryOptimizations(context.packageName) == true
         if (ignoring) {
             statusText.setText(R.string.onb_battery_body_done)
             openButton.visibility = View.GONE

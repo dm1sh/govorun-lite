@@ -321,7 +321,7 @@ class MainActivity : AppCompatActivity() {
         cardKeyboardMissing.visibility = if (keyboardOk || serviceOk) View.GONE else View.VISIBLE
         // Battery card is independent of criticalOk — it co-exists with stats
         // and promo as a soft "recommended" hint, not a setup blocker.
-        cardBatteryMissing.visibility = if (batteryOk) View.GONE else View.VISIBLE
+        cardBatteryMissing.visibility = if (serviceOk && !batteryOk) View.VISIBLE else View.GONE
 
         // "What's new" FYI card — gated only on critical readiness + dismissal.
         // A user without battery exemption can still see new-feature highlights;

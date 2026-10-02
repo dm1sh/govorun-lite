@@ -71,7 +71,7 @@ class LiteAccessibilityService : AccessibilityService() {
     @Volatile private var manualAlwaysShow: Boolean = false
 
     // User-controlled "silence" override, toggled via a separate Quick
-    // Settings tile (the «sleeping bird» one). When true, the bubble stays
+    // Settings tile (the «microphone-off» one). When true, the bubble stays
     // hidden even if an IME is up — the metaphor is «voice input is asleep»,
     // useful at night, in meetings, in libraries. Runtime-only; resets on
     // service restart. Symmetrical toggle (one tap on, one tap off) — does
@@ -286,7 +286,7 @@ class LiteAccessibilityService : AccessibilityService() {
         isImeVisible = shouldShow
 
         // Silence override beats everything — if the user explicitly put
-        // the bird to sleep, keep it hidden no matter what. Always-show
+        // the microphone to sleep, keep it hidden no matter what. Always-show
         // also intentionally bypasses the search filter: tile is the
         // user's explicit "I want voice everywhere right now" toggle.
         val effectiveVisibility = when {
@@ -544,7 +544,7 @@ class LiteAccessibilityService : AccessibilityService() {
     fun isSilenceEnabled(): Boolean = manualSilence
 
     /**
-     * Quick Settings Tile action for the «sleeping bird» tile. When turned
+     * Quick Settings Tile action for the «microphone-off» tile. When turned
      * on, the bubble stays hidden even if an IME is up — voice input is
      * asleep until the user taps the tile again. Symmetrical: one tap to
      * silence, one tap to wake. Doesn't disable the service.

@@ -5,7 +5,7 @@
 set -euo pipefail
 
 RELEASE_TAG="model-gigaam-v3"
-BASE_URL="https://github.com/dm1sh/rechka-lite/releases/download/${RELEASE_TAG}"
+BASE_URL="https://github.com/dm1sh/rechka/releases/download/${RELEASE_TAG}"
 DEST_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/app/src/main/assets/models/gigaam-v3"
 
 mkdir -p "${DEST_DIR}"

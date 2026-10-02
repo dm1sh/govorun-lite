@@ -31,7 +31,6 @@ ffmpeg-build/
 
 # Logs
 *.log
-rustore-screenshots/
 
 # Shotframe lives in its own repo — github.com/dm1sh/shotframe
 scripts/shotframe/

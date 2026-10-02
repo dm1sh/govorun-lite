@@ -13,5 +13,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "rechka-lite"
+rootProject.name = "rechka"
 include(":app")

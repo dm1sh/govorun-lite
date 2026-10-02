@@ -6,7 +6,7 @@
 
 | Версия | Поддержка |
 | ------ | --------- |
-| 1.0.x (последняя) | :white_check_mark: |
+| 1.1.x (последняя) | :white_check_mark: |
 | Старее | :x: |
 
 ## Сообщить об уязвимости
@@ -14,7 +14,7 @@
 Не публикуйте уязвимости в открытых issues, пока они не исправлены.
 
 **Через GitHub (рекомендуется):**
-[Открыть приватный отчёт](https://github.com/dm1sh/rechka-lite/security/advisories/new)
+[Открыть приватный отчёт](https://github.com/dm1sh/rechka/security/advisories/new)
 
 **По почте:**
 rechka@i-lo.org

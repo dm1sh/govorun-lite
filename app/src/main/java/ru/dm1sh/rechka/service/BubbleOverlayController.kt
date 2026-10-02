@@ -221,7 +221,7 @@ class BubbleOverlayController(
      * bubble pick up the user's wallpaper accent.
      */
     private fun bubbleContext(): Context {
-        val themed = ContextThemeWrapper(service, R.style.Theme_RechkaLite)
+        val themed = ContextThemeWrapper(service, R.style.Theme_Rechka)
         return DynamicColors.wrapContextIfAvailable(themed)
     }
 

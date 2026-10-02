@@ -133,7 +133,7 @@
     <string name="main_card_service_body">Птичка не появится в других программах, пока вы не включили «Речка — голосовой ввод» в специальных возможностях.</string>
     <string name="main_card_service_button">Разрешить специальные возможности</string>
     <string name="main_card_keyboard_title">Включите голосовую клавиатуру</string>
-    <string name="main_card_keyboard_body">Можно использовать Речка без специальных возможностей — включите «Речка — голосовой ввод» в настройках клавиатур и запускайте диктовку кнопкой микрофона.</string>
+    <string name="main_card_keyboard_body">Речку можно использовать без специальных возможностей — включите «Речка — голосовой ввод» в настройках клавиатур и запускайте диктовку кнопкой микрофона.</string>
     <string name="main_card_keyboard_button">Открыть настройки клавиатур</string>
     <string name="main_card_battery_title">Разрешите работу в фоне</string>
     <string name="main_card_battery_body">Без этого Android со временем может выгрузить Речку, и птичка перестанет появляться — пока вы заново не откроете приложение.</string>
@@ -155,7 +155,7 @@
     <!-- Settings: tapping the switch while Речка is OFF opens this dialog
          so the user isn't left without a way back into the accessibility
          settings screen. -->
-    <string name="main_enable_service_title">Речка сейчас выключен</string>
+    <string name="main_enable_service_title">Речка сейчас выключена</string>
     <string name="main_enable_service_body">Чтобы снова видеть птичку над клавиатурой, включите Речку в специальных возможностях Android.</string>
     <string name="main_open_accessibility">Открыть специальные возможности</string>
 
@@ -170,8 +170,8 @@
     <!-- "Tell friends" card on main screen -->
     <string name="main_share_card_title">Расскажите о приложении</string>
     <string name="main_share_card_body">Порекомендуйте друзьям и коллегам</string>
-    <string name="main_share_chooser">Порекомендовать Речка</string>
-    <string name="main_share_app_text">Речка: голос в текст. Голосовой ввод на русском без интернета.\nhttps://github.com/dm1sh/rechka-lite/releases/latest</string>
+    <string name="main_share_chooser">Порекомендовать Речку</string>
+    <string name="main_share_app_text">Речка: голос в текст. Голосовой ввод на русском без интернета.\nhttps://github.com/dm1sh/rechka/releases/latest</string>
 
     <!-- Benchmark card on main screen -->
     <string name="main_benchmark_card_title">Тест скорости</string>
@@ -222,7 +222,7 @@
 
     <!-- Main screen: promo card -->
     <string name="main_promo_title">Хотите больше возможностей?</string>
-    <string name="main_promo_body">Помогите нам сделать Речка ещё удобнее.</string>
+    <string name="main_promo_body">Помогите нам сделать Речку ещё удобнее.</string>
 
     <!-- Future plans screen -->
     <string name="future_title">Как развивается Речка</string>
@@ -248,8 +248,8 @@
 
     <!-- About: GitHub action row -->
     <string name="about_action_github_title">Исходный код на GitHub</string>
-    <string name="about_action_github_sub">github.com/dm1sh/rechka-lite</string>
-    <string name="about_github_url">https://github.com/dm1sh/rechka-lite</string>
+    <string name="about_action_github_sub">github.com/dm1sh/rechka</string>
+    <string name="about_github_url">https://github.com/dm1sh/rechka</string>
 
     <!-- About: licenses action row -->
     <string name="about_action_licenses_title">Лицензии</string>
@@ -258,7 +258,7 @@
     <!-- About: privacy policy action row -->
     <string name="about_action_privacy_title">Политика конфиденциальности</string>
     <string name="about_action_privacy_sub">Что приложение делает с вашими данными и условия использования</string>
-    <string name="about_privacy_url">https://dm1sh.github.io/rechka-lite/privacy.html</string>
+    <string name="about_privacy_url">https://github.com/dm1sh/rechka/blob/main/docs/privacy.html</string>
 
     <!-- Licenses screen -->
     <string name="licenses_title">Лицензии</string>
@@ -292,7 +292,7 @@
     <string name="main_pro_feat_more">…и многое другое, реализованное благодаря вашим отзывам.</string>
     <string name="main_pro_review_button">Оставить отзыв на GitHub</string>
     <string name="main_pro_share_button">Расскажите о приложении</string>
-    <string name="main_pro_review_url">https://github.com/dm1sh/rechka-lite/releases/latest</string>
+    <string name="main_pro_review_url">https://github.com/dm1sh/rechka/releases/latest</string>
 
     <!-- Dictionary screen -->
     <string name="dict_title">Свой словарь</string>
@@ -383,7 +383,7 @@
     <string name="benchmark_hero_label">скорость распознавания</string>
     <string name="benchmark_help_action">Как считается</string>
     <string name="benchmark_help_title">Как считается результат</string>
-    <string name="benchmark_help_body">Речка работает в режиме голосового ввода: вы говорите, делаете паузу — и текст появляется. Пауза между вашей речью и появлением текста складывается из двух частей: время распознавания тишины (около полсекунды) плюс время обработки аудио моделью. Именно это второе время и измеряет тест.\n\nЧем больше число — тем быстрее телефон обрабатывает речь и тем короче ощущаемая пауза. При результате ×16 обработка занимает доли секунды — пока вы формулируете следующую мысль, текст уже напечатан. При ×4–5 пауза заметна: приходится ждать 1–2 секунды после каждой остановки.\n\nЧто означает ваш результат:\n×3–4 — пауза после речи заметна\n×5–9 — комфортно\n×10 и выше — почти мгновенно\n\nТест полезен, если хотите сравнить разные устройства или разобраться, почему на конкретном телефоне Речка работает медленнее.\n\nПервый запуск — медленнее: модель загружается с нуля. Повторный — реальная скорость в обычной работе. Длинный ролик (71 сек) проверяет, как устройство справляется с продолжительной записью.\n\nNNAPI — стандартный Android API для ускорения нейросетей. Какой именно чип он задействует (NPU, DSP или CPU) — решает сам Android в зависимости от устройства. Процессор — NNAPI недоступен, модель считает напрямую на CPU.\n\nТестовые ролики — официальные примеры GigaAM от Сбера, лицензия MIT:\nhttps://github.com/dm1sh/rechka-lite/tree/main/app/src/main/assets</string>
+    <string name="benchmark_help_body">Речка работает в режиме голосового ввода: вы говорите, делаете паузу — и текст появляется. Пауза между вашей речью и появлением текста складывается из двух частей: время распознавания тишины (около полсекунды) плюс время обработки аудио моделью. Именно это второе время и измеряет тест.\n\nЧем больше число — тем быстрее телефон обрабатывает речь и тем короче ощущаемая пауза. При результате ×16 обработка занимает доли секунды — пока вы формулируете следующую мысль, текст уже напечатан. При ×4–5 пауза заметна: приходится ждать 1–2 секунды после каждой остановки.\n\nЧто означает ваш результат:\n×3–4 — пауза после речи заметна\n×5–9 — комфортно\n×10 и выше — почти мгновенно\n\nТест полезен, если хотите сравнить разные устройства или разобраться, почему на конкретном телефоне Речка работает медленнее.\n\nПервый запуск — медленнее: модель загружается с нуля. Повторный — реальная скорость в обычной работе. Длинный ролик (71 сек) проверяет, как устройство справляется с продолжительной записью.\n\nNNAPI — стандартный Android API для ускорения нейросетей. Какой именно чип он задействует (NPU, DSP или CPU) — решает сам Android в зависимости от устройства. Процессор — NNAPI недоступен, модель считает напрямую на CPU.\n\nТестовые ролики — официальные примеры GigaAM от Сбера, лицензия MIT:\nhttps://github.com/dm1sh/rechka/tree/main/app/src/main/assets</string>
     <string name="benchmark_help_close">Понятно</string>
     <string name="benchmark_short_title">Короткий ролик (11 сек)</string>
     <string name="benchmark_cold_title">Первый запуск</string>

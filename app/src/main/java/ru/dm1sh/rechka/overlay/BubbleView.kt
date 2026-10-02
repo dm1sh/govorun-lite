@@ -42,7 +42,7 @@ class BubbleView @JvmOverloads constructor(
     private var iconSize = (32 * dp * sizeScale).toInt()
 
     // Fallbacks if the host theme lacks M3 attrs (shouldn't happen — the
-    // app theme is Theme.RechkaLite, Material3 — but keep the bubble
+    // app theme is Theme.Rechka, Material3 — but keep the bubble
     // visible regardless).
     private val fallbackIdleFill = 0x80404040.toInt()
     private val fallbackIdleTint = 0xFFFFFFFF.toInt()

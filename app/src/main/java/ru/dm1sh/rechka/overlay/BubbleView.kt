@@ -31,14 +31,10 @@ class BubbleView @JvmOverloads constructor(
 ) : View(context, attrs, defStyleAttr) {
 
     private val dp = resources.displayMetrics.density
-    // Baseline 56dp disc with 32dp microphone, both scaled by the user-chosen
-    // size factor from Prefs (default 1.0×). All animation maths derives
-    // from these — change the scale, everything (halo radius, recording
-    // pulse range, breathing amplitude) re-anchors automatically.
+    // The microphone fills the 56dp disc, so the lower ribbon reaches the
+    // circular button edge. Both dimensions follow the user-selected scale.
     private var sizeScale: Float = Prefs.getBubbleSize(context)
     private var bubbleSize = (56 * dp * sizeScale).toInt()
-    // Microphone silhouette reads a bit small at 24dp on a 56dp disc — bump it up
-    // so the shape is recognisable at a glance.
     private var iconSize = (56 * dp * sizeScale).toInt()
 
     // Fallbacks if the host theme lacks M3 attrs (shouldn't happen — the

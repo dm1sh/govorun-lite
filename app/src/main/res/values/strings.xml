@@ -51,6 +51,9 @@
     <string name="onb_modes_title">Как вы будете использовать Речку?</string>
     <string name="onb_mode_overlay">Плавающий микрофон</string>
     <string name="onb_mode_keyboard">Голосовая клавиатура</string>
+    <string name="onb_mode_overlay_body">Микрофон поверх других приложений для быстрой диктовки.</string>
+    <string name="onb_mode_keyboard_body">Диктуйте через голосовую клавиатуру в любом поле ввода.</string>
+
     <string name="onb_mode_files">Расшифровка аудио и видеофайлов</string>
     <string name="onb_mode_files_body">Откройте файл в Речке или поделитесь им с приложением. Разрешения не нужны.</string>
     <string name="onb_welcome_title">Говорите свободно</string>

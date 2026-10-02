@@ -21,8 +21,8 @@ class WelcomeFragment : OnboardingStepFragment() {
         val prefs = requireContext().getSharedPreferences(PREFS, Context.MODE_PRIVATE)
         val overlay = view.findViewById<MaterialCheckBox>(R.id.onbModeOverlay)
         val keyboard = view.findViewById<MaterialCheckBox>(R.id.onbModeKeyboard)
-        overlay.isChecked = prefs.getBoolean(KEY_OVERLAY, true)
-        keyboard.isChecked = prefs.getBoolean(KEY_KEYBOARD, true)
+        overlay.isChecked = prefs.getBoolean(KEY_OVERLAY, false)
+        keyboard.isChecked = prefs.getBoolean(KEY_KEYBOARD, false)
         view.findViewById<MaterialCheckBox>(R.id.onbModeFiles).apply {
             isChecked = true
             isEnabled = false
@@ -43,10 +43,10 @@ class WelcomeFragment : OnboardingStepFragment() {
 
         fun isOverlaySelected(context: Context): Boolean = context
             .getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-            .getBoolean(KEY_OVERLAY, true)
+            .getBoolean(KEY_OVERLAY, false)
 
         fun isKeyboardSelected(context: Context): Boolean = context
             .getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-            .getBoolean(KEY_KEYBOARD, true)
+            .getBoolean(KEY_KEYBOARD, false)
     }
 }

@@ -2,6 +2,7 @@ package ru.dm1sh.rechka.service
 
 import android.Manifest
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.graphics.Color
@@ -16,6 +17,7 @@ import android.view.WindowInsets
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.ExtractedTextRequest
 import android.widget.LinearLayout
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.color.DynamicColors
@@ -24,6 +26,7 @@ import ru.dm1sh.rechka.R
 import ru.dm1sh.rechka.model.GigaAmModel
 import ru.dm1sh.rechka.stats.StatsStore
 import ru.dm1sh.rechka.transcriber.OfflineTranscriber
+import ru.dm1sh.rechka.ui.MainActivity
 import ru.dm1sh.rechka.util.Prefs
 import ru.dm1sh.rechka.util.Haptics
 import ru.dm1sh.rechka.transcriber.VadRecorder
@@ -494,6 +497,10 @@ class RechkaInputMethodService : InputMethodService() {
     }
 
     private fun configureRecordTouch() {
+        recordButton.setOnClickListener {
+            if (Prefs.isImeWalkieTalkieEnabled(this)) return@setOnClickListener
+            if (recording) stopRecording() else startRecording()
+        }
         recordButton.setOnTouchListener { _, event ->
             if (!Prefs.isImeWalkieTalkieEnabled(this)) return@setOnTouchListener false
             when (event.actionMasked) {
@@ -585,6 +592,13 @@ class RechkaInputMethodService : InputMethodService() {
         if (recording) return
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
             recordButton.tooltipText = getString(R.string.ime_mic_permission)
+            Toast.makeText(this, R.string.ime_mic_permission, Toast.LENGTH_LONG).show()
+            try {
+                startActivity(Intent(this, MainActivity::class.java).apply {
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                    putExtra(MainActivity.EXTRA_REQUEST_MIC, true)
+                })
+            } catch (_: Exception) { }
             return
         }
         if (!GigaAmModel.isInstalled(this)) {

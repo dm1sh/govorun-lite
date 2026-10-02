@@ -339,6 +339,7 @@ class LiteAccessibilityService : AccessibilityService() {
             AppLog.log(this, "Service: tap with revoked RECORD_AUDIO → opening MainActivity")
             val intent = Intent(this, MainActivity::class.java).apply {
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                putExtra(MainActivity.EXTRA_REQUEST_MIC, true)
             }
             try { startActivity(intent) } catch (e: Exception) {
                 Log.w(TAG, "Failed to open MainActivity from bubble tap: ${e.message}")

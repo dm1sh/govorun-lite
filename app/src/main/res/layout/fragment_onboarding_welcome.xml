@@ -42,15 +42,31 @@
             android:id="@+id/onbModeOverlay"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:checked="true"
+            android:checked="false"
             android:text="@string/onb_mode_overlay" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="48dp"
+            android:text="@string/onb_mode_overlay_body"
+            android:textAppearance="?attr/textAppearanceBodySmall"
+            android:textColor="?attr/colorOnSurfaceVariant" />
 
         <com.google.android.material.checkbox.MaterialCheckBox
             android:id="@+id/onbModeKeyboard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:checked="true"
+            android:checked="false"
             android:text="@string/onb_mode_keyboard" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="48dp"
+            android:text="@string/onb_mode_keyboard_body"
+            android:textAppearance="?attr/textAppearanceBodySmall"
+            android:textColor="?attr/colorOnSurfaceVariant" />
 
         <com.google.android.material.checkbox.MaterialCheckBox
             android:id="@+id/onbModeFiles"

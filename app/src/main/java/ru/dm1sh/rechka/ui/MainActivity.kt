@@ -14,7 +14,9 @@ import android.os.PowerManager
 import android.provider.Settings
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
@@ -80,6 +82,13 @@ class MainActivity : AppCompatActivity() {
     private lateinit var toolbar: MaterialToolbar
     private var showJustFinished: Boolean = false
 
+    private val micPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (!granted) Toast.makeText(this, R.string.onb_try_denied, Toast.LENGTH_LONG).show()
+        refreshStatuses()
+    }
+
     // Observes accessibility-related Secure settings so the per-problem cards
     // refresh the instant the user toggles the service OR taps the little
     // shortcut button on top of our bubble — no need to leave MainActivity.
@@ -124,7 +133,12 @@ class MainActivity : AppCompatActivity() {
 
         cardMicMissing = findViewById(R.id.cardMicMissing)
         cardMicButton = findViewById(R.id.cardMicButton)
-        cardMicButton.setOnClickListener { openAppDetails() }
+        cardMicButton.setOnClickListener { requestMicrophonePermission() }
+
+        if (intent.getBooleanExtra(EXTRA_REQUEST_MIC, false)) {
+            window.decorView.post { requestMicrophonePermission() }
+            intent.removeExtra(EXTRA_REQUEST_MIC)
+        }
 
         cardServiceMissing = findViewById(R.id.cardServiceMissing)
         cardServiceButton = findViewById(R.id.cardServiceButton)
@@ -148,12 +162,18 @@ class MainActivity : AppCompatActivity() {
         modeFilesCheck.isChecked = true
         modeFilesCheck.isEnabled = false
         modeOverlayCheck.setOnClickListener {
-            if (!modeOverlayCheck.isChecked) AccessibilityHelper.openAccessibilitySettings(this)
+            setModeSelected(KEY_MODE_OVERLAY, modeOverlayCheck.isChecked)
+            if (modeOverlayCheck.isChecked && !AccessibilityHelper.isLiteServiceEnabled(this)) {
+                AccessibilityHelper.openAccessibilitySettings(this)
+            }
+            refreshStatuses()
         }
         modeKeyboardCheck.setOnClickListener {
-            if (!modeKeyboardCheck.isChecked) {
+            setModeSelected(KEY_MODE_KEYBOARD, modeKeyboardCheck.isChecked)
+            if (modeKeyboardCheck.isChecked && !isVoiceKeyboardEnabled()) {
                 try { startActivity(Intent(Settings.ACTION_INPUT_METHOD_SETTINGS)) } catch (_: Exception) { }
             }
+            refreshStatuses()
         }
 
         cardWhatsNew = findViewById(R.id.cardWhatsNew)
@@ -306,13 +326,12 @@ class MainActivity : AppCompatActivity() {
         // to our bubble that disables the service when tapped — count it as a
         // setup problem so the headline and promo card honestly reflect state.
         val shortcutOn = AccessibilityHelper.isLiteShortcutEnabled(this)
-        // Critical = blocks the bubble entirely (no mic, no service, or shortcut
-        // turns it off). Battery is recommended, not critical: many users on
-        // stock Android with light use never hit the kill, and we shouldn't
-        // hold the whole main screen hostage over an optional optimisation.
-        // Either input mode is sufficient. The accessibility shortcut only
-        // matters when accessibility is the selected mode.
-        val criticalOk = micOk && (keyboardOk || (serviceOk && !shortcutOn))
+        val overlaySelected = isModeSelected(KEY_MODE_OVERLAY)
+        val keyboardSelected = isModeSelected(KEY_MODE_KEYBOARD)
+        // Critical = blocks a selected input mode. File transcription is always
+        // available and therefore keeps the main screen usable by itself.
+        val criticalOk = !overlaySelected && !keyboardSelected ||
+            micOk && ((keyboardSelected && keyboardOk) || (overlaySelected && serviceOk && !shortcutOn))
 
         // Only surface the shortcut card when the service is on — otherwise
         // the user is still in "enable me first" mode and the extra advisory
@@ -334,16 +353,18 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        modeOverlayCheck.isChecked = serviceOk
-        modeKeyboardCheck.isChecked = keyboardOk
+        modeOverlayCheck.isChecked = overlaySelected
+        modeKeyboardCheck.isChecked = keyboardSelected
         modeFilesCheck.isChecked = true
 
-        cardMicMissing.visibility = if (micOk) View.GONE else View.VISIBLE
-        cardServiceMissing.visibility = if (serviceOk) View.GONE else View.VISIBLE
-        cardKeyboardMissing.visibility = if (keyboardOk) View.GONE else View.VISIBLE
+        // Permission cards belong above the mode/status and statistics widgets,
+        // and only appear for modes the user selected.
+        cardMicMissing.visibility = if (micOk || (!overlaySelected && !keyboardSelected)) View.GONE else View.VISIBLE
+        cardServiceMissing.visibility = if (!overlaySelected || serviceOk) View.GONE else View.VISIBLE
+        cardKeyboardMissing.visibility = if (!keyboardSelected || keyboardOk) View.GONE else View.VISIBLE
         // Battery card is independent of criticalOk — it co-exists with stats
         // and promo as a soft "recommended" hint, not a setup blocker.
-        cardBatteryMissing.visibility = if (serviceOk && !batteryOk) View.VISIBLE else View.GONE
+        cardBatteryMissing.visibility = if (overlaySelected && serviceOk && !batteryOk) View.VISIBLE else View.GONE
 
         // "What's new" FYI card — gated only on critical readiness + dismissal.
         // A user without battery exemption can still see new-feature highlights;
@@ -357,6 +378,13 @@ class MainActivity : AppCompatActivity() {
         promoCard.visibility = View.VISIBLE
     }
 
+    private fun isModeSelected(key: String): Boolean =
+        getSharedPreferences(PREFS, MODE_PRIVATE).getBoolean(key, false)
+
+    private fun setModeSelected(key: String, selected: Boolean) {
+        getSharedPreferences(PREFS, MODE_PRIVATE).edit().putBoolean(key, selected).apply()
+    }
+
     private fun isVoiceKeyboardEnabled(): Boolean {
         val imm = getSystemService(InputMethodManager::class.java) ?: return false
         val serviceName = ru.dm1sh.rechka.service.RechkaInputMethodService::class.java.name
@@ -366,6 +394,14 @@ class MainActivity : AppCompatActivity() {
             // component string, which made the old exact-id check return false.
             info.packageName == packageName && info.serviceName == serviceName
         }
+    }
+
+    private fun requestMicrophonePermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
+            refreshStatuses()
+            return
+        }
+        micPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
     }
 
     private fun openAppDetails() {
@@ -399,6 +435,9 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         const val EXTRA_JUST_FINISHED = "just_finished"
+        const val EXTRA_REQUEST_MIC = "request_microphone"
         private const val PREFS = "rechka_lite_prefs"
+        private const val KEY_MODE_OVERLAY = "onboarding_mode_overlay"
+        private const val KEY_MODE_KEYBOARD = "onboarding_mode_keyboard"
     }
 }

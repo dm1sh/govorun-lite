@@ -17,6 +17,8 @@ import ru.dm1sh.rechka.R
 import ru.dm1sh.rechka.ui.onboarding.OnboardingPagerAdapter
 import ru.dm1sh.rechka.ui.onboarding.OnboardingStep
 import ru.dm1sh.rechka.ui.onboarding.OnboardingStepFragment
+import ru.dm1sh.rechka.ui.onboarding.WelcomeFragment
+import ru.dm1sh.rechka.util.AccessibilityHelper
 
 /**
  * Host for the onboarding wizard. ViewPager2 with user-swipe disabled — the
@@ -81,11 +83,8 @@ class OnboardingActivity : AppCompatActivity() {
         })
 
         nextButton.setOnClickListener {
-            if (pager.currentItem < pagerAdapter.itemCount - 1) {
-                pager.currentItem = pager.currentItem + 1
-            } else {
-                finishOnboarding()
-            }
+            val next = findNextRequiredStep(pager.currentItem, 1)
+            if (next >= 0) pager.currentItem = next else finishOnboarding()
         }
 
         backButton.setOnClickListener { goBackOneStep() }
@@ -100,18 +99,44 @@ class OnboardingActivity : AppCompatActivity() {
             }
         })
 
-        val resumeAt = loadResumeStep()
+        val loadedStep = loadResumeStep()
+        val resumeAt = if (isStepRequired(loadedStep)) loadedStep else {
+            val next = findNextRequiredStep(loadedStep.ordinal, 1)
+            if (next >= 0) pagerAdapter.stepAt(next) else OnboardingStep.WELCOME
+        }
         pager.setCurrentItem(resumeAt.ordinal, false)
         progress.setProgressCompat(resumeAt.ordinal + 1, false)
         refreshNextButton()
     }
 
     private fun goBackOneStep(): Boolean {
-        if (pager.currentItem > 0) {
-            pager.currentItem = pager.currentItem - 1
+        val previous = findNextRequiredStep(pager.currentItem, -1)
+        if (previous >= 0) {
+            pager.currentItem = previous
             return true
         }
         return false
+    }
+
+    private fun findNextRequiredStep(from: Int, direction: Int): Int {
+        var index = from + direction
+        while (index in 0 until pagerAdapter.itemCount) {
+            if (isStepRequired(pagerAdapter.stepAt(index))) return index
+            index += direction
+        }
+        return -1
+    }
+
+    private fun isStepRequired(step: OnboardingStep): Boolean {
+        return when (step) {
+            OnboardingStep.WELCOME -> true
+            OnboardingStep.TRY_IT -> WelcomeFragment.isOverlaySelected(this) ||
+                WelcomeFragment.isKeyboardSelected(this)
+            OnboardingStep.ACCESSIBILITY -> WelcomeFragment.isOverlaySelected(this)
+            OnboardingStep.KEYBOARD -> WelcomeFragment.isKeyboardSelected(this)
+            OnboardingStep.BATTERY -> WelcomeFragment.isOverlaySelected(this) &&
+                AccessibilityHelper.isLiteServiceEnabled(this)
+        }
     }
 
     fun onStepStateChanged() {

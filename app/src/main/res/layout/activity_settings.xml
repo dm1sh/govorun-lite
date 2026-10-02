@@ -107,13 +107,14 @@
                 </com.google.android.material.button.MaterialButtonToggleGroup>
 
             </LinearLayout>
-
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginHorizontal="16dp"
                 android:layout_marginVertical="8dp"
                 android:background="?attr/colorOutlineVariant" />
+
+
 
             <LinearLayout
                 android:id="@+id/sizeRow"
@@ -149,13 +150,14 @@
                     android:valueTo="1.4" />
 
             </LinearLayout>
-
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginHorizontal="16dp"
                 android:layout_marginVertical="8dp"
                 android:background="?attr/colorOutlineVariant" />
+
+
 
             <LinearLayout
                 android:id="@+id/transparencyRow"
@@ -191,13 +193,14 @@
                     android:valueTo="1.0" />
 
             </LinearLayout>
-
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginHorizontal="16dp"
                 android:layout_marginVertical="8dp"
                 android:background="?attr/colorOutlineVariant" />
+
+
 
             <LinearLayout
                 android:id="@+id/edgeMarginRow"
@@ -233,13 +236,14 @@
                     android:valueTo="24" />
 
             </LinearLayout>
-
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginHorizontal="16dp"
                 android:layout_marginVertical="8dp"
                 android:background="?attr/colorOutlineVariant" />
+
+
 
             <LinearLayout
                 android:id="@+id/hapticsRow"
@@ -281,13 +285,14 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp" />
             </LinearLayout>
-
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginHorizontal="16dp"
                 android:layout_marginVertical="8dp"
                 android:background="?attr/colorOutlineVariant" />
+
+
 
             <LinearLayout
                 android:id="@+id/bubbleLockRow"
@@ -329,13 +334,14 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp" />
             </LinearLayout>
-
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginHorizontal="16dp"
                 android:layout_marginVertical="8dp"
                 android:background="?attr/colorOutlineVariant" />
+
+
 
             <LinearLayout
                 android:id="@+id/pauseLengthRow"
@@ -401,13 +407,14 @@
                     android:textColor="?attr/colorOnSurfaceVariant" />
 
             </LinearLayout>
-
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginHorizontal="16dp"
                 android:layout_marginVertical="8dp"
                 android:background="?attr/colorOutlineVariant" />
+
+
 
             <LinearLayout
                 android:id="@+id/dictionaryRow"
@@ -443,13 +450,14 @@
                         android:textColor="?attr/colorOnSurfaceVariant" />
                 </LinearLayout>
             </LinearLayout>
-
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginHorizontal="16dp"
                 android:layout_marginVertical="8dp"
                 android:background="?attr/colorOutlineVariant" />
+
+
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/settingsKeyboardHeader"
@@ -502,6 +510,13 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp" />
             </LinearLayout>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginVertical="8dp"
+                android:background="?attr/colorOutlineVariant" />
+
 
             <LinearLayout
                 android:id="@+id/imeAutoStartRow"
@@ -539,6 +554,13 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp" />
             </LinearLayout>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginVertical="8dp"
+                android:background="?attr/colorOutlineVariant" />
+
 
             <LinearLayout
                 android:id="@+id/imeWalkieRow"
@@ -576,13 +598,14 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp" />
             </LinearLayout>
-
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginHorizontal="16dp"
                 android:layout_marginVertical="8dp"
                 android:background="?attr/colorOutlineVariant" />
+
+
 
             <LinearLayout
                 android:id="@+id/imeRepeatDeleteRow"
@@ -620,6 +643,13 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp" />
             </LinearLayout>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginVertical="8dp"
+                android:background="?attr/colorOutlineVariant" />
+
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/settingsFilesHeader"
@@ -678,6 +708,13 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp" />
             </LinearLayout>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginVertical="8dp"
+                android:background="?attr/colorOutlineVariant" />
+
 
             <LinearLayout
                 android:id="@+id/hideInSearchRow"
@@ -719,6 +756,13 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp" />
             </LinearLayout>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginVertical="8dp"
+                android:background="?attr/colorOutlineVariant" />
+
 
             <LinearLayout
                 android:id="@+id/appFilterRow"
@@ -755,6 +799,13 @@
                         android:textColor="?attr/colorOnSurfaceVariant" />
                 </LinearLayout>
             </LinearLayout>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginVertical="8dp"
+                android:background="?attr/colorOutlineVariant" />
+
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/settingsGeneralHeader"
@@ -801,6 +852,13 @@
                         android:textColor="?attr/colorOnSurfaceVariant" />
                 </LinearLayout>
             </LinearLayout>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginVertical="8dp"
+                android:background="?attr/colorOutlineVariant" />
+
 
             <!-- Keep screen on toggle. -->
             <LinearLayout
@@ -844,6 +902,13 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp" />
             </LinearLayout>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginVertical="8dp"
+                android:background="?attr/colorOutlineVariant" />
+
 
             <LinearLayout
                 android:id="@+id/autoStopRow"
@@ -908,6 +973,13 @@
                         android:text="@string/settings_auto_stop_off" />
                 </com.google.android.material.button.MaterialButtonToggleGroup>
             </LinearLayout>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginVertical="8dp"
+                android:background="?attr/colorOutlineVariant" />
+
 
             <LinearLayout
                 android:id="@+id/showServiceRow"
@@ -953,13 +1025,14 @@
                     android:clickable="false"
                     android:focusable="false" />
             </LinearLayout>
-
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginHorizontal="16dp"
                 android:layout_marginVertical="8dp"
                 android:background="?attr/colorOutlineVariant" />
+
+
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/resetButton"

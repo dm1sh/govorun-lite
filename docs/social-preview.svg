@@ -9,7 +9,7 @@
   <rect width="1280" height="640" rx="32" fill="#F5F5F7"/>
 
   <!-- Soft tonal container behind the logo -->
-  <circle cx="340" cy="320" r="215" fill="#FFFFFF" opacity="0.85"/>
+  <circle cx="340" cy="320" r="215" fill="#F5F5F7" opacity="0.85"/>
 
   <!-- Rechka mark from the app icon -->
   <g transform="translate(125 105) scale(0.375)" fill="#2563EB">

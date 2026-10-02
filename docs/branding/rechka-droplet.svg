@@ -1,7 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-labelledby="title desc">
-  <title id="title">Rechka blue droplet icon</title>
-  <desc id="desc">A minimal blue water droplet containing a quiet waveform.</desc>
-  <rect width="1024" height="1024" rx="224" fill="#FFFFFF"/>
-  <path d="M512 150C425 282 268 431 268 601c0 145 109 263 244 263s244-118 244-263c0-170-157-319-244-451Z" fill="#2563EB"/>
-  <path d="M365 614c49-69 83 69 132 0s83-69 132 0 83 69 132 0" fill="none" stroke="#FFFFFF" stroke-width="34" stroke-linecap="round"/>
-</svg>

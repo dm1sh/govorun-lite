@@ -340,11 +340,12 @@
                          subtle brand accent rather than a second focal
                          point competing with the numbers. -->
                     <ImageView
-                        android:layout_width="104dp"
-                        android:layout_height="108dp"
+                        android:layout_width="128dp"
+                        android:layout_height="match_parent"
                         android:layout_gravity="end|center_vertical"
                         android:layout_marginEnd="8dp"
                         android:alpha="0.14"
+                        android:scaleType="fitXY"
                         android:importantForAccessibility="no"
                         android:src="@drawable/logo_rechka"
                         app:tint="?attr/colorPrimary" />
@@ -353,7 +354,10 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:padding="20dp">
+                        android:paddingStart="20dp"
+                        android:paddingTop="20dp"
+                        android:paddingEnd="136dp"
+                        android:paddingBottom="20dp">
 
                         <com.google.android.material.textview.MaterialTextView
                             android:layout_width="match_parent"

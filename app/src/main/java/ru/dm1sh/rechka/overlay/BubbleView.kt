@@ -282,7 +282,7 @@ class BubbleView @JvmOverloads constructor(
         }
     }
 
-    private fun startRecordingPulse() {
+    private fun startRecordingPulse {
         pulseAnimator?.cancel()
         val maxR = bubbleSize / 2f * 1.4f
         pulseAnimator = ValueAnimator.ofFloat(bubbleSize / 2f, maxR).apply {

@@ -5,12 +5,7 @@
 set -euo pipefail
 
 RELEASE_TAG="model-gigaam-v3"
-# The large model release is still hosted in the upstream repository. Keep the
-# repository configurable so it can move to Rechka without changing this script.
-MODEL_REPOSITORY="${GIGAAM_MODEL_REPOSITORY:-amidexe/govorun-lite}"
-BASE_URL="https://github.com/${MODEL_REPOSITORY}/releases/download/${RELEASE_TAG}"
-MODEL_REPOSITORY="${GIGAAM_MODEL_REPOSITORY:-amidexe/govorun-lite}"
-BASE_URL="https://github.com/${MODEL_REPOSITORY}/releases/download/${RELEASE_TAG}"
+BASE_URL="https://github.com/dm1sh/rechka/releases/download/${RELEASE_TAG}"
 DEST_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/app/src/main/assets/models/gigaam-v3"
 
 mkdir -p "${DEST_DIR}"

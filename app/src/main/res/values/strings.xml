@@ -68,7 +68,7 @@
     <string name="onb_accessibility_dont_row">Быстрый запуск (не включать)</string>
 
     <!-- Onboarding: inline "try it" demo right after mic permission.
-         Gives the user (and the RuStore moderator) an immediate reward:
+         Gives the user (and the модератор магазина приложений) an immediate reward:
          tap a button, say something, see the transcribed text. Proves the
          app is real before sending them into the more involved accessibility
          setup. Borrowed UX idea from Whisper Flow. -->
@@ -171,7 +171,7 @@
     <string name="main_share_card_title">Расскажите о приложении</string>
     <string name="main_share_card_body">Порекомендуйте друзьям и коллегам</string>
     <string name="main_share_chooser">Порекомендовать Речка</string>
-    <string name="main_share_app_text">Речка: голос в текст. Голосовой ввод на русском без интернета.\nhttps://apps.rustore.ru/app/ru.dm1sh.rechka</string>
+    <string name="main_share_app_text">Речка: голос в текст. Голосовой ввод на русском без интернета.\nhttps://github.com/dm1sh/rechka-lite/releases/latest</string>
 
     <!-- Benchmark card on main screen -->
     <string name="main_benchmark_card_title">Тест скорости</string>
@@ -228,7 +228,7 @@
     <string name="future_title">Как развивается Речка</string>
     <string name="main_pro_feat_filter_title">Фильтр по приложениям</string>
     <string name="main_pro_feat_filter_body">Речка показывается только там, где нужно — например, только в мессенджерах.</string>
-    <string name="main_pro_follow_updates">Следите за обновлениями в RuStore, чтобы узнать, что появилось.</string>
+    <string name="main_pro_follow_updates">Следите за обновлениями проекта на GitHub, чтобы узнать, что появилось.</string>
 
     <!-- About screen -->
     <string name="about_title">О программе</string>
@@ -243,7 +243,7 @@
     <string name="about_row_offline_body">Звук обрабатывается прямо на телефоне и никуда не отправляется</string>
     <string name="about_row_source_title">Открытый исходный код</string>
     <string name="about_row_source_body">Приложение бесплатное — код можно изучать и собирать самому</string>
-    <string name="about_row_updates_title">Обновления через RuStore</string>
+    <string name="about_row_updates_title">Обновления проекта</string>
     <string name="about_row_updates_body">Речка сама предложит обновиться, когда выйдет новая версия</string>
 
     <!-- About: GitHub action row -->
@@ -266,7 +266,7 @@
 
     <!-- About: author -->
     <string name="about_author_title">Автор</string>
-    <string name="about_author_body">Речка — форк, основанный на оригинальном приложении «Говорун». Автор форка — dm1sh. Если Речка пригодилась — оставьте отзыв в RuStore, это лучший способ сказать спасибо. Баги и предложения удобнее присылать в Issues на GitHub.</string>
+    <string name="about_author_body">Речка — форк, основанный на оригинальном приложении «Говорун». Автор форка — dm1sh. Если Речка пригодилась — расскажите о ней или оставьте отзыв на GitHub, это лучший способ поддержать проект. Баги и предложения удобнее присылать в Issues на GitHub.</string>
 
     <!-- About: thanks -->
     <string name="about_thanks_title">Благодарности</string>
@@ -279,9 +279,9 @@
     <!-- About: footer -->
     <string name="about_footer_fmt">Речка · %1$s</string>
 
-    <!-- Future plans screen / RuStore review CTA -->
+    <!-- Future plans screen / отзыв о приложении -->
     <string name="main_pro_title">Новые функции</string>
-    <string name="main_pro_intro">Речка — небольшой проект, и мы делаем его с душой. За несколько месяцев вышло 13 обновлений, добавлено пять новых функций. Если приложение пригодилось — оставьте отзыв в RuStore или расскажите друзьям и коллегам: это лучший способ помочь проекту.</string>
+    <string name="main_pro_intro">Речка — небольшой проект, и мы делаем его с душой. За несколько месяцев вышло 13 обновлений, добавлено пять новых функций. Если приложение пригодилось — расскажите о приложении друзьям и коллегам или оставьте отзыв на GitHub: это лучший способ помочь проекту.</string>
     <string name="main_pro_feat_heading">Реализовано благодаря вашим отзывам</string>
     <string name="main_pro_feat_bg_record_title">Режим удержания</string>
     <string name="main_pro_feat_bg_record_body">Запись пока держишь птичку — удобно для коротких фраз.</string>
@@ -290,9 +290,9 @@
     <string name="main_pro_feat_theme_title">Блокировка и настройка пузыря</string>
     <string name="main_pro_feat_theme_body">Фиксация в нужном месте, прозрачность и размер.</string>
     <string name="main_pro_feat_more">…и многое другое, реализованное благодаря вашим отзывам.</string>
-    <string name="main_pro_review_button">Оставить отзыв в RuStore</string>
+    <string name="main_pro_review_button">Оставить отзыв на GitHub</string>
     <string name="main_pro_share_button">Расскажите о приложении</string>
-    <string name="main_pro_review_url">https://apps.rustore.ru/app/ru.dm1sh.rechka</string>
+    <string name="main_pro_review_url">https://github.com/dm1sh/rechka-lite/releases/latest</string>
 
     <!-- Dictionary screen -->
     <string name="dict_title">Свой словарь</string>

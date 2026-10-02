@@ -14,8 +14,8 @@ import java.io.File
  * sherpa-onnx wants real file paths, not AssetManager descriptors. The
  * bundle-and-copy pattern replaced an earlier remote-download flow that
  * routinely timed out — GitHub now serves release assets via Azure Blob,
- * which is painfully slow from Russia, and RuStore moderators kept failing
- * the download step.
+ * which is painfully slow from Russia, and download steps could fail
+ * intermittently.
  */
 object GigaAmModel {
 

@@ -2,7 +2,7 @@
 <resources>
     <color name="ic_launcher_background">#FFFFFF</color>
     <!-- Standard amber for the "rate us" star. Stays consistent in light/dark
-         themes — RuStore/Play associate this colour with ratings. -->
+         themes — магазины приложений связывают этот цвет с оценками. -->
     <color name="star_amber">#FFC107</color>
     <!-- Semantic "do this" green used on the accessibility step's checklist.
          Balances the colorError red on the "don't enable" row so both

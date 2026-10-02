@@ -18,7 +18,7 @@ import com.google.android.material.textview.MaterialTextView
 import ru.dm1sh.rechka.R
 
 /**
- * "Что будет дальше" — the future-features teaser with a RuStore review CTA.
+ * "Что будет дальше" — the future-features teaser with a review CTA.
  * Accessed via the MainActivity toolbar overflow menu.
  */
 class FuturePlansActivity : AppCompatActivity() {
@@ -51,7 +51,7 @@ class FuturePlansActivity : AppCompatActivity() {
             R.string.main_pro_feat_filter_title, R.string.main_pro_feat_filter_body)
 
         findViewById<MaterialButton>(R.id.proReviewButton).setOnClickListener {
-            openRuStoreReview()
+            openReview()
         }
         findViewById<MaterialButton>(R.id.proShareButton).setOnClickListener {
             shareApp()
@@ -65,7 +65,7 @@ class FuturePlansActivity : AppCompatActivity() {
         row.findViewById<MaterialTextView>(R.id.rowBody).setText(bodyRes)
     }
 
-    private fun openRuStoreReview() {
+    private fun openReview() {
         val uri = Uri.parse(getString(R.string.main_pro_review_url))
         val intent = Intent(Intent.ACTION_VIEW, uri).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         try {

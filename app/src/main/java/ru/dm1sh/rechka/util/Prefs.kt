@@ -42,7 +42,7 @@ object Prefs {
     // the VAD considers the utterance finished. SHORT is the historic default
     // and matches what 1.0.6 and earlier shipped with; existing users keep it.
     // LONG gives "thinking pauses" room before the model commits a paragraph
-    // — this is what the RuStore feedback ("she pauses to think and the app
+    // — this is what user feedback ("she pauses to think and the app
     // cuts the sentence") asked for.
     const val PAUSE_SHORT = "short"
     const val PAUSE_MEDIUM = "medium"

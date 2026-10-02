@@ -38,7 +38,7 @@
             android:paddingTop="16dp"
             android:paddingBottom="24dp">
 
-            <!-- Hero banner: intro prose + prominent RuStore review CTA.
+            <!-- Hero banner: intro prose + prominent review CTA.
                  Same tonal surface as main-screen cards so the two feel
                  like the same app; the CTA button carries visual weight
                  instead of the background colour. -->

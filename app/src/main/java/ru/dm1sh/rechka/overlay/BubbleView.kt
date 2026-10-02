@@ -39,7 +39,7 @@ class BubbleView @JvmOverloads constructor(
     private var bubbleSize = (56 * dp * sizeScale).toInt()
     // Microphone silhouette reads a bit small at 24dp on a 56dp disc — bump it up
     // so the shape is recognisable at a glance.
-    private var iconSize = (32 * dp * sizeScale).toInt()
+    private var iconSize = (56 * dp * sizeScale).toInt()
 
     // Fallbacks if the host theme lacks M3 attrs (shouldn't happen — the
     // app theme is Theme.Rechka, Material3 — but keep the bubble
@@ -175,7 +175,7 @@ class BubbleView @JvmOverloads constructor(
         if (newScale == sizeScale) return false
         sizeScale = newScale
         bubbleSize = (56 * dp * sizeScale).toInt()
-        iconSize = (32 * dp * sizeScale).toInt()
+        iconSize = (56 * dp * sizeScale).toInt()
         requestLayout()
         invalidate()
         return true

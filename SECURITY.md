@@ -17,6 +17,6 @@
 [Открыть приватный отчёт](https://github.com/dm1sh/rechka/security/advisories/new)
 
 **По почте:**
-rechka@i-lo.org
+me@dmitriy.icu
 
 Постараемся ответить в течение нескольких дней. Если уязвимость подтверждена — выпустим исправление в ближайшем релизе и опубликуем security advisory.

@@ -23,6 +23,7 @@ import androidx.core.view.updatePadding
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
+import com.google.android.material.checkbox.MaterialCheckBox
 import com.google.android.material.color.DynamicColors
 import com.google.android.material.color.MaterialColors
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -60,6 +61,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var cardBatteryButton: MaterialButton
     private lateinit var cardWhatsNew: MaterialCardView
     private lateinit var cardWhatsNewDismissButton: MaterialButton
+    private lateinit var modeOverlayCheck: MaterialCheckBox
+    private lateinit var modeKeyboardCheck: MaterialCheckBox
+    private lateinit var modeFilesCheck: MaterialCheckBox
 
     private lateinit var shortcutCard: View
     private lateinit var shortcutCardButton: MaterialButton
@@ -137,6 +141,20 @@ class MainActivity : AppCompatActivity() {
         cardBatteryMissing = findViewById(R.id.cardBatteryMissing)
         cardBatteryButton = findViewById(R.id.cardBatteryButton)
         cardBatteryButton.setOnClickListener { requestIgnoreBatteryOptimizations() }
+
+        modeOverlayCheck = findViewById(R.id.modeOverlayCheck)
+        modeKeyboardCheck = findViewById(R.id.modeKeyboardCheck)
+        modeFilesCheck = findViewById(R.id.modeFilesCheck)
+        modeFilesCheck.isChecked = true
+        modeFilesCheck.isEnabled = false
+        modeOverlayCheck.setOnClickListener {
+            if (!modeOverlayCheck.isChecked) AccessibilityHelper.openAccessibilitySettings(this)
+        }
+        modeKeyboardCheck.setOnClickListener {
+            if (!modeKeyboardCheck.isChecked) {
+                try { startActivity(Intent(Settings.ACTION_INPUT_METHOD_SETTINGS)) } catch (_: Exception) { }
+            }
+        }
 
         cardWhatsNew = findViewById(R.id.cardWhatsNew)
         cardWhatsNewDismissButton = findViewById(R.id.cardWhatsNewDismissButton)
@@ -316,9 +334,13 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        modeOverlayCheck.isChecked = serviceOk
+        modeKeyboardCheck.isChecked = keyboardOk
+        modeFilesCheck.isChecked = true
+
         cardMicMissing.visibility = if (micOk) View.GONE else View.VISIBLE
-        cardServiceMissing.visibility = if (serviceOk || keyboardOk) View.GONE else View.VISIBLE
-        cardKeyboardMissing.visibility = if (keyboardOk || serviceOk) View.GONE else View.VISIBLE
+        cardServiceMissing.visibility = if (serviceOk) View.GONE else View.VISIBLE
+        cardKeyboardMissing.visibility = if (keyboardOk) View.GONE else View.VISIBLE
         // Battery card is independent of criticalOk — it co-exists with stats
         // and promo as a soft "recommended" hint, not a setup blocker.
         cardBatteryMissing.visibility = if (serviceOk && !batteryOk) View.VISIBLE else View.GONE
@@ -331,8 +353,8 @@ class MainActivity : AppCompatActivity() {
         // Stats and promo hide only while there are *critical* problems —
         // the screen shouldn't split attention between "fix this NOW" cards
         // and nice-to-have surfaces. Battery being unset doesn't qualify.
-        statsCard.visibility = if (criticalOk) View.VISIBLE else View.GONE
-        promoCard.visibility = if (criticalOk) View.VISIBLE else View.GONE
+        statsCard.visibility = View.VISIBLE
+        promoCard.visibility = View.VISIBLE
     }
 
     private fun isVoiceKeyboardEnabled(): Boolean {

@@ -94,6 +94,12 @@ class BatteryFragment : OnboardingStepFragment() {
 
     private fun refreshState() {
         val context = requireContext()
+        if (!WelcomeFragment.isOverlaySelected(context)) {
+            requireView().visibility = View.GONE
+            setStepComplete(true)
+            return
+        }
+        requireView().visibility = View.VISIBLE
         if (!AccessibilityHelper.isLiteServiceEnabled(context)) {
             statusText.setText(R.string.onb_battery_not_needed)
             openButton.visibility = View.GONE

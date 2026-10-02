@@ -50,6 +50,12 @@ class KeyboardFragment : OnboardingStepFragment() {
     }
 
     private fun refreshState() {
+        if (!WelcomeFragment.isKeyboardSelected(requireContext())) {
+            requireView().visibility = View.GONE
+            setStepComplete(true)
+            return
+        }
+        requireView().visibility = View.VISIBLE
         val enabled = isKeyboardEnabled(requireContext())
         status.setText(if (enabled) R.string.onb_keyboard_enabled else R.string.onb_keyboard_pending)
         openButton.visibility = if (enabled) View.GONE else View.VISIBLE

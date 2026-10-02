@@ -61,6 +61,12 @@ class AccessibilityFragment : OnboardingStepFragment() {
 
     private fun refreshState() {
         val ctx = requireContext()
+        if (!WelcomeFragment.isOverlaySelected(ctx)) {
+            requireView().visibility = View.GONE
+            setStepComplete(true)
+            return
+        }
+        requireView().visibility = View.VISIBLE
         val serviceOn = AccessibilityHelper.isLiteServiceEnabled(ctx)
         val primary = MaterialColors.getColor(requireView(), com.google.android.material.R.attr.colorPrimary)
         val onSurface = MaterialColors.getColor(requireView(), com.google.android.material.R.attr.colorOnSurface)

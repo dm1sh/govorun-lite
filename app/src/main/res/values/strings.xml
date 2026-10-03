@@ -59,14 +59,9 @@
 
     <!-- Onboarding: external speech model -->
     <string name="onb_model_title">Установите модель распознавания</string>
-    <string name="onb_model_body">Для работы Речки нужна модель распознавания размером около 326 МБ. Скачайте четыре файла с GitHub, сохраните их в одну отдельную папку, а затем выберите эту папку.</string>
-    <string name="onb_model_files">Нужны эти файлы:
-
-• gigaam_v3_e2e_rnnt_encoder_int8.onnx
-• gigaam_v3_e2e_rnnt_decoder.onnx
-• gigaam_v3_e2e_rnnt_joint.onnx
-• gigaam_v3_e2e_rnnt_tokens.txt</string>
-    <string name="onb_model_folder_warning">Важно: корневую папку «Загрузки» Android не разрешает выбирать. Создайте внутри неё отдельную папку, например «Rechka model», скачайте все четыре файла туда и выберите именно эту папку. После копирования исходные файлы можно удалить.</string>
+    <string name="onb_model_body">Для работы Речки нужна модель распознавания размером около 326 МБ. Скачайте файлы с GitHub, сохраните их в одну отдельную папку, а затем выберите эту папку.</string>
+    <string name="onb_model_files">Нужны эти файлы:\n\n• gigaam_v3_e2e_rnnt_encoder_int8.onnx\n• gigaam_v3_e2e_rnnt_decoder.onnx\n• gigaam_v3_e2e_rnnt_joint.onnx\n• gigaam_v3_e2e_rnnt_tokens.txt</string>
+    <string name="onb_model_folder_warning">Важно: корневую папку «Загрузки» Android не разрешает выбирать. Создайте внутри неё отдельную папку, например «Rechka model», сохраните туда файлы и выберите именно эту папку. После копирования исходные файлы можно удалить.</string>
     <string name="onb_model_download">Скачать модель с GitHub</string>
     <string name="onb_model_choose">Выбрать папку с моделью</string>
     <string name="onb_model_pending">Модель ещё не установлена.</string>
@@ -205,7 +200,7 @@
     <string name="main_share_card_title">Расскажите о приложении</string>
     <string name="main_share_card_body">Порекомендуйте друзьям и коллегам</string>
     <string name="main_share_chooser">Порекомендовать Речку</string>
-    <string name="main_share_app_text">Речка: голос в текст. Голосовой ввод на русском без интернета.\nhttps://github.com/dm1sh/rechka/releases/latest</string>
+    <string name="main_share_app_text">Речка: голос в текст. Голосовой ввод на русском без интернета.\nhttps://github.com/dm1sh/rechka</string>
 
     <!-- Benchmark card on main screen -->
     <string name="main_benchmark_card_title">Тест скорости</string>
@@ -320,7 +315,7 @@
     <string name="main_pro_intro">Речка развивается благодаря участию пользователей. Оставьте отзыв, сообщите об ошибке или предложите улучшение на GitHub.</string>
     <string name="main_pro_review_button">Оставить отзыв на GitHub</string>
     <string name="main_pro_share_button">Расскажите о приложении</string>
-    <string name="main_pro_review_url">https://github.com/dm1sh/rechka/releases/latest</string>
+    <string name="main_pro_review_url">https://github.com/dm1sh/rechka</string>
 
     <!-- Dictionary screen -->
     <string name="dict_title">Свой словарь</string>

@@ -86,6 +86,6 @@ class ModelFragment : OnboardingStepFragment() {
 
     companion object {
         private const val MODEL_RELEASE_URL =
-            "https://github.com/amidexe/govorun-lite/releases/tag/model-gigaam-v3"
+            "https://github.com/dm1sh/rechka/releases/tag/model-gigaam-v3"
     }
 }

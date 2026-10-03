@@ -1,6 +1,7 @@
 package ru.dm1sh.rechka.service
 
 import android.Manifest
+import android.animation.ValueAnimator
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -40,6 +41,9 @@ class RechkaInputMethodService : InputMethodService() {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
     private var recorder: VadRecorder? = null
     private var recording = false
+    private var processing = false
+    private var recordingAnimator: ValueAnimator? = null
+    private var processingAnimator: ValueAnimator? = null
     private val touchHandler = Handler(Looper.getMainLooper())
     private var walkieLongPressTriggered = false
     private var walkieLocked = false
@@ -170,16 +174,53 @@ class RechkaInputMethodService : InputMethodService() {
         }
 
     private fun makeRecordButton(): MaterialButton =
-        makeIconButton(R.drawable.ic_mic_24, R.string.ime_start) {
+        makeIconButton(R.drawable.ic_rechka_24, R.string.ime_start) {
             if (recording) stopRecording() else startRecording()
         }.apply {
-            iconSize = dp(32)
+            // Match the floating overlay button: a full circular container
+            // with the Rechka microphone artwork filling its bounds.
+            iconSize = dp(56)
             cornerRadius = dp(32)
             backgroundTintList = ColorStateList.valueOf(primaryColor())
             iconTint = ColorStateList.valueOf(onPrimaryColor())
-            insetTop = dp(4)
-            insetBottom = dp(4)
+            insetTop = 0
+            insetBottom = 0
         }
+
+    private fun startRecordingAnimation() {
+        recordingAnimator?.cancel()
+        recordingAnimator = ValueAnimator.ofFloat(1f, 1.08f).apply {
+            duration = 800L
+            repeatCount = ValueAnimator.INFINITE
+            repeatMode = ValueAnimator.REVERSE
+            addUpdateListener {
+                val value = it.animatedValue as Float
+                recordButton.scaleX = value
+                recordButton.scaleY = value
+            }
+            start()
+        }
+    }
+
+    private fun startProcessingAnimation() {
+        processingAnimator?.cancel()
+        processingAnimator = ValueAnimator.ofFloat(0f, 360f).apply {
+            duration = 900L
+            repeatCount = ValueAnimator.INFINITE
+            addUpdateListener { recordButton.rotation = it.animatedValue as Float }
+            start()
+        }
+    }
+
+    private fun stopButtonAnimations() {
+        recordingAnimator?.cancel()
+        recordingAnimator = null
+        processingAnimator?.cancel()
+        processingAnimator = null
+        recordButton.scaleX = 1f
+        recordButton.scaleY = 1f
+        recordButton.rotation = 0f
+    }
 
     private fun updateUndoButton() {
         if (!::undoButton.isInitialized) return
@@ -606,6 +647,7 @@ class RechkaInputMethodService : InputMethodService() {
             return
         }
         sessionText.clear()
+        processing = false
         recording = true
         Haptics.longPress(this)
         updateRecordButton()
@@ -623,6 +665,7 @@ class RechkaInputMethodService : InputMethodService() {
             },
             onDone = {
                 recording = false
+                processing = false
                 walkieLocked = false
                 recorder = null
                 updateRecordButton()
@@ -635,33 +678,41 @@ class RechkaInputMethodService : InputMethodService() {
     private fun stopRecording() {
         if (!recording) return
         Haptics.tap(this)
+        processing = true
+        updateRecordButton()
         recordButton.tooltipText = getString(R.string.ime_processing)
         recorder?.stop()
     }
 
     private fun updateRecordButton() {
         if (!::recordButton.isInitialized) return
+        stopButtonAnimations()
         recordButton.icon = ContextCompat.getDrawable(
             themedContext,
-            when {
-                recording && walkieLocked -> R.drawable.ic_lock_24
-                recording -> R.drawable.ic_stop_24
-                else -> R.drawable.ic_mic_24
-            },
+            R.drawable.ic_rechka_24,
         )
         recordButton.backgroundTintList = ColorStateList.valueOf(
-            if (recording) errorColor() else primaryColor()
+            when {
+                processing -> Color.rgb(255, 167, 38)
+                recording -> errorColor()
+                else -> primaryColor()
+            }
         )
         recordButton.iconTint = ColorStateList.valueOf(
             if (recording) onErrorColor() else onPrimaryColor()
         )
         val label = when {
+            processing -> R.string.ime_processing
             recording && walkieLocked -> R.string.ime_locked
             recording -> R.string.ime_stop
             else -> R.string.ime_start
         }
         recordButton.contentDescription = getString(label)
         recordButton.tooltipText = getString(label)
+        when {
+            processing -> startProcessingAnimation()
+            recording -> startRecordingAnimation()
+        }
     }
 
     private fun performEditorActionIfSupported(): Boolean {

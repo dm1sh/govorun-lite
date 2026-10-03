@@ -336,7 +336,6 @@ class MainActivity : AppCompatActivity() {
         // setup problem so the headline and promo card honestly reflect state.
         val shortcutOn = AccessibilityHelper.isLiteShortcutEnabled(this)
         val overlayRequested = isModeSelected(KEY_MODE_OVERLAY)
-        val overlayEnabled = serviceOk
         val keyboardSelected = isModeSelected(KEY_MODE_KEYBOARD)
         // Critical = blocks a selected input mode. File transcription is always
         // available and therefore keeps the main screen usable by itself.
@@ -363,7 +362,11 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        modeOverlayCheck.isChecked = overlayEnabled
+        // The checkbox represents the user's selected method, not whether
+        // Android has completed its setup. Keep it checked while the
+        // accessibility service is still missing so the warning and method
+        // selection cannot contradict each other.
+        modeOverlayCheck.isChecked = overlayRequested
         modeKeyboardCheck.isChecked = keyboardSelected
         modeFilesCheck.isChecked = true
 

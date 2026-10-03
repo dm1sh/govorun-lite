@@ -4,7 +4,7 @@
 
     <!-- Accessibility service -->
     <string name="accessibility_service_label">Речка — голосовой ввод</string>
-    <string name="accessibility_description">Показывает плавающую Речку и вставляет распознанный текст в поле ввода. Работает без интернета. Звук не отправляется никуда.</string>
+    <string name="accessibility_description">Показывает плавающий микрофон поверх других приложений и вставляет распознанный текст в поле ввода. Работает без интернета. Звук не отправляется никуда.</string>
 
     <!-- System voice-input keyboard -->
     <string name="ime_label">Речка — голосовой ввод</string>
@@ -36,8 +36,8 @@
     <string name="voice_recognition_stop">Остановить и вставить</string>
 
     <!-- Notifications -->
-    <string name="notif_channel_overlay">Речка</string>
-    <string name="notif_overlay_title">Речка</string>
+    <string name="notif_channel_overlay">Плавающий микрофон</string>
+    <string name="notif_overlay_title">Плавающий микрофон</string>
     <string name="notif_overlay_text">Голосовой ввод готов</string>
     <string name="notif_channel_download">Установка модели</string>
     <string name="notif_download_title">Установка модели распознавания</string>
@@ -144,8 +144,8 @@
     <string name="main_card_mic_title">Включите микрофон</string>
     <string name="main_card_mic_body">Без микрофона Речка не услышит, что вы говорите. Выберите Разрешения → Микрофон → Разрешить во время использования приложения.</string>
     <string name="main_card_mic_button">Перейти в настройки</string>
-    <string name="main_card_service_title">Включите Речку</string>
-    <string name="main_card_service_body">Микрофон не появится в других программах, пока вы не включили «Речка — голосовой ввод» в специальных возможностях.</string>
+    <string name="main_card_service_title">Включите плавающий микрофон</string>
+    <string name="main_card_service_body">Чтобы микрофон появился поверх других приложений, включите «Речка — голосовой ввод» в специальных возможностях Android.</string>
     <string name="main_card_service_button">Разрешить специальные возможности</string>
     <string name="main_card_keyboard_title">Включите голосовую клавиатуру</string>
     <string name="main_card_keyboard_body">Речку можно использовать без специальных возможностей — включите «Речка — голосовой ввод» в настройках клавиатур и запускайте диктовку кнопкой микрофона.</string>
@@ -163,15 +163,15 @@
 
     <string name="main_card_whats_new_dismiss">Понятно</string>
     <string name="main_needs_setup_sub">Несколько мелочей надо подкрутить — карточки ниже подскажут, что и где.</string>
-    <string name="main_disable_service">Выключить Речку</string>
-    <string name="main_disable_service_title">Выключить Речку?</string>
-    <string name="main_disable_service_hint">Речка перестанет работать прямо сейчас. Микрофон пропадёт во всех программах. Чтобы включить обратно, придётся снова открыть «Специальные возможности» Android и заново разрешить там Речке работать.</string>
+    <string name="main_disable_service">Выключить плавающий микрофон</string>
+    <string name="main_disable_service_title">Выключить плавающий микрофон?</string>
+    <string name="main_disable_service_hint">Плавающий микрофон исчезнет из других приложений. Чтобы вернуть его, снова включите «Речка — голосовой ввод» в специальных возможностях Android.</string>
 
     <!-- Settings: tapping the switch while Речка is OFF opens this dialog
          so the user isn't left without a way back into the accessibility
          settings screen. -->
-    <string name="main_enable_service_title">Речка сейчас выключена</string>
-    <string name="main_enable_service_body">Чтобы снова видеть микрофон над клавиатурой, включите Речку в специальных возможностях Android.</string>
+    <string name="main_enable_service_title">Плавающий микрофон выключен</string>
+    <string name="main_enable_service_body">Чтобы снова видеть микрофон поверх других приложений, включите «Речка — голосовой ввод» в специальных возможностях Android.</string>
     <string name="main_open_accessibility">Открыть специальные возможности</string>
 
     <!-- Main screen: usage stats -->
@@ -225,11 +225,11 @@
          what tapping does. Toggle row tap leads to a confirmation dialog
          (main_disable_service_*) — the switch itself is non-interactive
          and only mirrors the system accessibility-enabled flag. -->
-    <string name="settings_service_on_title">Речка включена</string>
+    <string name="settings_service_on_title">Плавающий микрофон включён</string>
     <string name="settings_service_on_body">Нажмите, чтобы выключить.</string>
-    <string name="settings_service_off_title">Речка выключена</string>
-    <string name="settings_service_off_body">Нажмите, чтобы включить. Микрофон не появляется, пока Речке не разрешены специальные возможности Android.</string>
-    <string name="settings_disable_body">Речка перестанет появляться над клавиатурой.</string>
+    <string name="settings_service_off_title">Плавающий микрофон выключен</string>
+    <string name="settings_service_off_body">Нажмите, чтобы включить. Для работы микрофона нужно разрешить «Речка — голосовой ввод» в специальных возможностях Android.</string>
+    <string name="settings_disable_body">Плавающий микрофон перестанет появляться поверх клавиатуры.</string>
 
     <string name="settings_bubble_size_title">Размер</string>
     <string name="settings_bubble_size_body">Какого размера микрофон появляется над клавиатурой.</string>

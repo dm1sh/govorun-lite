@@ -624,6 +624,9 @@ class RechkaInputMethodService : InputMethodService() {
                 processing = false
                 walkieLocked = false
                 recorder = null
+                if (sessionText.isNotEmpty() && Prefs.isVoiceSuffixEnabled(this@RechkaInputMethodService)) {
+                    currentInputConnection?.commitText("\n\n[текст распознан с голоса]", 1)
+                }
                 updateRecordButton()
                 recordButton.tooltipText = getString(R.string.ime_start)
             },

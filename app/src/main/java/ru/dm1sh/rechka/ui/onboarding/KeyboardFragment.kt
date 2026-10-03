@@ -43,6 +43,10 @@ class KeyboardFragment : OnboardingStepFragment() {
     override fun onResume() {
         super.onResume()
         refreshState()
+        // Android may update enabledInputMethodList just after returning
+        // from the system settings activity. Recheck after that write has
+        // propagated so «Далее» unlocks without requiring «Пропустить».
+        view?.postDelayed({ if (isAdded) refreshState() }, 500L)
     }
 
     override fun onStepFocused() {

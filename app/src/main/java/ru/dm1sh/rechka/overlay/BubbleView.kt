@@ -9,7 +9,6 @@ import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
-import android.view.animation.LinearInterpolator
 import androidx.core.content.ContextCompat
 import ru.dm1sh.rechka.R
 import ru.dm1sh.rechka.util.Prefs
@@ -80,7 +79,7 @@ class BubbleView @JvmOverloads constructor(
         style = Paint.Style.FILL
     }
     private val recordingPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = recordingFill; style = Paint.Style.FILL
+        color = idleMicrophoneTint; style = Paint.Style.FILL
     }
     private val processingPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = processingFill; style = Paint.Style.FILL
@@ -99,8 +98,6 @@ class BubbleView @JvmOverloads constructor(
     private var isProcessing = false
     private var pulseRadius = 0f
     private var pulseAnimator: ValueAnimator? = null
-    private var processingAngle = 0f
-    private var processingAnimator: ValueAnimator? = null
 
     private var idleHaloActive = false
     private var idleHaloRadius = 0f
@@ -126,12 +123,11 @@ class BubbleView @JvmOverloads constructor(
 
     fun setProcessing(processing: Boolean) {
         isProcessing = processing; isRecording = false
-        stopRecordingPulse()
         if (processing) {
             stopIdleHalo()
-            startProcessingSpin()
+            startRecordingPulse()
         } else {
-            stopProcessingSpin()
+            stopRecordingPulse()
             if (idleHaloActive) startIdleHalo()
         }
         invalidate()
@@ -201,6 +197,7 @@ class BubbleView @JvmOverloads constructor(
             recordingFill
         ) or 0xFF000000.toInt()
         basePaint.color = composeIdleFill()
+        recordingPaint.color = idleMicrophoneTint
         idleHaloPaint.color = haloBaseColor
         invalidate()
     }
@@ -241,15 +238,19 @@ class BubbleView @JvmOverloads constructor(
         }
 
         // 2. Recording pulse.
-        if (pulseRadius > 0 && isRecording) {
+        if (pulseRadius > 0 && (isRecording || isProcessing)) {
+            val pulseColor = if (isProcessing) {
+                (idleFillRgb and 0x00FFFFFF) or 0x40000000
+            } else {
+                (idleMicrophoneTint and 0x00FFFFFF) or 0x40000000
+            }
+            pulsePaint.color = pulseColor
             canvas.drawCircle(cx, cy, pulseRadius, pulsePaint)
         }
 
-        // 3. Main bubble disc.
-        val paint = when {
-            isProcessing || isRecording -> recordingPaint
-            else -> basePaint
-        }
+        // 3. Main bubble disc. Processing uses the same idle colour as the
+        // idle button; only active recording switches to the recording colour.
+        val paint = if (isRecording) recordingPaint else basePaint
         canvas.drawCircle(cx, cy, radius, paint)
 
         // 4. Microphone on top. Tint swaps with state so contrast holds on any
@@ -263,22 +264,14 @@ class BubbleView @JvmOverloads constructor(
             // idleMicrophoneTint (high contrast against colorPrimaryContainer
             // disc, used at alpha≈1) by the current alpha fraction.
             val micTint = when {
-                isRecording || isProcessing -> recordingMicrophoneTint
+                isRecording -> idleFillRgb or 0xFF000000.toInt()
                 else -> lerpColor(bareMicrophoneTint, idleMicrophoneTint, idleAlphaFraction)
             }
             it.setTint(micTint)
             val l = (cx - scaledIcon / 2).toInt()
             val t = (cy - scaledIcon / 2).toInt()
             it.setBounds(l, t, l + scaledIcon, t + scaledIcon)
-            if (isProcessing) {
-                // Spin the microphone around its centre while the model is thinking.
-                canvas.save()
-                canvas.rotate(processingAngle, cx, cy)
-                it.draw(canvas)
-                canvas.restore()
-            } else {
-                it.draw(canvas)
-            }
+            it.draw(canvas)
         }
     }
 
@@ -299,24 +292,6 @@ class BubbleView @JvmOverloads constructor(
         pulseAnimator?.cancel()
         pulseAnimator = null
         pulseRadius = 0f
-    }
-
-    private fun startProcessingSpin() {
-        processingAnimator?.cancel()
-        processingAnimator = ValueAnimator.ofFloat(0f, 360f).apply {
-            duration = 1500L
-            repeatCount = ValueAnimator.INFINITE
-            repeatMode = ValueAnimator.RESTART
-            interpolator = LinearInterpolator()
-            addUpdateListener { processingAngle = it.animatedValue as Float; invalidate() }
-            start()
-        }
-    }
-
-    private fun stopProcessingSpin() {
-        processingAnimator?.cancel()
-        processingAnimator = null
-        processingAngle = 0f
     }
 
     // Combined breathing animation: the bubble itself scales 1.0 → 1.07 → 1.0
@@ -359,7 +334,6 @@ class BubbleView @JvmOverloads constructor(
         super.onDetachedFromWindow()
         pulseAnimator?.cancel()
         idleHaloAnimator?.cancel()
-        processingAnimator?.cancel()
     }
 
     // Theme lookup wrapper: keeps the whole bubble working even if someone

@@ -1,7 +1,6 @@
 package ru.dm1sh.rechka.service
 
 import android.Manifest
-import android.animation.ValueAnimator
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -21,6 +20,7 @@ import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import com.google.android.material.button.MaterialButton
+import ru.dm1sh.rechka.overlay.BubbleView
 import com.google.android.material.color.DynamicColors
 import com.google.android.material.color.MaterialColors
 import ru.dm1sh.rechka.R
@@ -43,8 +43,6 @@ class RechkaInputMethodService : InputMethodService() {
     private var recorder: VadRecorder? = null
     private var recording = false
     private var processing = false
-    private var recordingAnimator: ValueAnimator? = null
-    private var processingAnimator: ValueAnimator? = null
     private val touchHandler = Handler(Looper.getMainLooper())
     private var walkieLongPressTriggered = false
     private var walkieLocked = false
@@ -53,7 +51,7 @@ class RechkaInputMethodService : InputMethodService() {
         if (!recording && walkieLongPressTriggered) startRecording()
     }
 
-    private lateinit var recordButton: MaterialButton
+    private lateinit var recordButton: BubbleView
     private lateinit var themedContext: Context
     private var currentEditorInfo: EditorInfo? = null
 
@@ -136,7 +134,7 @@ class RechkaInputMethodService : InputMethodService() {
             true
         }
         controls.addView(enterButton, weightedButtonParams())
-        root.addView(controls, LinearLayout.LayoutParams(-1, dp(64)))
+        root.addView(controls, LinearLayout.LayoutParams(-1, dp(96)))
 
         // Keep the entire system hide/switcher touch target below our content.
         // Android 17 can place those controls over the bottom of an IME view.
@@ -174,53 +172,10 @@ class RechkaInputMethodService : InputMethodService() {
             setOnClickListener { action() }
         }
 
-    private fun makeRecordButton(): MaterialButton =
-        makeIconButton(R.drawable.ic_rechka_24, R.string.ime_start) {
-            if (recording) stopRecording() else startRecording()
-        }.apply {
-            // Match the floating overlay button: a full circular container
-            // with the Rechka microphone artwork filling its bounds.
-            iconSize = dp(56)
-            cornerRadius = dp(32)
-            backgroundTintList = ColorStateList.valueOf(primaryColor())
-            iconTint = ColorStateList.valueOf(onPrimaryColor())
-            insetTop = 0
-            insetBottom = 0
-        }
-
-    private fun startRecordingAnimation() {
-        recordingAnimator?.cancel()
-        recordingAnimator = ValueAnimator.ofFloat(1f, 1.08f).apply {
-            duration = 800L
-            repeatCount = ValueAnimator.INFINITE
-            repeatMode = ValueAnimator.REVERSE
-            addUpdateListener {
-                val value = it.animatedValue as Float
-                recordButton.scaleX = value
-                recordButton.scaleY = value
-            }
-            start()
-        }
-    }
-
-    private fun startProcessingAnimation() {
-        processingAnimator?.cancel()
-        processingAnimator = ValueAnimator.ofFloat(0f, 360f).apply {
-            duration = 900L
-            repeatCount = ValueAnimator.INFINITE
-            addUpdateListener { recordButton.rotation = it.animatedValue as Float }
-            start()
-        }
-    }
-
-    private fun stopButtonAnimations() {
-        recordingAnimator?.cancel()
-        recordingAnimator = null
-        processingAnimator?.cancel()
-        processingAnimator = null
-        recordButton.scaleX = 1f
-        recordButton.scaleY = 1f
-        recordButton.rotation = 0f
+    private fun makeRecordButton(): BubbleView = BubbleView(themedContext).apply {
+        contentDescription = getString(R.string.ime_start)
+        tooltipText = getString(R.string.ime_start)
+        setIdlePulse(false)
     }
 
     private fun updateUndoButton() {
@@ -594,7 +549,7 @@ class RechkaInputMethodService : InputMethodService() {
         marginEnd = dp(4)
     }
 
-    private fun recordButtonParams() = LinearLayout.LayoutParams(dp(64), dp(64)).apply {
+    private fun recordButtonParams() = LinearLayout.LayoutParams(dp(90), dp(90)).apply {
         marginStart = dp(4)
         marginEnd = dp(4)
     }
@@ -687,21 +642,14 @@ class RechkaInputMethodService : InputMethodService() {
 
     private fun updateRecordButton() {
         if (!::recordButton.isInitialized) return
-        stopButtonAnimations()
-        recordButton.icon = ContextCompat.getDrawable(
-            themedContext,
-            R.drawable.ic_rechka_24,
-        )
-        recordButton.backgroundTintList = ColorStateList.valueOf(
-            when {
-                processing -> Color.rgb(255, 167, 38)
-                recording -> errorColor()
-                else -> primaryColor()
-            }
-        )
-        recordButton.iconTint = ColorStateList.valueOf(
-            if (recording) onErrorColor() else onPrimaryColor()
-        )
+        if (processing) {
+            // BubbleView states are mutually exclusive. Do not call
+            // setProcessing(false) after setRecording(true): that would
+            // immediately clear the recording animation.
+            recordButton.setProcessing(true)
+        } else {
+            recordButton.setRecording(recording)
+        }
         val label = when {
             processing -> R.string.ime_processing
             recording && walkieLocked -> R.string.ime_locked
@@ -710,10 +658,6 @@ class RechkaInputMethodService : InputMethodService() {
         }
         recordButton.contentDescription = getString(label)
         recordButton.tooltipText = getString(label)
-        when {
-            processing -> startProcessingAnimation()
-            recording -> startRecordingAnimation()
-        }
     }
 
     private fun performEditorActionIfSupported(): Boolean {

@@ -188,6 +188,7 @@ class SettingsActivity : AppCompatActivity() {
         val keepScreenRow = findViewById<View>(R.id.keepScreenRow)
         val keepScreenBody = findViewById<MaterialTextView>(R.id.keepScreenBody)
         val autoStopRow = findViewById<View>(R.id.autoStopRow)
+        val autoStopDivider = findViewById<View>(R.id.autoStopDivider)
         val autoStopGroup = findViewById<MaterialButtonToggleGroup>(R.id.autoStopToggleGroup)
 
         // Show/hide the auto-stop picker based on the keep-screen-on toggle.
@@ -195,6 +196,7 @@ class SettingsActivity : AppCompatActivity() {
         // session via screenOffReceiver well before any wall-clock cap could
         // fire, so the picker would just be confusing dead UI.
         fun applyAutoStopVisibility(keepScreenOn: Boolean) {
+            autoStopDivider.visibility = if (keepScreenOn) View.VISIBLE else View.GONE
             autoStopRow.visibility = if (keepScreenOn) View.VISIBLE else View.GONE
         }
         fun applyKeepScreenBody(checked: Boolean) {

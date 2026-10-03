@@ -59,9 +59,9 @@
 
     <!-- Onboarding: external speech model -->
     <string name="onb_model_title">Установите модель распознавания</string>
-    <string name="onb_model_body">Для работы Речки нужна модель распознавания размером около 326 МБ. Скачайте файлы с GitHub, сохраните их в одну отдельную папку, а затем выберите эту папку.</string>
+    <string name="onb_model_body">Для работы Речки нужна модель распознавания размером около 326 МБ.</string>
     <string name="onb_model_files">Нужны эти файлы:\n\n• gigaam_v3_e2e_rnnt_encoder_int8.onnx\n• gigaam_v3_e2e_rnnt_decoder.onnx\n• gigaam_v3_e2e_rnnt_joint.onnx\n• gigaam_v3_e2e_rnnt_tokens.txt</string>
-    <string name="onb_model_folder_warning">Важно: корневую папку «Загрузки» Android не разрешает выбирать. Создайте внутри неё отдельную папку, например «Rechka model», сохраните туда файлы и выберите именно эту папку. После копирования исходные файлы можно удалить.</string>
+    <string name="onb_model_folder_warning">Важно: Android не разрешает выбирать корневую папку «Загрузки» Создайте внутри неё отдельную папку, например «Rechka model», сохраните туда файлы и выберите её. После копирования исходные файлы можно удалить.</string>
     <string name="onb_model_download">Скачать модель с GitHub</string>
     <string name="onb_model_choose">Выбрать папку с моделью</string>
     <string name="onb_model_pending">Модель ещё не установлена.</string>
@@ -81,7 +81,7 @@
     <string name="onb_accessibility_open">Разрешить специальные возможности</string>
     <string name="onb_skip">Пропустить</string>
 
-    <!-- Onboarding: optional voice keyboard -->
+    <!-- Onboarding optional voice keyboard -->
     <string name="onb_keyboard_title">Голосовая клавиатура</string>
     <string name="onb_keyboard_pending">Включите «Речка — голосовой ввод» в настройках экранной клавиатуры, чтобы запускать диктовку кнопкой микрофона в других клавиатурах.</string>
     <string name="onb_keyboard_enabled">Голосовая клавиатура включена. Её можно выбрать кнопкой смены клавиатуры или кнопкой микрофона в AOSP Keyboard и HeliBoard.</string>
@@ -246,7 +246,7 @@
     <string name="settings_disable_body">Плавающий микрофон перестанет появляться поверх клавиатуры.</string>
 
     <string name="settings_bubble_size_title">Размер</string>
-    <string name="settings_bubble_size_body">Какого размера микрофон появляется над клавиатурой.</string>
+    <string name="settings_bubble_size_body">Какого размера должна быть кнопка с микрофоном.</string>
     <string name="settings_bubble_edge_margin_title">Отступ от края</string>
     <string name="settings_bubble_edge_margin_body">Насколько далеко микрофон от края экрана.</string>
     <string name="settings_bubble_side_title">Положение</string>

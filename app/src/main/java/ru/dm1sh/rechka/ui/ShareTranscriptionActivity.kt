@@ -16,6 +16,7 @@ import ru.dm1sh.rechka.R
 import ru.dm1sh.rechka.model.GigaAmModel
 import ru.dm1sh.rechka.stats.StatsStore
 import ru.dm1sh.rechka.transcriber.AudioFileDecoder
+import ru.dm1sh.rechka.transcriber.Dictionary
 import ru.dm1sh.rechka.transcriber.OfflineTranscriber
 import ru.dm1sh.rechka.transcriber.SpeechSegmenter
 import ru.dm1sh.rechka.util.Prefs
@@ -105,8 +106,9 @@ class ShareTranscriptionActivity : AppCompatActivity() {
                             transcriber.startAudio()
                             transcriber.sendAudioChunk(bytes)
                             val part = transcriber.stopAudioAndGetTranscript()
-                            if (part.isNotBlank()) {
-                                withContext(Dispatchers.Main) { appendTranscriptPart(part) }
+                            val replaced = Dictionary.applyReplacements(this@ShareTranscriptionActivity, part)
+                            if (replaced.isNotBlank()) {
+                                withContext(Dispatchers.Main) { appendTranscriptPart(replaced) }
                             }
                         }
                     }

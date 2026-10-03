@@ -26,6 +26,7 @@ import com.google.android.material.color.MaterialColors
 import ru.dm1sh.rechka.R
 import ru.dm1sh.rechka.model.GigaAmModel
 import ru.dm1sh.rechka.stats.StatsStore
+import ru.dm1sh.rechka.transcriber.Dictionary
 import ru.dm1sh.rechka.transcriber.OfflineTranscriber
 import ru.dm1sh.rechka.ui.MainActivity
 import ru.dm1sh.rechka.util.Prefs
@@ -659,8 +660,8 @@ class RechkaInputMethodService : InputMethodService() {
             transcriberProvider = { OfflineTranscriber.getInstance(this@RechkaInputMethodService) },
             onSegment = { text ->
                 if (text.isNotBlank()) {
-                    commitInserted(text)
-                    StatsStore.addWords(applicationContext, StatsStore.countWords(text))
+                    val inserted = commitInserted(text)
+                    StatsStore.addWords(applicationContext, StatsStore.countWords(inserted))
                 }
             },
             onDone = {
@@ -723,20 +724,22 @@ class RechkaInputMethodService : InputMethodService() {
         return currentInputConnection?.performEditorAction(action) == true
     }
 
-    private fun commitInserted(text: String) {
-        if (text.isEmpty()) return
-        val connection = currentInputConnection ?: return
+    private fun commitInserted(text: String): String {
+        if (text.isEmpty()) return ""
+        val replaced = Dictionary.applyReplacements(this, text)
+        val connection = currentInputConnection ?: return ""
         val before = connection.getTextBeforeCursor(2, 0)?.toString().orEmpty()
         val previous = before.lastOrNull()
-        val first = text.firstOrNull()
+        val first = replaced.firstOrNull()
         val needsSpace = previous != null &&
             !previous.isWhitespace() &&
             first != null &&
             first.isLetterOrDigit() &&
             previous !in "([\\{\\\"'«"
-        val inserted = if (needsSpace) " $text" else text
+        val inserted = if (needsSpace) " $replaced" else replaced
         connection.commitText(inserted, 1)
         sessionText.append(inserted)
+        return inserted
     }
 
     private fun deletePreviousCodePoint() {

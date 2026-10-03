@@ -88,7 +88,6 @@ class ShareTranscriptionActivity : AppCompatActivity() {
         lifecycleScope.launch {
             try {
                 withContext(Dispatchers.IO) {
-                    GigaAmModel.ensureInstalled(this@ShareTranscriptionActivity)
                     val transcriber = OfflineTranscriber.getInstance(this@ShareTranscriptionActivity)
                     val useVad = Prefs.isFileVadEnabled(this@ShareTranscriptionActivity)
                     val segmenter = if (useVad) SpeechSegmenter(this@ShareTranscriptionActivity) else null

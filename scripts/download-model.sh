@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Downloads GigaAM v3 ONNX model files into app/src/main/assets/models/gigaam-v3/.
+# Downloads GigaAM v3 ONNX model files into models/gigaam-v3/ for local
+# inspection or packaging into a user-selected folder. Models are not APK assets.
 # Total ~327 MB, gitignored — too large for regular git but served via GitHub Release.
 # Files are verified by SHA-256 so a truncated or tampered download fails loud.
 set -euo pipefail
@@ -11,7 +12,7 @@ MODEL_REPOSITORY="${GIGAAM_MODEL_REPOSITORY:-amidexe/govorun-lite}"
 BASE_URL="https://github.com/${MODEL_REPOSITORY}/releases/download/${RELEASE_TAG}"
 MODEL_REPOSITORY="${GIGAAM_MODEL_REPOSITORY:-amidexe/govorun-lite}"
 BASE_URL="https://github.com/${MODEL_REPOSITORY}/releases/download/${RELEASE_TAG}"
-DEST_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/app/src/main/assets/models/gigaam-v3"
+DEST_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/models/gigaam-v3"
 
 mkdir -p "${DEST_DIR}"
 

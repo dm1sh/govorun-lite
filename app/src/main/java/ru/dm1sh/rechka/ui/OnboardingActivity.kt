@@ -130,6 +130,7 @@ class OnboardingActivity : AppCompatActivity() {
     private fun isStepRequired(step: OnboardingStep): Boolean {
         return when (step) {
             OnboardingStep.WELCOME -> true
+            OnboardingStep.MODEL -> true
             OnboardingStep.TRY_IT -> WelcomeFragment.isOverlaySelected(this) ||
                 WelcomeFragment.isKeyboardSelected(this)
             OnboardingStep.ACCESSIBILITY -> WelcomeFragment.isOverlaySelected(this)

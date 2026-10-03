@@ -82,15 +82,6 @@ android {
         }
     }
 
-    // Bundled GigaAM .onnx files are already highly-compressed tensor data;
-    // compressing them in the APK adds ~5% at best and forces a full unpack
-    // to /data/app_extracted on install. Skipping compression lets the PM
-    // store them uncompressed and means our filesDir copy can use plain
-    // buffered IO without extra decompression.
-    androidResources {
-        noCompress += listOf("onnx")
-    }
-
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -111,6 +102,7 @@ dependencies {
     implementation("androidx.viewpager2:viewpager2:1.1.0")
     implementation("com.google.android.material:material:1.12.0")
     implementation("androidx.constraintlayout:constraintlayout:2.2.0")
+    implementation("androidx.documentfile:documentfile:1.0.1")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")
     // sherpa-onnx v1.12.34: offline ASR engine used with GigaAM v3.

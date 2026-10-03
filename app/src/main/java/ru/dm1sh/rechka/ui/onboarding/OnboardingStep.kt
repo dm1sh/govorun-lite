@@ -7,6 +7,7 @@ package ru.dm1sh.rechka.ui.onboarding
  */
 enum class OnboardingStep {
     WELCOME,
+    MODEL,
     TRY_IT,
     ACCESSIBILITY,
     KEYBOARD,

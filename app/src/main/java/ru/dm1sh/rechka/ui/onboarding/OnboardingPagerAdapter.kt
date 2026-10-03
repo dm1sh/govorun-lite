@@ -12,6 +12,7 @@ class OnboardingPagerAdapter(activity: FragmentActivity) : FragmentStateAdapter(
 
     override fun createFragment(position: Int): Fragment = when (steps[position]) {
         OnboardingStep.WELCOME -> WelcomeFragment()
+        OnboardingStep.MODEL -> ModelFragment()
         OnboardingStep.TRY_IT -> TryItFragment()
         OnboardingStep.ACCESSIBILITY -> AccessibilityFragment()
         OnboardingStep.KEYBOARD -> KeyboardFragment()

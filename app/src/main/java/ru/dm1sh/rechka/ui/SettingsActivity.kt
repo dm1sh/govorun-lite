@@ -1,6 +1,5 @@
 package ru.dm1sh.rechka.ui
 
-import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import kotlin.math.roundToInt
@@ -14,21 +13,16 @@ import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.button.MaterialButtonToggleGroup
 import com.google.android.material.color.DynamicColors
-import com.google.android.material.color.MaterialColors
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.materialswitch.MaterialSwitch
 import com.google.android.material.slider.Slider
 import com.google.android.material.textview.MaterialTextView
 import ru.dm1sh.rechka.R
 import ru.dm1sh.rechka.overlay.BubbleView
 import ru.dm1sh.rechka.service.LiteAccessibilityService
-import ru.dm1sh.rechka.util.AccessibilityHelper
 import ru.dm1sh.rechka.util.Prefs
 
 class SettingsActivity : AppCompatActivity() {
 
-    private lateinit var showServiceRow: View
-    private lateinit var showServiceSwitch: MaterialSwitch
     private lateinit var appFilterSubtitle: MaterialTextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -273,22 +267,6 @@ class SettingsActivity : AppCompatActivity() {
             startActivity(Intent(this, BenchmarkActivity::class.java))
         }
 
-        showServiceRow = findViewById(R.id.showServiceRow)
-        showServiceSwitch = findViewById(R.id.showServiceSwitch)
-        // Row is visible regardless of service state so the user always has a
-        // discoverable way back into accessibility settings. The tap handler
-        // branches on the current service state: on → confirm-disable dialog,
-        // off → "go turn it on again" dialog. Hiding the row when the service
-        // is off would leave the user wondering where the setting went, with
-        // no in-app breadcrumb to the system screen.
-        showServiceRow.setOnClickListener {
-            if (AccessibilityHelper.isLiteServiceEnabled(this)) {
-                confirmDisableService()
-            } else {
-                promptEnableService()
-            }
-        }
-
         findViewById<MaterialButton>(R.id.resetButton).setOnClickListener {
             // Reset all customisation prefs to project defaults. Sliders and
             // switch update via setValue/isChecked (no fromUser flag → our
@@ -347,7 +325,6 @@ class SettingsActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        refreshServiceSwitch()
         updateAppFilterSubtitle()
     }
 
@@ -376,55 +353,6 @@ class SettingsActivity : AppCompatActivity() {
     private fun applyPreviewEdgeMargin(previewBubble: BubbleView, side: String, marginDp: Int) {
         val px = marginDp * resources.displayMetrics.density
         previewBubble.translationX = if (side == Prefs.BUBBLE_SIDE_LEFT) px else -px
-    }
-
-    private fun refreshServiceSwitch() {
-        val enabled = AccessibilityHelper.isLiteServiceEnabled(this)
-        showServiceSwitch.isChecked = enabled
-        // Title shows current state ("включён" / "выключен"); body says what
-        // tapping the row will do. Without this dynamic update the row reads
-        // as "Показывать Речку" with a switch — and tapping it confusingly
-        // brings up a "выключить?" dialog when the user expected the switch
-        // to just flip.
-        findViewById<MaterialTextView>(R.id.showServiceTitle).setText(
-            if (enabled) R.string.settings_service_on_title
-            else R.string.settings_service_off_title
-        )
-        findViewById<MaterialTextView>(R.id.showServiceBody).setText(
-            if (enabled) R.string.settings_service_on_body
-            else R.string.settings_service_off_body
-        )
-    }
-
-    private fun confirmDisableService() {
-        val dialog = MaterialAlertDialogBuilder(this)
-            .setTitle(R.string.main_disable_service_title)
-            .setMessage(R.string.main_disable_service_hint)
-            .setPositiveButton(R.string.main_disable_service) { _, _ ->
-                LiteAccessibilityService.instance?.disableSelf()
-                // System updates the enabled list asynchronously; refresh after
-                // a beat so the switch reflects reality.
-                showServiceRow.postDelayed({ refreshServiceSwitch() }, 300)
-            }
-            .setNegativeButton(android.R.string.cancel, null)
-            .show()
-        // Tint the destructive action so the «Выключить» button reads as a
-        // consequence, not a casual OK. M3 doesn't ship a destructive-button
-        // style out of the box, so we recolour it after show().
-        dialog.getButton(DialogInterface.BUTTON_POSITIVE)?.setTextColor(
-            MaterialColors.getColor(showServiceRow, com.google.android.material.R.attr.colorError)
-        )
-    }
-
-    private fun promptEnableService() {
-        MaterialAlertDialogBuilder(this)
-            .setTitle(R.string.main_enable_service_title)
-            .setMessage(R.string.main_enable_service_body)
-            .setPositiveButton(R.string.main_open_accessibility) { _, _ ->
-                AccessibilityHelper.openAccessibilitySettings(this)
-            }
-            .setNegativeButton(android.R.string.cancel, null)
-            .show()
     }
 
     private fun updateAppFilterSubtitle() {

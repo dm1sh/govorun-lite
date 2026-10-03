@@ -170,6 +170,8 @@ class LiteAccessibilityService : AccessibilityService() {
         // exactly which framework crashes are covered and why.
         AccessibilityFrameworkCrashGuard.install()
         instance = this
+        val modePrefs = getSharedPreferences("rechka_lite_prefs", MODE_PRIVATE)
+        manualSilence = !modePrefs.getBoolean("onboarding_mode_overlay", false)
         Log.i(TAG, "Accessibility service connected")
 
         keyguardManager = getSystemService(KEYGUARD_SERVICE) as KeyguardManager
@@ -517,6 +519,15 @@ class LiteAccessibilityService : AccessibilityService() {
      * True when the bubble is currently painted on screen.
      */
     fun isBubbleVisible(): Boolean = bubbleOverlay?.isVisible() == true
+
+    /** Enable or disable the overlay mode without disabling the accessibility
+     * service itself. The main screen uses this when the user changes the
+     * mode checkbox. */
+    fun setOverlayModeEnabled(enabled: Boolean) {
+        manualSilence = !enabled
+        applyVisibilityNow()
+        if (enabled) updateImeVisibility()
+    }
 
     /**
      * Quick Settings Tile read-out. True when the user has opted into

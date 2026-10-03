@@ -33,6 +33,7 @@ import com.google.android.material.textview.MaterialTextView
 
 import ru.dm1sh.rechka.R
 import ru.dm1sh.rechka.stats.StatsStore
+import ru.dm1sh.rechka.service.LiteAccessibilityService
 import ru.dm1sh.rechka.util.AccessibilityHelper
 import ru.dm1sh.rechka.util.Prefs
 
@@ -162,11 +163,19 @@ class MainActivity : AppCompatActivity() {
         modeFilesCheck.isChecked = true
         modeFilesCheck.isEnabled = false
         modeOverlayCheck.setOnClickListener {
-            setModeSelected(KEY_MODE_OVERLAY, modeOverlayCheck.isChecked)
-            if (modeOverlayCheck.isChecked && !AccessibilityHelper.isLiteServiceEnabled(this)) {
-                AccessibilityHelper.openAccessibilitySettings(this)
+            val requested = modeOverlayCheck.isChecked
+            setModeSelected(KEY_MODE_OVERLAY, requested)
+            if (requested) {
+                LiteAccessibilityService.instance?.setOverlayModeEnabled(true)
+                if (!AccessibilityHelper.isLiteServiceEnabled(this)) {
+                    AccessibilityHelper.openAccessibilitySettings(this)
+                }
+            } else {
+                LiteAccessibilityService.instance?.setOverlayModeEnabled(false)
+                LiteAccessibilityService.instance?.disableSelf()
+                modeOverlayCheck.isChecked = false
+                window.decorView.postDelayed({ refreshStatuses() }, 500)
             }
-            refreshStatuses()
         }
         modeKeyboardCheck.setOnClickListener {
             setModeSelected(KEY_MODE_KEYBOARD, modeKeyboardCheck.isChecked)
@@ -326,17 +335,18 @@ class MainActivity : AppCompatActivity() {
         // to our bubble that disables the service when tapped — count it as a
         // setup problem so the headline and promo card honestly reflect state.
         val shortcutOn = AccessibilityHelper.isLiteShortcutEnabled(this)
-        val overlaySelected = isModeSelected(KEY_MODE_OVERLAY)
+        val overlayRequested = isModeSelected(KEY_MODE_OVERLAY)
+        val overlayEnabled = serviceOk
         val keyboardSelected = isModeSelected(KEY_MODE_KEYBOARD)
         // Critical = blocks a selected input mode. File transcription is always
         // available and therefore keeps the main screen usable by itself.
-        val criticalOk = !overlaySelected && !keyboardSelected ||
-            micOk && ((keyboardSelected && keyboardOk) || (overlaySelected && serviceOk && !shortcutOn))
+        val criticalOk = !overlayRequested && !keyboardSelected ||
+            micOk && ((keyboardSelected && keyboardOk) || (overlayRequested && serviceOk && !shortcutOn))
 
         // Only surface the shortcut card when the service is on — otherwise
         // the user is still in "enable me first" mode and the extra advisory
         // would be noise.
-        shortcutCard.visibility = if (serviceOk && shortcutOn) View.VISIBLE else View.GONE
+        shortcutCard.visibility = if (overlayRequested && serviceOk && shortcutOn) View.VISIBLE else View.GONE
 
         when {
             showJustFinished && criticalOk -> {
@@ -353,18 +363,18 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        modeOverlayCheck.isChecked = overlaySelected
+        modeOverlayCheck.isChecked = overlayEnabled
         modeKeyboardCheck.isChecked = keyboardSelected
         modeFilesCheck.isChecked = true
 
         // Permission cards belong above the mode/status and statistics widgets,
         // and only appear for modes the user selected.
-        cardMicMissing.visibility = if (micOk || (!overlaySelected && !keyboardSelected)) View.GONE else View.VISIBLE
-        cardServiceMissing.visibility = if (!overlaySelected || serviceOk) View.GONE else View.VISIBLE
+        cardMicMissing.visibility = if (micOk || (!overlayRequested && !keyboardSelected)) View.GONE else View.VISIBLE
+        cardServiceMissing.visibility = if (!overlayRequested || serviceOk) View.GONE else View.VISIBLE
         cardKeyboardMissing.visibility = if (!keyboardSelected || keyboardOk) View.GONE else View.VISIBLE
         // Battery card is independent of criticalOk — it co-exists with stats
         // and promo as a soft "recommended" hint, not a setup blocker.
-        cardBatteryMissing.visibility = if (overlaySelected && serviceOk && !batteryOk) View.VISIBLE else View.GONE
+        cardBatteryMissing.visibility = if (overlayRequested && serviceOk && !batteryOk) View.VISIBLE else View.GONE
 
         // "What's new" FYI card — gated only on critical readiness + dismissal.
         // A user without battery exemption can still see new-feature highlights;

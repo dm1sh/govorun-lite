@@ -170,10 +170,10 @@
 
     <!-- One-time "What's new" card for the current release. Shown on the
          main screen only after setup problems are cleared. -->
-    <string name="main_card_whats_new_title">Что нового в 1.1.0</string>
-    <string name="main_card_whats_new_line1">• Речка работает как системная голосовая клавиатура — диктуйте в любом приложении кнопкой микрофона.</string>
-    <string name="main_card_whats_new_line2">• Аудио и видеофайлы можно открыть в Речке или передать через «Поделиться» и получить расшифровку.</string>
-    <string name="main_card_whats_new_line3">• Для длинных файлов видны прогресс и время, а текст появляется по мере обработки.</string>
+    <string name="main_card_whats_new_title">Что нового в 1.2.0</string>
+    <string name="main_card_whats_new_line1">• Модель распознавания теперь скачивается отдельно от APK — приложение стало значительно меньше.</string>
+    <string name="main_card_whats_new_line2">• Пользовательский словарь и общие настройки диктовки работают во всех режимах.</string>
+    <string name="main_card_whats_new_line3">• Обновлён onboarding: модель, режимы и разрешения настраиваются последовательно.</string>
 
     <string name="main_card_whats_new_dismiss">Понятно</string>
     <string name="main_needs_setup_sub">Несколько мелочей надо подкрутить — карточки ниже подскажут, что и где.</string>

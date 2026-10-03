@@ -28,8 +28,8 @@ android {
         applicationId = "ru.dm1sh.rechka"
         minSdk = 33
         targetSdk = 35
-        versionCode = ciVersionCode ?: 20
-        versionName = "1.1.0" + (ciVersionCode?.let { "+$it" } ?: "")
+        versionCode = ciVersionCode ?: 21
+        versionName = "1.2.0" + (ciVersionCode?.let { "+$it" } ?: "")
         ndk {
             abiFilters += "arm64-v8a"
         }
